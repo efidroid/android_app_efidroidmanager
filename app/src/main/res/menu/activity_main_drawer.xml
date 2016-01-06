@@ -1,36 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single" android:id="@+id/nav_group_main">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_operating_systems"
+            android:icon="@drawable/ic_menu_memory"
+            android:title="Operating Systems" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_recovery_tools"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Recovery Tools" />
+        <item
+            android:id="@+id/nav_uefi_apps"
+            android:icon="@drawable/ic_menu_archive"
+            android:title="UEFI Apps" />
+        <item
+            android:id="@+id/nav_plugins"
+            android:icon="@drawable/ic_menu_extension"
+            android:title="Plugins" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
+    <group android:checkableBehavior="single" android:id="@+id/nav_group_setup">
+        <item
+            android:id="@+id/nav_install"
+            android:icon="@drawable/ic_menu_settings"
+            android:title="Install/Update" />
+    </group>
+
+    <group android:checkableBehavior="single" android:id="@+id/nav_group_communicate">
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/ic_menu_share"
+            android:title="Share" />
+        <item
+            android:id="@+id/nav_troubleshoot"
+            android:icon="@drawable/ic_menu_hospital"
+            android:title="Troubleshoot" />
+        <item
+            android:id="@+id/nav_bug_report"
+            android:icon="@drawable/ic_menu_bug_report"
+            android:title="Report bug" />
+
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_menu_info_outline"
+            android:title="About EFIDroid" />
+    </group>
+
 
 </menu>

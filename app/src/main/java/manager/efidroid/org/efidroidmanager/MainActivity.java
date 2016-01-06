@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +21,8 @@ import manager.efidroid.org.efidroidmanager.fragments.dummy.DummyContent;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OperatingSystemFragment.OnListFragmentInteractionListener {
+
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +46,8 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -86,8 +89,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         Class fragmentClass;
         Fragment fragment = null;
-
-        if (id == R.id.nav_camera) {
+        fragmentClass = OperatingSystemFragment.class;
+       /* if (id == R.id.nav_camera) {
             // Handle the camera action
             fragmentClass = OperatingSystemFragment.class;
         } else if (id == R.id.nav_gallery) {
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity
         }
         else {
             fragmentClass = OperatingSystemFragment.class;
-        }
+        }*/
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -114,6 +117,22 @@ public class MainActivity extends AppCompatActivity
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+
+        if(item.getGroupId()==R.id.nav_group_main){
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_main,true,true);
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_setup,false,true);
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_communicate,false,true);
+        }
+        else if(item.getGroupId()==R.id.nav_group_setup){
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_main,false,true);
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_setup,true,true);
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_communicate,false,true);
+        }
+        else if(item.getGroupId()==R.id.nav_group_communicate){
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_main,false,true);
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_setup,false,true);
+            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_communicate,true,true);
+        }
 
         // Highlight the selected item and update the title
         item.setChecked(true);
