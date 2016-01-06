@@ -3,6 +3,8 @@ package manager.efidroid.org.efidroidmanager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import manager.efidroid.org.efidroidmanager.fragments.OperatingSystemFragment;
+import manager.efidroid.org.efidroidmanager.fragments.dummy.DummyContent;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OperatingSystemFragment.OnListFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,23 +84,47 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Class fragmentClass;
+        Fragment fragment = null;
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            fragmentClass = OperatingSystemFragment.class;
         } else if (id == R.id.nav_gallery) {
-
+            fragmentClass = OperatingSystemFragment.class;
         } else if (id == R.id.nav_slideshow) {
-
+            fragmentClass = OperatingSystemFragment.class;
         } else if (id == R.id.nav_manage) {
-
+            fragmentClass = OperatingSystemFragment.class;
         } else if (id == R.id.nav_share) {
-
+            fragmentClass = OperatingSystemFragment.class;
         } else if (id == R.id.nav_send) {
-
+            fragmentClass = OperatingSystemFragment.class;
         }
+        else {
+            fragmentClass = OperatingSystemFragment.class;
+        }
+
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+
+        // Highlight the selected item and update the title
+        item.setChecked(true);
+        setTitle(item.getTitle());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+
     }
 }
