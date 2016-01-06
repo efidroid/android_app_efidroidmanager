@@ -1,28 +1,30 @@
 package manager.efidroid.org.efidroidmanager.fragments;
 
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import manager.efidroid.org.efidroidmanager.R;
 import manager.efidroid.org.efidroidmanager.fragments.OperatingSystemFragment.OnListFragmentInteractionListener;
-import manager.efidroid.org.efidroidmanager.fragments.dummy.DummyContent.DummyItem;
+import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link OperatingSystem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<OperatingSystemRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<OperatingSystem> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public OperatingSystemRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public OperatingSystemRecyclerViewAdapter(List<OperatingSystem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,9 +38,25 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        OperatingSystem os = mValues.get(position);
+
+        holder.mItem = os;
+        holder.mTitleView.setText(os.getName());
+        Drawable icon = ResourcesCompat.getDrawable(
+                holder.mView.getResources(),
+                android.R.mipmap.sym_def_app_icon,
+                holder.mView.getContext().getTheme()
+        );
+        holder.mImageView.setImageDrawable(icon);
+
+        String desc = os.getDescription();
+        if(desc.length()>0) {
+            holder.mSubtitleView.setText(desc);
+            holder.mSubtitleView.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.mSubtitleView.setVisibility(View.GONE);
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,29 +75,19 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mTitleView;
+        public final TextView mSubtitleView;
+        public final ImageView mImageView;
+        public OperatingSystem mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
-
-            view.setOnClickListener(this);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
-
-        @Override
-        public void onClick(View view) {
+            mTitleView = (TextView) view.findViewById(R.id.text);
+            mSubtitleView = (TextView) view.findViewById(R.id.text2);
+            mImageView = (ImageView) view.findViewById(R.id.image);
         }
     }
 }

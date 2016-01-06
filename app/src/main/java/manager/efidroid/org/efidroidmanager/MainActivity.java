@@ -17,12 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import manager.efidroid.org.efidroidmanager.fragments.OperatingSystemFragment;
-import manager.efidroid.org.efidroidmanager.fragments.dummy.DummyContent;
+import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OperatingSystemFragment.OnListFragmentInteractionListener {
 
     private NavigationView mNavigationView;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +32,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
+        onNavigationItemSelected(mNavigationView.getMenu().getItem(0));
     }
 
     @Override
@@ -87,31 +89,22 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Class fragmentClass;
         Fragment fragment = null;
-        fragmentClass = OperatingSystemFragment.class;
-       /* if (id == R.id.nav_camera) {
-            // Handle the camera action
-            fragmentClass = OperatingSystemFragment.class;
-        } else if (id == R.id.nav_gallery) {
-            fragmentClass = OperatingSystemFragment.class;
-        } else if (id == R.id.nav_slideshow) {
-            fragmentClass = OperatingSystemFragment.class;
-        } else if (id == R.id.nav_manage) {
-            fragmentClass = OperatingSystemFragment.class;
-        } else if (id == R.id.nav_share) {
-            fragmentClass = OperatingSystemFragment.class;
-        } else if (id == R.id.nav_send) {
-            fragmentClass = OperatingSystemFragment.class;
-        }
-        else {
-            fragmentClass = OperatingSystemFragment.class;
-        }*/
 
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (id == R.id.nav_operating_systems) {
+            fragment = new OperatingSystemFragment();
+        } else if (id == R.id.nav_recovery_tools) {
+        } else if (id == R.id.nav_uefi_apps) {
+        } else if (id == R.id.nav_plugins) {
+        } else if (id == R.id.nav_install) {
+        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_troubleshoot) {
+        } else if (id == R.id.nav_bug_report) {
+        } else if (id == R.id.nav_about) {
+        }
+
+        if(fragment == null) {
+            return false;
         }
 
         // Insert the fragment by replacing any existing fragment
@@ -143,7 +136,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(OperatingSystem item) {
 
     }
 }

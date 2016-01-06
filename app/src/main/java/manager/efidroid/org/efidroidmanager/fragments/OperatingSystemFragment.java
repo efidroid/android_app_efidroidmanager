@@ -10,11 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import manager.efidroid.org.efidroidmanager.R;
-import manager.efidroid.org.efidroidmanager.fragments.dummy.DummyContent;
-import manager.efidroid.org.efidroidmanager.fragments.dummy.DummyContent.DummyItem;
+import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,11 +23,6 @@ import java.util.List;
  * interface.
  */
 public class OperatingSystemFragment extends Fragment {
-
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -38,23 +32,11 @@ public class OperatingSystemFragment extends Fragment {
     public OperatingSystemFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static OperatingSystemFragment newInstance(int columnCount) {
-        OperatingSystemFragment fragment = new OperatingSystemFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+
     }
 
     @Override
@@ -62,16 +44,39 @@ public class OperatingSystemFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_operatingsystem_list, container, false);
 
+        ArrayList<OperatingSystem> list = new ArrayList<>();
+        OperatingSystem s;
+
+        s = new OperatingSystem();
+        s.setName("OS1");
+        list.add(s);
+
+        s = new OperatingSystem();
+        s.setName("OS1");
+        list.add(s);
+
+        s = new OperatingSystem();
+        s.setName("OS1");
+        list.add(s);
+
+        s = new OperatingSystem();
+        s.setName("OS1");
+        list.add(s);
+
+        s = new OperatingSystem();
+        s.setName("OS1");
+        list.add(s);
+
+        s = new OperatingSystem();
+        s.setName("OS1");
+        list.add(s);
+
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new OperatingSystemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(new OperatingSystemRecyclerViewAdapter(list, mListener));
         }
         return view;
     }
@@ -105,7 +110,6 @@ public class OperatingSystemFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(OperatingSystem item);
     }
 }
