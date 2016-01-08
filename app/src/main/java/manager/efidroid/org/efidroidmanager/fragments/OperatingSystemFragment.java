@@ -10,7 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import manager.efidroid.org.efidroidmanager.R;
+import manager.efidroid.org.efidroidmanager.RootToolsEx;
+import manager.efidroid.org.efidroidmanager.models.DeviceInfo;
 import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
 
 import java.util.ArrayList;
@@ -24,6 +29,7 @@ import java.util.List;
  */
 public class OperatingSystemFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
+    private MaterialDialog mProgressDialog;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -35,8 +41,6 @@ public class OperatingSystemFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -44,39 +48,12 @@ public class OperatingSystemFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_operatingsystem_list, container, false);
 
-        ArrayList<OperatingSystem> list = new ArrayList<>();
-        OperatingSystem s;
-
-        s = new OperatingSystem();
-        s.setName("OS1");
-        list.add(s);
-
-        s = new OperatingSystem();
-        s.setName("OS1");
-        list.add(s);
-
-        s = new OperatingSystem();
-        s.setName("OS1");
-        list.add(s);
-
-        s = new OperatingSystem();
-        s.setName("OS1");
-        list.add(s);
-
-        s = new OperatingSystem();
-        s.setName("OS1");
-        list.add(s);
-
-        s = new OperatingSystem();
-        s.setName("OS1");
-        list.add(s);
-
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new OperatingSystemRecyclerViewAdapter(list, mListener));
+            recyclerView.setAdapter(new OperatingSystemRecyclerViewAdapter(mListener.getOperatingSystems(), mListener));
         }
         return view;
     }
@@ -111,5 +88,7 @@ public class OperatingSystemFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(OperatingSystem item);
+        DeviceInfo getDeviceInfo();
+        List<OperatingSystem> getOperatingSystems();
     }
 }

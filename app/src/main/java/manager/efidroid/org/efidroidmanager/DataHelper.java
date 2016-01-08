@@ -37,7 +37,6 @@ public class DataHelper {
     public interface DeviceInfoLoadCallback {
         void onDeviceInfoLoadError(Exception e);
         void onDeviceInfoLoaded(DeviceInfo deviceInfo);
-        void onDeviceInfoStartLoading();
     }
 
     private static String streamToString(InputStream is) throws IOException {
@@ -69,7 +68,7 @@ public class DataHelper {
         }
         catch (Exception e) {
             // show loading screen
-            callback.onDeviceInfoStartLoading();
+
             reload = true;
         }
         finally {
