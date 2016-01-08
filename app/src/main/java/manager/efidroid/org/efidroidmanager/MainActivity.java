@@ -22,26 +22,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
+import com.stericson.RootTools.RootTools;
 import manager.efidroid.org.efidroidmanager.fragments.OperatingSystemFragment;
 import manager.efidroid.org.efidroidmanager.models.DeviceInfo;
 import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
-import manager.efidroid.org.efidroidmanager.services.ResourceLoaderIntentService;
-import org.ini4j.Ini;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.StringReader;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -51,6 +37,8 @@ public class MainActivity extends AppCompatActivity
     private NavigationView mNavigationView;
     private FloatingActionButton mFab;
     private MaterialDialog mProgressDialog = null;
+    private boolean hasBusybox = false;
+    private boolean hasRoot = false;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -90,7 +78,6 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
-        onNavigationItemSelected(mNavigationView.getMenu().getItem(0));
 
         mProgressDialog = new MaterialDialog.Builder(this)
                 .title("Loading device info")
@@ -113,9 +100,44 @@ public class MainActivity extends AppCompatActivity
         }).show();
     }
 
+    private void onLoadUiData() {
+        if (!hasBusybox && !RootTools.isBusyboxAvailable()) {
+            new MaterialDialog.Builder(this)
+                    .title("Title")
+                    .content("You need BusyBox to use this app.")
+                    .positiveText("Install")
+                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
+                @Override
+                public void onClick(MaterialDialog dialog, DialogAction which) {
+                    RootTools.offerBusyBox(MainActivity.this);
+                }
+            }).show();
+            return;
+        }
+        hasBusybox = true;
+
+        if (!hasRoot && !RootToolsEx.isAccessGiven(0, 0)) {
+            new MaterialDialog.Builder(this)
+                    .title("Title")
+                    .content("You need Root access to use this app.")
+                    .positiveText("Try again")
+                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            onLoadUiData();
+                        }
+                    }).show();
+            return;
+        }
+
+        // show first tab
+        onNavigationItemSelected(mNavigationView.getMenu().getItem(0));
+    }
+
     @Override
     public void onDeviceInfoLoaded(DeviceInfo deviceInfo) {
         mProgressDialog.dismiss();
+        onLoadUiData();
     }
 
     @Override
@@ -127,6 +149,12 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         registerReceiver(receiver, new IntentFilter("NOTIFICATION"));
+
+        // we got paused by offering the busybox, so resume loading now
+        if(!hasBusybox) {
+            onLoadUiData();
+        }
+
     }
     @Override
     protected void onPause() {
