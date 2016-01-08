@@ -324,6 +324,9 @@ public class MainActivity extends AppCompatActivity
         mSwipeRefreshLayout.setOnRefreshListener(null);
         mSwipeRefreshLayout.setEnabled(false);
 
+        // hide FAB
+        mFab.setVisibility(View.GONE);
+
         if (id == R.id.nav_operating_systems) {
             // start loading
             if(mOperatingSystems==null) {
@@ -347,7 +350,13 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             mSwipeRefreshLayout.setEnabled(true);
+
+            // show fab
+            mFab.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_recovery_tools) {
+
+            // show fab
+            mFab.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_uefi_apps) {
         } else if (id == R.id.nav_plugins) {
         } else if (id == R.id.nav_install) {
