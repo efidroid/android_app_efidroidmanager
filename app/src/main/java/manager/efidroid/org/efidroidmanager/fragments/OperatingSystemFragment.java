@@ -83,12 +83,12 @@ public class OperatingSystemFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) activity;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnListFragmentInteractionListener) {
+            mListener = (OnListFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(activity.toString()
+            throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
     }
