@@ -8,4 +8,5 @@
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
     tools:context=".fragments.OperatingSystemFragment"
-    tools:listitem="@layout/fragment_operatingsystem_item" />
+    tools:listitem="@layout/fragment_operatingsystem_item"
+    android:scrollbars="vertical"/>
