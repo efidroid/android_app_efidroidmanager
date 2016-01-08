@@ -416,4 +416,8 @@ public class MainActivity extends AppCompatActivity
     public List<OperatingSystem> getOperatingSystems() {
         return mOperatingSystems;
     }
+
+    public FloatingActionButton getFAB() {
+        return mFab;
+    }
 }

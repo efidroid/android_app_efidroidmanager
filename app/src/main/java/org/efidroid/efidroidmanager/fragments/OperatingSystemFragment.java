@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.efidroid.efidroidmanager.R;
 
@@ -51,6 +52,7 @@ public class OperatingSystemFragment extends Fragment {
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(new OperatingSystemRecyclerViewAdapter(mListener.getOperatingSystems(), mListener));
+            mListener.getFAB().attachToRecyclerView(recyclerView);
         }
         return view;
     }
@@ -87,5 +89,6 @@ public class OperatingSystemFragment extends Fragment {
         void onListFragmentInteraction(OperatingSystem item);
         DeviceInfo getDeviceInfo();
         List<OperatingSystem> getOperatingSystems();
+        public FloatingActionButton getFAB();
     }
 }
