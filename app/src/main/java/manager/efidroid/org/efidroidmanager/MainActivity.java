@@ -182,6 +182,14 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+
+        // cancel current task and disable loading animations
+        if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled()) {
+            mFragmentLoadingTask.cancel(true);
+            mSwipeRefreshLayout.setRefreshing(false);
+            mFragmentProgress.setVisibility(View.GONE);
+            mTouchDisabled = false;
+        }
     }
 
     @Override
@@ -217,6 +225,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private AsyncTask<Void, Void, Exception> makeOperatingSystemsTask() {
+        final ArrayList<OperatingSystem> list = new ArrayList<>();
+
         return new AsyncTask<Void, Void, Exception>() {
             @Override
             protected Exception doInBackground(Void... params) {
@@ -258,7 +268,7 @@ public class MainActivity extends AppCompatActivity
                                 continue;
 
                             Ini ini = new Ini(new StringReader(data));
-                            mOperatingSystems.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
                         }
                     }
                 } catch (Exception e) {
@@ -279,6 +289,8 @@ public class MainActivity extends AppCompatActivity
                             .positiveText("ok").show();
                     return;
                 }
+
+                mOperatingSystems = list;
 
                 // show fragment
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -318,9 +330,6 @@ public class MainActivity extends AppCompatActivity
                 // show progressbar
                 mFragmentProgress.setVisibility(View.VISIBLE);
 
-                // clear operating systems list
-                mOperatingSystems = new ArrayList<>();
-
                 // run task
                 mFragmentLoadingTask = makeOperatingSystemsTask().execute();
             }
@@ -332,9 +341,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onRefresh() {
                     mTouchDisabled = true;
-
-                    // clear operating systems list
-                    mOperatingSystems.clear();
 
                     // run task
                     mFragmentLoadingTask = makeOperatingSystemsTask().execute();
