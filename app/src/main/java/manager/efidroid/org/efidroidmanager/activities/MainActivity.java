@@ -1,4 +1,4 @@
-package manager.efidroid.org.efidroidmanager;
+package manager.efidroid.org.efidroidmanager.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,6 +33,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import manager.efidroid.org.efidroidmanager.DataHelper;
+import manager.efidroid.org.efidroidmanager.R;
+import manager.efidroid.org.efidroidmanager.RootToolsEx;
 import manager.efidroid.org.efidroidmanager.fragments.EmptyFragment;
 import manager.efidroid.org.efidroidmanager.fragments.OperatingSystemFragment;
 import manager.efidroid.org.efidroidmanager.models.DeviceInfo;
@@ -44,7 +46,7 @@ import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OperatingSystemFragment.OnListFragmentInteractionListener,
-        DataHelper.DeviceInfoLoadCallback{
+        DataHelper.DeviceInfoLoadCallback {
 
     private NavigationView mNavigationView;
     private FloatingActionButton mFab;
