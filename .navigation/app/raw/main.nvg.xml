@@ -6,7 +6,7 @@
     <statePointEntry>
       <state      
         class = "com.android.tools.idea.editors.navigation.model.ActivityState"      
-        className = "manager.efidroid.org.efidroidmanager.activities.MainActivity"/>
+        className = "org.efidroid.efidroidmanager.activities.MainActivity"/>
       <point      
         x = "500"      
         y = "100"/>
