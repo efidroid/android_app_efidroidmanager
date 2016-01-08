@@ -1,5 +1,11 @@
 package manager.efidroid.org.efidroidmanager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,15 +21,50 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import manager.efidroid.org.efidroidmanager.fragments.OperatingSystemFragment;
+import manager.efidroid.org.efidroidmanager.models.DeviceInfo;
 import manager.efidroid.org.efidroidmanager.models.OperatingSystem;
+import manager.efidroid.org.efidroidmanager.services.ResourceLoaderIntentService;
+import org.ini4j.Ini;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OperatingSystemFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        OperatingSystemFragment.OnListFragmentInteractionListener,
+        DataHelper.DeviceInfoLoadCallback{
 
     private NavigationView mNavigationView;
     private FloatingActionButton mFab;
+    private MaterialDialog mProgressDialog = null;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                String string = bundle.getString("FILEPATH");
+                Toast.makeText(MainActivity.this, string,
+                        Toast.LENGTH_LONG).show();
+            }
+
+            removeStickyBroadcast(intent);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +91,47 @@ public class MainActivity extends AppCompatActivity
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
         onNavigationItemSelected(mNavigationView.getMenu().getItem(0));
+
+        mProgressDialog = new MaterialDialog.Builder(this)
+                .title("Loading device info")
+                .content("Please wait")
+                .progress(true, 0)
+                .show();
+        DataHelper.loadDeviceInfo(this, this);
+    }
+
+    public void onDeviceInfoLoadError(Exception e) {
+        new MaterialDialog.Builder(this)
+                .title("Title")
+                .content("Can't load device info. Please check your connection.\n\n"+e.getLocalizedMessage())
+                .positiveText("Try again")
+                .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
+            @Override
+            public void onClick(MaterialDialog dialog, DialogAction which) {
+                DataHelper.loadDeviceInfo(MainActivity.this, MainActivity.this);
+            }
+        }).show();
+    }
+
+    @Override
+    public void onDeviceInfoLoaded(DeviceInfo deviceInfo) {
+        mProgressDialog.dismiss();
+    }
+
+    @Override
+    public void onDeviceInfoStartLoading() {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter("NOTIFICATION"));
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override
