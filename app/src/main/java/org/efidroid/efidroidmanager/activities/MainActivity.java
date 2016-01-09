@@ -60,6 +60,22 @@ public class MainActivity extends AppCompatActivity
     private AsyncTask<?, ?, ?> mFragmentLoadingTask = null;
     private ArrayList<OperatingSystem> mOperatingSystems;
     private boolean mTouchDisabled = false;
+    private DataFragment dataFragment;
+    private int mActiveMenuItemIndex = 0;
+
+    public static class DataFragment extends Fragment {
+        public DeviceInfo device_info = null;
+        public ArrayList<OperatingSystem> operating_systems = null;
+        public int active_menu_item_index = 0;
+        public boolean has_busybox = false;
+        public boolean has_root = false;
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setRetainInstance(true);
+        }
+    }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -106,13 +122,45 @@ public class MainActivity extends AppCompatActivity
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setEnabled(false);
 
-        // load device info
-        mProgressDialog = new MaterialDialog.Builder(this)
-                .title("Loading device info")
-                .content("Please wait")
-                .progress(true, 0)
-                .show();
-        DataHelper.loadDeviceInfo(this, this);
+        // get data fragment
+        FragmentManager fm = getSupportFragmentManager();
+        dataFragment = (DataFragment) fm.findFragmentByTag("data");
+
+        // create the fragment and data the first time
+        if (dataFragment == null) {
+            // load device info
+            mProgressDialog = new MaterialDialog.Builder(this)
+                    .title("Loading device info")
+                    .content("Please wait")
+                    .progress(true, 0)
+                    .show();
+
+            dataFragment = new DataFragment();
+            fm.beginTransaction().add(dataFragment, "data").commit();
+
+            DataHelper.loadDeviceInfo(this, this);
+        }
+
+        else {
+            getDataFragmentData();
+            onLoadUiData();
+        }
+    }
+
+    private void getDataFragmentData() {
+        mDeviceInfo = dataFragment.device_info;
+        mOperatingSystems = dataFragment.operating_systems;
+        mActiveMenuItemIndex = dataFragment.active_menu_item_index;
+        hasBusybox = dataFragment.has_busybox;
+        hasRoot = dataFragment.has_root;
+    }
+
+    private void setDataFragmentData() {
+        dataFragment.device_info = mDeviceInfo;
+        dataFragment.operating_systems = mOperatingSystems;
+        dataFragment.active_menu_item_index = mActiveMenuItemIndex;
+        dataFragment.has_busybox = hasBusybox;
+        dataFragment.has_root = hasRoot;
     }
 
     public void onDeviceInfoLoadError(Exception e) {
@@ -159,7 +207,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // show first tab
-        onNavigationItemSelected(mNavigationView.getMenu().getItem(0));
+        onNavigationItemSelected(mNavigationView.getMenu().getItem(mActiveMenuItemIndex));
     }
 
     @Override
@@ -192,6 +240,12 @@ public class MainActivity extends AppCompatActivity
             mFragmentProgress.setVisibility(View.GONE);
             mTouchDisabled = false;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        setDataFragmentData();
     }
 
     @Override
@@ -330,6 +384,8 @@ public class MainActivity extends AppCompatActivity
         mFab.setVisibility(View.GONE);
 
         if (id == R.id.nav_operating_systems) {
+            mActiveMenuItemIndex = 0;
+
             // start loading
             if(mOperatingSystems==null) {
                 // show progressbar
@@ -356,16 +412,24 @@ public class MainActivity extends AppCompatActivity
             // show fab
             mFab.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_recovery_tools) {
+            mActiveMenuItemIndex = 1;
 
             // show fab
             mFab.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_uefi_apps) {
+            mActiveMenuItemIndex = 2;
         } else if (id == R.id.nav_plugins) {
+            mActiveMenuItemIndex = 3;
         } else if (id == R.id.nav_install) {
+            mActiveMenuItemIndex = 4;
         } else if (id == R.id.nav_share) {
+            mActiveMenuItemIndex = 5;
         } else if (id == R.id.nav_troubleshoot) {
+            mActiveMenuItemIndex = 6;
         } else if (id == R.id.nav_bug_report) {
+            mActiveMenuItemIndex = 7;
         } else if (id == R.id.nav_about) {
+            mActiveMenuItemIndex = 8;
         }
 
         // use empty fragment
