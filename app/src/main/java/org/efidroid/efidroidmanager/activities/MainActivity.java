@@ -469,7 +469,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onListFragmentInteraction(OperatingSystem item) {
-
+        Intent intent = new Intent(this, OperatingSystemEditActivity.class);
+        intent.putExtra("operatingsystem", item);
+        startActivity(intent);
     }
 
     @Override
