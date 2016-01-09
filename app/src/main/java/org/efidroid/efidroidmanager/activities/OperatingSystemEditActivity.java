@@ -20,9 +20,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
+import org.efidroid.efidroidmanager.fragments.operatingsystemedit.PartitionItemFragment;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 
-public class OperatingSystemEditActivity extends AppCompatActivity {
+public class OperatingSystemEditActivity extends AppCompatActivity implements PartitionItemFragment.OnListFragmentInteractionListener {
     private OperatingSystem mOperatingSystem;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -63,6 +64,11 @@ public class OperatingSystemEditActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    @Override
+    public void onListFragmentInteraction(OperatingSystem.Partition item) {
+
     }
 
     /**
@@ -112,6 +118,10 @@ public class OperatingSystemEditActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            switch(position) {
+                case 1:
+                    return PartitionItemFragment.newInstance(mOperatingSystem);
+            }
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1);
