@@ -7,6 +7,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,29 +37,34 @@ import android.widget.EditText;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.activities.MainActivity;
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 import org.efidroid.efidroidmanager.types.FABListener;
+import org.efidroid.efidroidmanager.types.RootFileChooserDialog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
-public class ReplacementItemFragment extends Fragment implements FABListener, ReplacementItemRecyclerViewAdapter.OnListFragmentInteractionListener, ActionMode.Callback {
+public class ReplacementItemFragment extends Fragment implements FABListener, ReplacementItemRecyclerViewAdapter.OnListFragmentInteractionListener, ActionMode.Callback, RootFileChooserDialog.FileCallback {
     private OperatingSystem mOperatingSystem = null;
     private OperatingSystemEditActivity mActivity;
     private RecyclerView mRecyclerView = null;
     private ActionMode mActionMode = null;
     private ReplacementItemRecyclerViewAdapter mAdapter = null;
     private SparseArray<Fragment> registeredFragments = new SparseArray();
+    private int mChooserItemPosition = -1;
 
     private static final String ARG_ACTIONMODE_ENABLED = "actionmode_enabled";
     private static final String ARG_SELECTED_ITEMS = "actionmode_selected_items";
+    private static final String ARG_CHOOSER_ITEM_POSITION = "choose_item_position";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -76,6 +83,7 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(ARG_ACTIONMODE_ENABLED, mActionMode!=null);
         outState.putIntegerArrayList(ARG_SELECTED_ITEMS, mAdapter.getSelectedItems());
+        outState.putInt(ARG_CHOOSER_ITEM_POSITION, mChooserItemPosition);
         super.onSaveInstanceState(outState);
     }
 
@@ -106,6 +114,8 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
             for(Integer position : selectedItems) {
                 mAdapter.setSelected(position, true);
             }
+
+            mChooserItemPosition = savedInstanceState.getInt(ARG_CHOOSER_ITEM_POSITION);
         }
 
         return view;
@@ -288,6 +298,33 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
         if(mAdapter.getSelectedItems().size()==0) {
             mActionMode.finish();
         }
+    }
+
+    @Override
+    public void onFileSelection(@NonNull File file) {
+        Log.e("TAG", file.getAbsolutePath());
+
+        ReplacementItemRecyclerViewAdapter.ReplacementItem item = (ReplacementItemRecyclerViewAdapter.ReplacementItem)mAdapter.getItem(mChooserItemPosition);
+        item.setValue(file.getName());
+        mAdapter.notifyItemChanged(mChooserItemPosition);
+
+        mChooserItemPosition = -1;
+    }
+
+    @Override
+    public void onReplacementItemClicked(View v, ReplacementItemRecyclerViewAdapter.ReplacementItem item) {
+        mChooserItemPosition = mAdapter.getItemPosition(item);
+
+        RootFileChooserDialog d = new RootFileChooserDialog.Builder(mActivity)
+                .initialPath("/")  // changes initial path, defaults to external storage directory
+                .build();
+        d.setTargetFragment(this, 0);
+        d.show(mActivity);
+    }
+
+    @Override
+    public void onReplacementItemLongClicked(View v, ReplacementItemRecyclerViewAdapter.ReplacementItem item) {
+
     }
 
 

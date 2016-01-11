@@ -143,6 +143,18 @@ public class OperatingSystem implements Parcelable {
         return mIni.get("replacements", "dt");
     }
 
+    public void setReplacementKernel(String s) {
+        mIni.put("replacements", "kernel", s);
+    }
+
+    public void setReplacementRamdisk(String s) {
+        mIni.put("replacements", "ramdisk", s);
+    }
+
+    public void setReplacementDT(String s) {
+        mIni.put("replacements", "dt", s);
+    }
+
     @Override
     public int describeContents() {
         return 0;

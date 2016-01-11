@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.types.RootFileChooserDialog;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -36,12 +37,73 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
     }
 
     public static class ReplacementItem {
-        public String name;
-        public String value;
+        private String mName;
+        private String mValue;
 
         public ReplacementItem(String name, String value) {
-            this.name = name;
-            this.value = value;
+            mName = name;
+            mValue = value;
+        }
+
+        public void setName(String name) {
+            mName = name;
+        }
+
+        public void setValue(String value) {
+            mValue = value;
+        }
+
+        public String getName() {
+            return mName;
+        }
+
+        public String getValue() {
+            return mValue;
+        }
+    }
+
+    private static class KernelReplacementItem extends ReplacementItem {
+        private final OperatingSystem mOS;
+
+        public KernelReplacementItem(OperatingSystem os, String name, String value) {
+            super(name, value);
+            mOS = os;
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            mOS.setReplacementKernel(value);
+        }
+    }
+
+    private static class RamdiskReplacementItem extends ReplacementItem {
+        private final OperatingSystem mOS;
+
+        public RamdiskReplacementItem(OperatingSystem os, String name, String value) {
+            super(name, value);
+            mOS = os;
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            mOS.setReplacementRamdisk(value);
+        }
+    }
+
+    private static class DTReplacementItem extends ReplacementItem {
+        private final OperatingSystem mOS;
+
+        public DTReplacementItem(OperatingSystem os, String name, String value) {
+            super(name, value);
+            mOS = os;
+        }
+
+        @Override
+        public void setValue(String value) {
+            super.setValue(value);
+            mOS.setReplacementDT(value);
         }
     }
 
@@ -79,13 +141,13 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
         mValues.add(new HeaderItem("Binaries"));
 
         String value = mOperatingSystem.getReplacementKernel();
-        mValues.add(new ReplacementItem("kernel", value));
+        mValues.add(new KernelReplacementItem(mOperatingSystem, "kernel", value));
 
         value = mOperatingSystem.getReplacementRamdisk();
-        mValues.add(new ReplacementItem("ramdisk", value));
+        mValues.add(new RamdiskReplacementItem(mOperatingSystem, "ramdisk", value));
 
         value = mOperatingSystem.getReplacementDT();
-        mValues.add(new ReplacementItem("dt", value));
+        mValues.add(new DTReplacementItem(mOperatingSystem, "dt", value));
 
         mValues.add(new HeaderItem("Commandline"));
         mValues.addAll(mOperatingSystem.getCmdline());
@@ -137,8 +199,8 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
 
         else if (holder.mItem instanceof ReplacementItem) {
             ReplacementItem item = (ReplacementItem)mValues.get(position);
-            holder.mTitleView.setText(item.name);
-            holder.mSubtitleView.setText(item.value);
+            holder.mTitleView.setText(item.getName());
+            holder.mSubtitleView.setText(item.getValue());
             holder.mPosition = position;
         }
 
@@ -157,6 +219,9 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
                     // fragment is attached to one) that an item has been selected.
                     if(holder.mItem instanceof OperatingSystem.CmdlineItem)
                         mListener.onCmdlineItemClicked(v, (OperatingSystem.CmdlineItem)holder.mItem);
+                    else if(holder.mItem instanceof ReplacementItem) {
+                        mListener.onReplacementItemClicked(v, (ReplacementItem)holder.mItem);
+                    }
                 }
             }
         });
@@ -167,11 +232,9 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
                 if (null != mListener) {
                     if (holder.mItem instanceof OperatingSystem.CmdlineItem)
                         mListener.onCmdlineItemLongClicked(v, (OperatingSystem.CmdlineItem) holder.mItem);
-
-                    /*int pos = mValues.indexOf(item);
-                    mOperatingSystem.getCmdline().remove(item);
-                    mOperatingSystem.notifyChange();
-                    notifyItemRemoved(pos);*/
+                    else if(holder.mItem instanceof ReplacementItem) {
+                        mListener.onReplacementItemLongClicked(v, (ReplacementItem)holder.mItem);
+                    }
                 }
                 return true;
             }
@@ -198,6 +261,10 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
 
     public int getItemPosition(Object item) {
         return mValues.indexOf(item);
+    }
+
+    public Object getItem(int position) {
+        return mValues.get(position);
     }
 
     public ArrayList<Integer> getSelectedItems() {
@@ -254,5 +321,7 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
     public interface OnListFragmentInteractionListener {
         void onCmdlineItemClicked(View v, OperatingSystem.CmdlineItem item);
         void onCmdlineItemLongClicked(View v, OperatingSystem.CmdlineItem item);
+        void onReplacementItemClicked(View v, ReplacementItem item);
+        void onReplacementItemLongClicked(View v, ReplacementItem item);
     }
 }

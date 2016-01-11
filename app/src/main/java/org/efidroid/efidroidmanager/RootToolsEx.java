@@ -1,10 +1,15 @@
 package org.efidroid.efidroidmanager;
 
+import android.util.Log;
+
 import com.stericson.RootShell.RootShell;
+import com.stericson.RootShell.exceptions.RootDeniedException;
 import com.stericson.RootShell.execution.Command;
 import com.stericson.RootShell.execution.Shell;
 import com.stericson.RootTools.RootTools;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -210,6 +215,25 @@ public final class RootToolsEx {
         return directories;
     }
 
+    public static boolean isDirectory(String path) throws Exception {
+        final Pointer<Boolean> isDir = new Pointer<>(false);
+
+        final Command command = new Command(0, false, "busybox find \""+path+"\" -mindepth 0 -maxdepth 0 -type d")
+        {
+            @Override
+            public void commandOutput(int id, String line) {
+                super.commandOutput(id, line);
+                isDir.value = true;
+            }
+        };
+
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+
+        return isDir.value;
+    }
+
     public static String readFile(String path) throws Exception {
         final StringWriter stringWriter = new StringWriter();
 
@@ -231,5 +255,63 @@ public final class RootToolsEx {
             return null;
 
         return stringWriter.getBuffer().toString();
+    }
+
+    public static class RootFile extends File {
+        private boolean mIsDir;
+
+        public RootFile(String path, boolean isDir) {
+            super(path);
+            mIsDir = isDir;
+        }
+
+        public RootFile(String path) {
+            super(path);
+            try {
+                mIsDir = RootToolsEx.isDirectory(path);
+            } catch (Exception e) {
+                mIsDir = false;
+            }
+        }
+
+        @Override
+        public boolean isDirectory() {
+            return mIsDir;
+        }
+
+        @Override
+        public File getParentFile() {
+            return new RootFile(super.getParent());
+        }
+
+        @Override
+        public File[] listFiles() {
+            final String path = getAbsolutePath();
+            final ArrayList<RootFile> list = new ArrayList<>();
+            final String prefix = path.charAt(path.length()-1)=='/'?path:path+"/";
+
+            final Command command = new Command(0, false, "busybox ls -lL \""+path+"\"")
+            {
+                @Override
+                public void commandOutput(int id, String line) {
+                    super.commandOutput(id, line);
+                    String[] parts = line.split(" ");
+
+                    boolean is_dir = parts[0].charAt(0)=='d';
+                    String name = parts[parts.length-1];
+                    list.add(new RootFile(prefix+name, is_dir));
+                }
+            };
+
+            try {
+                Shell shell = RootTools.getShell(true);
+                shell.add(command);
+                commandWait(shell, command);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return list.toArray(new RootFile[]{});
+        }
     }
 }
