@@ -325,6 +325,24 @@ public class MainActivity extends AppCompatActivity
 
                             Ini ini = new Ini(new StringReader(data));
                             list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+                            list.add(new OperatingSystem(ini));
+
                         }
                     }
                 } catch (Exception e) {
@@ -470,7 +488,7 @@ public class MainActivity extends AppCompatActivity
 
     public void onListFragmentInteraction(OperatingSystem item) {
         Intent intent = new Intent(this, OperatingSystemEditActivity.class);
-        intent.putExtra("operatingsystem", item);
+        intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, item);
         startActivity(intent);
     }
 

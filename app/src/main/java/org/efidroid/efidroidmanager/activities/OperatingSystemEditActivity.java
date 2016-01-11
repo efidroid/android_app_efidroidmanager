@@ -1,9 +1,15 @@
 package org.efidroid.efidroidmanager.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
@@ -11,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,24 +27,35 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
+import org.efidroid.efidroidmanager.fragments.operatingsystemedit.GeneralFragment;
 import org.efidroid.efidroidmanager.fragments.operatingsystemedit.PartitionItemFragment;
+import org.efidroid.efidroidmanager.fragments.operatingsystemedit.ReplacementItemFragment;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.types.FABListener;
+import org.efidroid.efidroidmanager.view.CustomViewPager;
 
 public class OperatingSystemEditActivity extends AppCompatActivity implements PartitionItemFragment.OnListFragmentInteractionListener {
     private OperatingSystem mOperatingSystem;
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private FloatingActionButton mFab;
+    private TabLayout mTabLayout;
+
+    public static final String ARG_OPERATING_SYSTEM = "operatingsystem";
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private CustomViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operating_system_edit);
 
-        mOperatingSystem = getIntent().getParcelableExtra("operatingsystem");
+        if (savedInstanceState != null)
+            mOperatingSystem = savedInstanceState.getParcelable(ARG_OPERATING_SYSTEM);
+        else
+            mOperatingSystem = getIntent().getParcelableExtra(ARG_OPERATING_SYSTEM);
         setTitle(mOperatingSystem.getName());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -49,61 +67,60 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements Pa
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (CustomViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+            }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onPageSelected(int position) {
+                int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+                final boolean show = (mSectionsPagerAdapter.getRegisteredFragment(position) instanceof FABListener);
+
+                mFab.animate().setDuration(shortAnimTime).alpha(
+                        show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mFab.setVisibility(show ? View.VISIBLE : View.GONE);
+                    }
+                });
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                int position = mViewPager.getCurrentItem();
+                Fragment fragment = mSectionsPagerAdapter.getRegisteredFragment(position);
+                if ((fragment instanceof FABListener)) {
+                    ((FABListener)fragment).onFABClicked();
+                }
             }
         });
     }
 
     @Override
-    public void onListFragmentInteraction(OperatingSystem.Partition item) {
-
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(ARG_OPERATING_SYSTEM, mOperatingSystem);
+        super.onSaveInstanceState(outState);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    @Override
+    public void onPartitionItemClicked(OperatingSystem.Partition item) {
 
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_operating_system_edit, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
     }
 
     /**
@@ -111,6 +128,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements Pa
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private SparseArray<Fragment> registeredFragments = new SparseArray();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -118,19 +136,21 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements Pa
 
         @Override
         public Fragment getItem(int position) {
-            switch(position) {
+            switch (position) {
+                case 0:
+                    return GeneralFragment.newInstance(OperatingSystemEditActivity.this.mOperatingSystem);
                 case 1:
-                    return PartitionItemFragment.newInstance(mOperatingSystem);
+                    return PartitionItemFragment.newInstance(OperatingSystemEditActivity.this.mOperatingSystem);
+                case 2:
+                    return ReplacementItemFragment.newInstance(OperatingSystemEditActivity.this.mOperatingSystem);
             }
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return null;
+
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 4;
+            return 3;
         }
 
         @Override
@@ -147,5 +167,27 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements Pa
             }
             return null;
         }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
+        }
+
+        public Fragment getRegisteredFragment(int position) {
+            return this.registeredFragments.get(position);
+        }
+    }
+
+    public OperatingSystem getOperatingSystem() {
+        return mOperatingSystem;
+    }
+    public CustomViewPager getViewPager() {
+        return mViewPager;
+    }
+
+    public TabLayout getTabLayout() {
+        return mTabLayout;
     }
 }

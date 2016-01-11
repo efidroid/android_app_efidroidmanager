@@ -9,12 +9,33 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
 public class OperatingSystem implements Parcelable {
-    private final Ini mIni;
+    private Ini mIni;
+    private List<CmdlineItem> mCmdline;
+    private ArrayList<OperatingSystemChangeListener> mListeners = new ArrayList<>();
+
+    public interface OperatingSystemChangeListener {
+        void onOperatingSystemChanged();
+    }
+
+    public void addChangeListener(OperatingSystemChangeListener listener) {
+        mListeners.add(listener);
+    }
+
+    public void removeChangeListener(OperatingSystemChangeListener listener) {
+        mListeners.remove(listener);
+    }
+
+    public void notifyChange() {
+        for(OperatingSystemChangeListener listener : mListeners) {
+            listener.onOperatingSystemChanged();
+        }
+    }
 
     public static class Partition {
         public String name;
@@ -26,14 +47,43 @@ public class OperatingSystem implements Parcelable {
         }
     }
 
-    public OperatingSystem(Ini ini) {
+    public static class CmdlineItem {
+        public String name;
+        public String value;
+
+        public CmdlineItem(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
+
+    private void init(Ini ini) {
         mIni = ini;
+        mCmdline = new ArrayList<>();
+        String cmdlineStr = mIni.get("replacements", "cmdline");
+        if(cmdlineStr!=null) {
+            String[] parts = cmdlineStr.split(" ");
+            for(String part : parts) {
+                String[] kv = part.split("=");
+                String name = kv[0];
+                String value = null;
+
+                if(kv.length>1)
+                    value = kv[1];
+
+                mCmdline.add(new CmdlineItem(name, value));
+            }
+        }
+    }
+
+    public OperatingSystem(Ini ini) {
+        init(ini);
     }
 
     protected OperatingSystem(Parcel in) {
         StringReader stringReader = new StringReader(in.readString());
         try {
-            mIni = new Ini(stringReader);
+            init(new Ini(stringReader));
         } catch (IOException e) {
             throw new RuntimeException("Can't create Operating System from Parcelable");
         }
@@ -70,11 +120,27 @@ public class OperatingSystem implements Parcelable {
     public List<Partition> getPartitions() {
         ArrayList<Partition> partitions = new ArrayList<>();
         Profile.Section list = mIni.get("partitions");
-        for (Map.Entry<String, String> entry : list.entrySet()) {
+        for (Map.Entry<String, String> entry : new TreeMap<String,String>(list).entrySet()) {
             partitions.add(new Partition(entry.getKey(), entry.getValue()));
         }
 
         return partitions;
+    }
+
+    public List<CmdlineItem> getCmdline() {
+        return mCmdline;
+    }
+
+    public String getReplacementKernel() {
+        return mIni.get("replacements", "kernel");
+    }
+
+    public String getReplacementRamdisk() {
+        return mIni.get("replacements", "ramdisk");
+    }
+
+    public String getReplacementDT() {
+        return mIni.get("replacements", "dt");
     }
 
     @Override
@@ -84,6 +150,13 @@ public class OperatingSystem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        // write cmdline back to ini
+        StringWriter cmdlineWriter = new StringWriter();
+        for (CmdlineItem item : mCmdline) {
+            cmdlineWriter.write(" "+item.name+"="+item.value);
+        }
+        mIni.put("replacements", "cmdline", cmdlineWriter.getBuffer().toString());
+
         StringWriter stringWriter = new StringWriter();
         try {
             mIni.store(stringWriter);

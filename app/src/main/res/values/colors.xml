@@ -5,4 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorAccentDark">#C2185B</color>
     <color name="colorRipple">#F06292</color>
+
+    <color name="colorActionmode">#757575</color>
+    <color name="colorActionmodeDark">#616161</color>
 </resources>

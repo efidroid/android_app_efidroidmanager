@@ -1,38 +1,36 @@
 package org.efidroid.efidroidmanager.fragments.operatingsystemedit;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link GeneralFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link GeneralFragment#newInstance} factory method to
+ * create an instance of this fragment.
  */
-public class PartitionItemFragment extends Fragment {
+public class GeneralFragment extends Fragment {
     private OperatingSystem mOperatingSystem = null;
     private OperatingSystemEditActivity mListener;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public PartitionItemFragment() {
+    public GeneralFragment() {
+        // Required empty public constructor
     }
 
-    @SuppressWarnings("unused")
-    public static PartitionItemFragment newInstance(OperatingSystem os) {
-        PartitionItemFragment fragment = new PartitionItemFragment();
+    public static GeneralFragment newInstance(OperatingSystem os) {
+        GeneralFragment fragment = new GeneralFragment();
         return fragment;
     }
 
@@ -44,29 +42,28 @@ public class PartitionItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_partitionitem_list, container, false);
+        View view =  inflater.inflate(R.layout.fragment_general, container, false);
 
         mOperatingSystem = mListener.getOperatingSystem();
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new PartitionItemRecyclerViewAdapter(mOperatingSystem, mListener));
-        }
+        EditText name = (EditText)view.findViewById(R.id.name);
+        EditText description = (EditText)view.findViewById(R.id.description);
+
+        name.setText(mOperatingSystem.getName());
+        description.setText(mOperatingSystem.getDescription());
+
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         if (context instanceof OperatingSystemEditActivity) {
             mListener = (OperatingSystemEditActivity) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+            //throw new RuntimeException(context.toString()
+              //      + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -87,7 +84,8 @@ public class PartitionItemFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
-        void onPartitionItemClicked(OperatingSystem.Partition item);
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 }

@@ -2,8 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.efidroid.efidroidmanager">
 
-    <uses-permission android:name="android.permission.BROADCAST_STICKY"></uses-permission>
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -24,8 +29,11 @@
 
         <service
             android:name=".services.ResourceLoaderIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
 
+        <activity
+            android:name=".activities.LoginActivity"
+            android:label="@string/title_activity_login" />
         <activity
             android:name=".activities.OperatingSystemEditActivity"
             android:parentActivityName=".activities.MainActivity"
