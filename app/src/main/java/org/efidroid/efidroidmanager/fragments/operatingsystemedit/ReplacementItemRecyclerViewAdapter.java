@@ -199,8 +199,12 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
 
         else if (holder.mItem instanceof ReplacementItem) {
             ReplacementItem item = (ReplacementItem)mValues.get(position);
+            String value = item.getValue();
+            if(value==null)
+                value = "(disabled)";
+
             holder.mTitleView.setText(item.getName());
-            holder.mSubtitleView.setText(item.getValue());
+            holder.mSubtitleView.setText(value);
             holder.mPosition = position;
         }
 
