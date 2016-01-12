@@ -319,29 +319,8 @@ public class MainActivity extends AppCompatActivity
                         // get multiboot.ini's
                         List<String> directories = RootToolsEx.getMultibootSystems(multibootDir);
                         for (String directory : directories) {
-                            String data = RootToolsEx.readFile(directory + "/multiboot.ini");
-                            if (data == null)
-                                continue;
-
-                            Ini ini = new Ini(new StringReader(data));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
-                            list.add(new OperatingSystem(ini));
+                            String path = directory + "/multiboot.ini";
+                            list.add(new OperatingSystem(path));
 
                         }
                     }

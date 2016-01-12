@@ -2,9 +2,12 @@ package org.efidroid.efidroidmanager.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import org.efidroid.efidroidmanager.RootToolsEx;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -15,6 +18,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class OperatingSystem implements Parcelable {
+    private String mFilename;
     private Ini mIni;
     private List<CmdlineItem> mCmdline;
     private ArrayList<OperatingSystemChangeListener> mListeners = new ArrayList<>();
@@ -57,8 +61,13 @@ public class OperatingSystem implements Parcelable {
         }
     }
 
-    private void init(Ini ini) {
-        mIni = ini;
+    private void init(String filename) throws Exception {
+        String data = RootToolsEx.readFile(filename);
+        if (data == null)
+            throw new Exception("no data");
+
+        mFilename = filename;
+        mIni = new Ini(new StringReader(data));
         mCmdline = new ArrayList<>();
         String cmdlineStr = mIni.get("replacements", "cmdline");
         if(cmdlineStr!=null) {
@@ -76,15 +85,15 @@ public class OperatingSystem implements Parcelable {
         }
     }
 
-    public OperatingSystem(Ini ini) {
-        init(ini);
+    public OperatingSystem(String filename) throws Exception {
+        init(filename);
     }
 
     protected OperatingSystem(Parcel in) {
-        StringReader stringReader = new StringReader(in.readString());
+        String filename = in.readString();
         try {
-            init(new Ini(stringReader));
-        } catch (IOException e) {
+            init(filename);
+        } catch (Exception e) {
             throw new RuntimeException("Can't create Operating System from Parcelable");
         }
     }
@@ -100,6 +109,14 @@ public class OperatingSystem implements Parcelable {
             return new OperatingSystem[size];
         }
     };
+
+    public String getFilename() {
+        return mFilename;
+    }
+
+    public String getDirectory() {
+        return new File(mFilename).getParent();
+    }
 
     public String getName() {
         return mIni.get("config", "name");
@@ -169,13 +186,7 @@ public class OperatingSystem implements Parcelable {
         }
         mIni.put("replacements", "cmdline", cmdlineWriter.getBuffer().toString());
 
-        StringWriter stringWriter = new StringWriter();
-        try {
-            mIni.store(stringWriter);
-        } catch (IOException e) {
-            throw new RuntimeException("Can't store Operating System in Parcelable");
-        }
-
-        dest.writeString(stringWriter.getBuffer().toString());
+        // write filename to parcel
+        dest.writeString(mFilename);
     }
 }
