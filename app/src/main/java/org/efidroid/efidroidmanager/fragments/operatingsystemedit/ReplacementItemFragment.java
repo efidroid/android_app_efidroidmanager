@@ -324,7 +324,9 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
 
     @Override
     public void onReplacementItemLongClicked(View v, ReplacementItemRecyclerViewAdapter.ReplacementItem item) {
-
+        int position = mAdapter.getItemPosition(item);
+        item.setValue(null);
+        mAdapter.notifyItemChanged(position);
     }
 
 
