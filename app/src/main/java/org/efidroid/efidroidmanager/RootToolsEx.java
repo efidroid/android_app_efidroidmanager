@@ -280,6 +280,11 @@ public final class RootToolsEx {
         }
 
         @Override
+        public boolean isFile() {
+            return !mIsDir;
+        }
+
+        @Override
         public File getParentFile() {
             return new RootFile(super.getParent());
         }
@@ -307,6 +312,8 @@ public final class RootToolsEx {
                 Shell shell = RootTools.getShell(true);
                 shell.add(command);
                 commandWait(shell, command);
+                if(command.getExitCode()!=0)
+                    list.clear();
             } catch (Exception e) {
                 e.printStackTrace();
             }

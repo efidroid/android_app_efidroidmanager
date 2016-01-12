@@ -302,8 +302,6 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
 
     @Override
     public void onFileSelection(@NonNull File file) {
-        Log.e("TAG", file.getAbsolutePath());
-
         ReplacementItemRecyclerViewAdapter.ReplacementItem item = (ReplacementItemRecyclerViewAdapter.ReplacementItem)mAdapter.getItem(mChooserItemPosition);
         item.setValue(file.getName());
         mAdapter.notifyItemChanged(mChooserItemPosition);
@@ -316,7 +314,7 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
         mChooserItemPosition = mAdapter.getItemPosition(item);
 
         RootFileChooserDialog d = new RootFileChooserDialog.Builder(mActivity)
-                .initialPath("/")  // changes initial path, defaults to external storage directory
+                .initialPath(mOperatingSystem.getDirectory())
                 .build();
         d.setTargetFragment(this, 0);
         d.show(mActivity);
