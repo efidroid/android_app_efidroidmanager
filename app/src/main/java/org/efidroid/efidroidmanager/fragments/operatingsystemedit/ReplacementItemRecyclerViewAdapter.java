@@ -234,13 +234,15 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
             @Override
             public boolean onLongClick(View v) {
                 if (null != mListener) {
-                    if (holder.mItem instanceof OperatingSystem.CmdlineItem)
+                    if (holder.mItem instanceof OperatingSystem.CmdlineItem) {
                         mListener.onCmdlineItemLongClicked(v, (OperatingSystem.CmdlineItem) holder.mItem);
-                    else if(holder.mItem instanceof ReplacementItem) {
+                        return true;
+                    } else if(holder.mItem instanceof ReplacementItem) {
                         mListener.onReplacementItemLongClicked(v, (ReplacementItem)holder.mItem);
+                        return true;
                     }
                 }
-                return true;
+                return false;
             }
         });
 
