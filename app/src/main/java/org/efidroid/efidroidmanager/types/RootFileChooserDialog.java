@@ -38,6 +38,9 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
     private File[] parentContents;
     private boolean canGoUp = true;
     private FileCallback mCallback;
+    private String mInitialPath;
+    private boolean mProtectRoot;
+    private boolean mHideDirectories;
 
     public interface FileCallback {
         void onFileSelection(@NonNull File file);
@@ -59,7 +62,8 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
             MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
             for (File fi : contents) {
                 if (fi.isDirectory()) {
-                    results.add(fi);
+                    if(!mHideDirectories)
+                        results.add(fi);
                 } else {
                     if (fileIsMimeType(fi, mimeType, mimeTypeMap)) {
                         results.add(fi);
@@ -131,8 +135,15 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
             throw new IllegalStateException("You must create a FileChooserDialog using the Builder.");
         if (!getArguments().containsKey("current_path"))
             getArguments().putString("current_path", getBuilder().mInitialPath);
+        mHideDirectories = getBuilder().mHideDirectories;
         parentFolder = new RootToolsEx.RootFile(getArguments().getString("current_path"));
         parentContents = listFiles(getBuilder().mMimeType);
+        mProtectRoot = getBuilder().mProtectRoot;
+        mInitialPath = getBuilder().mInitialPath;
+
+        if(mProtectRoot)
+            canGoUp = false;
+
         return new MaterialDialog.Builder(getActivity())
                 .title(parentFolder.getAbsolutePath())
                 .items(getContentsArray())
@@ -155,6 +166,9 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
             if (parentFolder.getAbsolutePath().equals("/storage/emulated"))
                 parentFolder = parentFolder.getParentFile();
             canGoUp = parentFolder.getParent() != null;
+
+            if(mProtectRoot && parentFolder.getAbsolutePath().equals(new File(mInitialPath).getAbsolutePath()))
+                canGoUp = false;
         } else {
             parentFolder = parentContents[canGoUp ? i - 1 : i];
             canGoUp = true;
@@ -203,12 +217,16 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
         protected int mCancelButton;
         protected String mInitialPath;
         protected String mMimeType;
+        protected boolean mProtectRoot;
+        protected boolean mHideDirectories;
 
         public <ActivityType extends AppCompatActivity> Builder(@NonNull ActivityType context) {
             mContext = context;
             mCancelButton = android.R.string.cancel;
             mInitialPath = Environment.getExternalStorageDirectory().getAbsolutePath();
             mMimeType = null;
+            mProtectRoot = false;
+            mHideDirectories = false;
         }
 
         @NonNull
@@ -228,6 +246,16 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
         @NonNull
         public Builder mimeType(@Nullable String type) {
             mMimeType = type;
+            return this;
+        }
+
+        public Builder protectRoot(boolean b) {
+            mProtectRoot = b;
+            return this;
+        }
+
+        public Builder hideDirectories(boolean b) {
+            mHideDirectories = b;
             return this;
         }
 

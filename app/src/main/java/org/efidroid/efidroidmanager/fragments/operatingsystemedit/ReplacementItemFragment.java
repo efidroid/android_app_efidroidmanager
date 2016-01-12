@@ -315,6 +315,8 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
 
         RootFileChooserDialog d = new RootFileChooserDialog.Builder(mActivity)
                 .initialPath(mOperatingSystem.getDirectory())
+                .protectRoot(true)
+                .hideDirectories(true)
                 .build();
         d.setTargetFragment(this, 0);
         d.show(mActivity);
