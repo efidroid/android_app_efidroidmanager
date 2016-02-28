@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single" android:id="@+id/nav_group_main">
+    <group android:id="@+id/nav_group_main">
         <item
             android:id="@+id/nav_operating_systems"
             android:icon="@drawable/ic_menu_memory"
@@ -20,14 +20,14 @@
             android:title="Plugins" />
     </group>
 
-    <group android:checkableBehavior="single" android:id="@+id/nav_group_setup">
+    <group android:id="@+id/nav_group_setup">
         <item
             android:id="@+id/nav_install"
             android:icon="@drawable/ic_menu_settings"
             android:title="Install/Update" />
     </group>
 
-    <group android:checkableBehavior="single" android:id="@+id/nav_group_communicate">
+    <group android:id="@+id/nav_group_communicate">
         <item
             android:id="@+id/nav_share"
             android:icon="@drawable/ic_menu_share"

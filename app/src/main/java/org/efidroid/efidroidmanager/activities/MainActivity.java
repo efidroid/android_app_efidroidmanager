@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     private boolean mTouchDisabled = false;
     private DataFragment dataFragment;
     private int mActiveMenuItemIndex = 0;
+    private MenuItem mPreviousMenuItem;
 
     public static class DataFragment extends Fragment {
         public DeviceInfo device_info = null;
@@ -445,25 +446,12 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
-        // uncheck other groups
-        if(item.getGroupId()==R.id.nav_group_main){
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_main,true,true);
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_setup,false,true);
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_communicate,false,true);
-        }
-        else if(item.getGroupId()==R.id.nav_group_setup){
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_main,false,true);
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_setup,true,true);
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_communicate,false,true);
-        }
-        else if(item.getGroupId()==R.id.nav_group_communicate){
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_main,false,true);
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_setup,false,true);
-            mNavigationView.getMenu().setGroupCheckable(R.id.nav_group_communicate,true,true);
-        }
-
         // Highlight the selected item and update the title
         item.setChecked(true);
+        if (mPreviousMenuItem != null) {
+            mPreviousMenuItem.setChecked(false);
+        }
+        mPreviousMenuItem = item;
         setTitle(item.getTitle());
 
         // close drawer
