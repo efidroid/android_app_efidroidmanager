@@ -110,6 +110,9 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements Pa
                 }
             }
         });
+
+        boolean showFab = (mSectionsPagerAdapter.getRegisteredFragment(0) instanceof FABListener);
+        mFab.setVisibility(showFab ? View.VISIBLE : View.GONE);
     }
 
     @Override
