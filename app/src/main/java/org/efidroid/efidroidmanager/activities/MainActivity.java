@@ -182,12 +182,19 @@ public class MainActivity extends AppCompatActivity
                     .title("Title")
                     .content("You need BusyBox to use this app.")
                     .positiveText("Install")
+                    .neutralText("Try again")
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-                @Override
-                public void onClick(MaterialDialog dialog, DialogAction which) {
-                    RootTools.offerBusyBox(MainActivity.this);
-                }
-            }).show();
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            RootTools.offerBusyBox(MainActivity.this);
+                        }
+                    })
+                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            onLoadUiData();
+                        }
+                    }).show();
             return;
         }
         hasBusybox = true;
