@@ -80,6 +80,10 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements Pa
                 int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
                 final boolean show = (mSectionsPagerAdapter.getRegisteredFragment(position) instanceof FABListener);
 
+                if(show && mFab.getVisibility()==View.GONE) {
+                    mFab.setVisibility(View.VISIBLE);
+                    mFab.setAlpha(0f);
+                }
                 mFab.animate().setDuration(shortAnimTime).alpha(
                         show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                     @Override
