@@ -59,7 +59,6 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
     private RecyclerView mRecyclerView = null;
     private ActionMode mActionMode = null;
     private ReplacementItemRecyclerViewAdapter mAdapter = null;
-    private SparseArray<Fragment> registeredFragments = new SparseArray();
     private int mChooserItemPosition = -1;
 
     private static final String ARG_ACTIONMODE_ENABLED = "actionmode_enabled";
@@ -97,14 +96,12 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
         mOperatingSystem = mActivity.getOperatingSystem();
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new ReplacementItemRecyclerViewAdapter(mOperatingSystem, this);
-            recyclerView.setAdapter(mAdapter);
-            mRecyclerView = recyclerView;
-        }
+        Context context = view.getContext();
+        RecyclerView recyclerView = (RecyclerView) view;
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new ReplacementItemRecyclerViewAdapter(mOperatingSystem, this);
+        recyclerView.setAdapter(mAdapter);
+        mRecyclerView = recyclerView;
 
         if(savedInstanceState!=null) {
             boolean actionModeRunning = savedInstanceState.getBoolean(ARG_ACTIONMODE_ENABLED);
