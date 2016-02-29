@@ -81,8 +81,10 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(ARG_ACTIONMODE_ENABLED, mActionMode!=null);
-        outState.putIntegerArrayList(ARG_SELECTED_ITEMS, mAdapter.getSelectedItems());
+        outState.putBoolean(ARG_ACTIONMODE_ENABLED, mActionMode != null);
+        if(mActionMode!=null) {
+            outState.putIntegerArrayList(ARG_SELECTED_ITEMS, mAdapter.getSelectedItems());
+        }
         outState.putInt(ARG_CHOOSER_ITEM_POSITION, mChooserItemPosition);
         super.onSaveInstanceState(outState);
     }
@@ -108,11 +110,11 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
             boolean actionModeRunning = savedInstanceState.getBoolean(ARG_ACTIONMODE_ENABLED);
             if(actionModeRunning) {
                 mActionMode = mActivity.startSupportActionMode(this);
-            }
 
-            ArrayList<Integer> selectedItems = savedInstanceState.getIntegerArrayList(ARG_SELECTED_ITEMS);
-            for(Integer position : selectedItems) {
-                mAdapter.setSelected(position, true);
+                ArrayList<Integer> selectedItems = savedInstanceState.getIntegerArrayList(ARG_SELECTED_ITEMS);
+                for(Integer position : selectedItems) {
+                    mAdapter.setSelected(position, true);
+                }
             }
 
             mChooserItemPosition = savedInstanceState.getInt(ARG_CHOOSER_ITEM_POSITION);
