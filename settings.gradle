@@ -1,1 +1,2 @@
 include ':app'
+include ':sub_projects:RootTools', ':sub_projects:RootShell'

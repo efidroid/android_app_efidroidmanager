@@ -37,4 +37,5 @@ dependencies {
     compile 'org.ini4j:ini4j:0.5.1'
     compile 'commons-io:commons-io:2.4'
     compile 'com.melnykov:floatingactionbutton:1.3.0'
+    compile project(':sub_projects:RootTools')
 }

@@ -2,11 +2,11 @@ package org.efidroid.efidroidmanager;
 
 import android.util.Log;
 
-import com.stericson.RootShell.RootShell;
-import com.stericson.RootShell.exceptions.RootDeniedException;
-import com.stericson.RootShell.execution.Command;
-import com.stericson.RootShell.execution.Shell;
-import com.stericson.RootTools.RootTools;
+import com.stericson.rootshell.RootShell;
+import com.stericson.rootshell.exceptions.RootDeniedException;
+import com.stericson.rootshell.execution.Command;
+import com.stericson.rootshell.execution.Shell;
+import com.stericson.roottools.RootTools;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +19,10 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.efidroid.efidroidmanager.models.MountInfo;
+import org.efidroid.efidroidmanager.services.IntentServiceEx;
 import org.efidroid.efidroidmanager.types.MountEntry;
 import org.efidroid.efidroidmanager.types.Pointer;
+import org.efidroid.efidroidmanager.types.ReturnCodeException;
 
 public final class RootToolsEx {
     public interface MountInfoLoadedCallback {
@@ -30,6 +32,49 @@ public final class RootToolsEx {
 
     public static void commandWait(Shell shell, Command cmd) throws Exception {
         while (!cmd.isFinished()) {
+
+            RootShell.log(RootShell.version, shell.getCommandQueuePositionString(cmd));
+            RootShell.log(RootShell.version, "Processed " + cmd.totalOutputProcessed + " of " + cmd.totalOutput + " output from command.");
+
+            synchronized (cmd) {
+                try {
+                    if (!cmd.isFinished()) {
+                        cmd.wait(2000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (!cmd.isExecuting() && !cmd.isFinished()) {
+                if (!shell.isExecuting && !shell.isReading) {
+                    RootShell.log(RootShell.version, "Waiting for a command to be executed in a shell that is not executing and not reading! \n\n Command: " + cmd.getCommand());
+                    Exception e = new Exception();
+                    e.setStackTrace(Thread.currentThread().getStackTrace());
+                    e.printStackTrace();
+                } else if (shell.isExecuting && !shell.isReading) {
+                    RootShell.log(RootShell.version, "Waiting for a command to be executed in a shell that is executing but not reading! \n\n Command: " + cmd.getCommand());
+                    Exception e = new Exception();
+                    e.setStackTrace(Thread.currentThread().getStackTrace());
+                    e.printStackTrace();
+                } else {
+                    RootShell.log(RootShell.version, "Waiting for a command to be executed in a shell that is not reading! \n\n Command: " + cmd.getCommand());
+                    Exception e = new Exception();
+                    e.setStackTrace(Thread.currentThread().getStackTrace());
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+    public static void commandWaitService(Shell shell, Command cmd, int pid, IntentServiceEx service) throws Exception {
+        while (!cmd.isFinished()) {
+            if(service.shouldStop()) {
+                shell.close();
+                ReturnCodeException.check(kill(pid));
+                throw new Exception("command was killed");
+            }
 
             RootShell.log(RootShell.version, shell.getCommandQueuePositionString(cmd));
             RootShell.log(RootShell.version, "Processed " + cmd.totalOutputProcessed + " of " + cmd.totalOutput + " output from command.");
@@ -77,7 +122,7 @@ public final class RootToolsEx {
         try {
             RootShell.log("Checking for Root access");
 
-            Command command = new Command(IAG, false, "id") {
+            Command command = new Command(IAG, false, "busybox id") {
                 @Override
                 public void commandOutput(int id, String line) {
                     if (id == IAG) {
@@ -90,6 +135,7 @@ public final class RootToolsEx {
 
             Shell.startRootShell(timeout, retry).add(command);
             commandWait(Shell.startRootShell(timeout, retry), command);
+            ReturnCodeException.check(command.getExitCode());
 
             //parse the userid
             for (String userid : ID) {
@@ -111,7 +157,7 @@ public final class RootToolsEx {
     public static MountInfo getMountInfo() throws Exception {
         final ArrayList<MountEntry> mountinfos = new ArrayList<>();
 
-        final Command command = new Command(0, false, "cat /proc/1/mountinfo")
+        final Command command = new Command(0, false, "busybox cat /proc/1/mountinfo")
         {
             @Override
             public void commandOutput(int id, String line) {
@@ -139,6 +185,7 @@ public final class RootToolsEx {
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
 
         return new MountInfo(mountinfos);
     }
@@ -159,6 +206,7 @@ public final class RootToolsEx {
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
 
         return devices;
     }
@@ -182,6 +230,7 @@ public final class RootToolsEx {
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
 
         return new int[]{major.value, minor.value};
     }
@@ -211,6 +260,7 @@ public final class RootToolsEx {
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
 
         return directories;
     }
@@ -230,8 +280,31 @@ public final class RootToolsEx {
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
 
         return isDir.value;
+    }
+
+    public static long getDeviceSize(String path) throws Exception {
+        final Pointer<Long> size = new Pointer<>(new Long(-1));
+
+        final Command command = new Command(0, false, "busybox blockdev --getsize64 \""+path+"\"")
+        {
+            @Override
+            public void commandOutput(int id, String line) {
+                super.commandOutput(id, line);
+                String[] parts = line.split(" ");
+
+                size.value = Long.parseLong(line);
+            }
+        };
+
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
+
+        return size.value;
     }
 
     public static String readFile(String path) throws Exception {
@@ -250,11 +323,52 @@ public final class RootToolsEx {
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
 
         if(command.getExitCode()!=0)
             return null;
 
         return stringWriter.getBuffer().toString();
+    }
+
+    public static int kill(int pid) throws Exception {
+        final Command command = new Command(0, false, "busybox kill -SIGKILL "+pid);
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+
+        return command.getExitCode();
+    }
+
+    public static int runServiceCommand(IntentServiceEx service, final Command command) throws Exception {
+        final Pointer<Integer> pid = new Pointer<>(0);
+
+        final Command pidcommand = new Command(0, false, 0, "busybox dd if=/dev/zero of=/dev/null &\n echo $!")
+        {
+            @Override
+            public void commandOutput(int id, String line) {
+                super.commandOutput(id, line);
+                pid.value = Integer.parseInt(line);
+            }
+        };
+
+        // run command async
+        Shell shell = RootTools.getShell(true);
+        shell.add(pidcommand);
+        commandWait(shell, pidcommand);
+        ReturnCodeException.check(pidcommand.getExitCode());
+
+        // wait for async command to finish
+        final Command waitcommand = new Command(0, false, 0, "wait "+pid.value);
+        shell = RootTools.getShell(true);
+        shell.add(waitcommand);
+        commandWaitService(shell, waitcommand, pid.value, service);
+        return waitcommand.getExitCode();
+    }
+
+    public static void die(IntentServiceEx service) throws Exception {
+        final Command command = new Command(0, false, 0, "busybox dd if=/dev/zero of=/dev/null");
+        runServiceCommand(service, command);
     }
 
     public static class RootFile extends File {

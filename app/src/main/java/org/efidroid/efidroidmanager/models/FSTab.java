@@ -1,15 +1,20 @@
 package org.efidroid.efidroidmanager.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.apache.commons.io.IOUtils;
+import org.efidroid.efidroidmanager.types.FSTabEntry;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import org.efidroid.efidroidmanager.types.FSTabEntry;
-
-public class FSTab {
+public class FSTab implements Parcelable {
+    // data
     private ArrayList<FSTabEntry> mFSTabEntries = new ArrayList<>();
 
     public FSTab(String data) throws IOException {
@@ -17,15 +22,39 @@ public class FSTab {
 
         for(String line : lines) {
             String[] parts = line.split(" ");
-
-            for(String part : parts) {
-                mFSTabEntries.add(new FSTabEntry(parts[0], parts[1], parts[2], parts[3], parts[4]));
-            }
-            break;
+            ArrayList<String> al = new ArrayList<>(Arrays.asList(parts));
+            al.removeAll(Collections.singleton(""));
+            mFSTabEntries.add(new FSTabEntry(al.get(0), al.get(1), al.get(2), al.get(3), al.get(4)));
         }
     }
 
+    protected FSTab(Parcel in) {
+        in.readList(mFSTabEntries, FSTabEntry.class.getClassLoader());
+    }
+
+    public static final Creator<FSTab> CREATOR = new Creator<FSTab>() {
+        @Override
+        public FSTab createFromParcel(Parcel in) {
+            return new FSTab(in);
+        }
+
+        @Override
+        public FSTab[] newArray(int size) {
+            return new FSTab[size];
+        }
+    };
+
     public List<FSTabEntry> getFSTabEntries() {
         return mFSTabEntries;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(mFSTabEntries);
     }
 }

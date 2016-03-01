@@ -1,8 +1,8 @@
 package org.efidroid.efidroidmanager.models;
 
-import java.util.List;
-
 import org.efidroid.efidroidmanager.types.MountEntry;
+
+import java.util.List;
 
 public class MountInfo {
     private final List<MountEntry> mMountEntries;

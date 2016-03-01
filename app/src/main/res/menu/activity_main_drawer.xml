@@ -18,6 +18,10 @@
             android:id="@+id/nav_plugins"
             android:icon="@drawable/ic_menu_extension"
             android:title="Plugins" />
+        <item
+            android:id="@+id/nav_themes"
+            android:icon="@drawable/ic_menu_color_lens"
+            android:title="Themes" />
     </group>
 
     <group android:id="@+id/nav_group_setup">

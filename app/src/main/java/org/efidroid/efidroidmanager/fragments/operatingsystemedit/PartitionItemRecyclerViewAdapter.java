@@ -4,29 +4,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.apache.commons.io.FileUtils;
 import org.efidroid.efidroidmanager.R;
-import org.efidroid.efidroidmanager.fragments.operatingsystemedit.PartitionItemFragment.OnListFragmentInteractionListener;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.types.OSEditFragmentInteractionListener;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link OperatingSystem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
-public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<PartitionItemRecyclerViewAdapter.ViewHolder> {
-
-    private final List<OperatingSystem.Partition> mValues;
-    private final OnListFragmentInteractionListener mListener;
+public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<PartitionItemRecyclerViewAdapter.ViewHolder> implements OperatingSystem.OperatingSystemChangeListener {
+    private List<OperatingSystem.Partition> mValues;
+    private final OSEditFragmentInteractionListener mListener;
     private final OperatingSystem mOperatingSystem;
 
-    public PartitionItemRecyclerViewAdapter(OperatingSystem os, OnListFragmentInteractionListener listener) {
+    public PartitionItemRecyclerViewAdapter(OperatingSystem os, OSEditFragmentInteractionListener listener) {
         mOperatingSystem = os;
         mListener = listener;
-        mValues = mOperatingSystem.getPartitions();
+        rebuild();
     }
 
     @Override
@@ -38,16 +34,41 @@ public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<Parti
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).name);
-        holder.mContentView.setText(mValues.get(position).path);
+        OperatingSystem.Partition partition = mValues.get(position);
 
+        // data
+        holder.mItem = partition;
+
+        // text
+        holder.mIdView.setText(partition.getPartitionName());
+
+        // description
+        String description = partition.toIniPath();
+        if (partition.getType() != OperatingSystem.Partition.TYPE_BIND) {
+            description += " (" + FileUtils.byteCountToDisplaySize(partition.getSize()) + ")";
+        }
+        holder.mContentView.setText(description);
+
+        // icon letter
+        String letter = "";
+        switch (partition.getType()) {
+            case OperatingSystem.Partition.TYPE_BIND:
+                letter = "B";
+                break;
+            case OperatingSystem.Partition.TYPE_LOOP:
+                letter = "L";
+                break;
+            case OperatingSystem.Partition.TYPE_DYNFILEFS:
+                letter = "D";
+                break;
+        }
+        holder.mIconLetter.setText(letter);
+
+        // onclick
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     mListener.onPartitionItemClicked(holder.mItem);
                 }
             }
@@ -59,10 +80,34 @@ public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<Parti
         return mValues.size();
     }
 
+    private void rebuild() {
+        mValues = mOperatingSystem.getPartitions();
+    }
+
+    @Override
+    public void onOperatingSystemChanged() {
+        rebuild();
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mOperatingSystem.addChangeListener(this);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        mOperatingSystem.removeChangeListener(this);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final ImageView mImageView;
+        public final TextView mIconLetter;
         public OperatingSystem.Partition mItem;
 
         public ViewHolder(View view) {
@@ -70,6 +115,8 @@ public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<Parti
             mView = view;
             mIdView = (TextView) view.findViewById(android.support.design.R.id.text);
             mContentView = (TextView) view.findViewById(android.support.design.R.id.text2);
+            mImageView = (ImageView) view.findViewById(android.support.design.R.id.image);
+            mIconLetter = (TextView) view.findViewById(R.id.icon_letter);
         }
 
         @Override

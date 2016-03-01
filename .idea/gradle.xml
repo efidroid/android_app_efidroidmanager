@@ -10,6 +10,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/sub_projects" />
+            <option value="$PROJECT_DIR$/sub_projects/RootShell" />
+            <option value="$PROJECT_DIR$/sub_projects/RootTools" />
           </set>
         </option>
       </GradleProjectSettings>

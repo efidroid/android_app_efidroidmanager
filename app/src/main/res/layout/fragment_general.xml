@@ -1,38 +1,164 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:orientation="vertical"
     tools:context="org.efidroid.efidroidmanager.fragments.operatingsystemedit.GeneralFragment">
 
-    <View
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_width="0px"
-        android:layout_height="0px"/>
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment"
-        android:nextFocusUp="@id/name"
-        android:nextFocusLeft="@id/name"
-        android:hint="Name"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:inputType="text"/>
+        <!-- ICON -->
+        <LinearLayout
+            android:id="@+id/icon_entry"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <EditText
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Description"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:inputType="text"
-        android:text="@string/hello_blank_fragment"/>
+            <LinearLayout
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-</LinearLayout>
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Icon"
+                    android:textAppearance="?attr/textAppearanceListItem" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PATH -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin">
+
+            <TextView
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:alpha="0.54"
+                android:gravity="center_vertical"
+                android:text="Location"
+                android:textAppearance="?attr/textAppearanceListItemSmall" />
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/spinner_location"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1"></android.support.v7.widget.AppCompatSpinner>
+        </LinearLayout>
+
+        <!-- OSTYPE -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin">
+
+            <TextView
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:alpha="0.54"
+                android:gravity="center_vertical"
+                android:text="Type"
+                android:textAppearance="?attr/textAppearanceListItemSmall" />
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/spinner_ostype"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1"></android.support.v7.widget.AppCompatSpinner>
+        </LinearLayout>
+
+        <include layout="@layout/divider" />
+
+        <!-- NAME -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/md_transparent"
+                    android:hint="Name"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:nextFocusLeft="@id/name"
+                    android:nextFocusUp="@id/name"
+                    android:singleLine="true"
+                    android:text="@string/hello_blank_fragment" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <include layout="@layout/divider" />
+
+        <!-- DESCRIPTION -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/md_transparent"
+                    android:hint="Description"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:nextFocusLeft="@id/name"
+                    android:nextFocusUp="@id/name"
+                    android:singleLine="true"
+                    android:text="@string/hello_blank_fragment" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

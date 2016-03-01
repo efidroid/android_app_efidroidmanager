@@ -6,11 +6,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -29,12 +24,9 @@
         </activity>
 
         <service
-            android:name=".services.ResourceLoaderIntentService"
+            android:name=".services.OperatingSystemUpdateIntentService"
             android:exported="false" />
 
-        <activity
-            android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login" />
         <activity
             android:name=".activities.OperatingSystemEditActivity"
             android:parentActivityName=".activities.MainActivity"
@@ -43,6 +35,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.efidroid.efidroidmanager.activities.MainActivity" />
         </activity>
+        <activity android:name=".activities.NotificationReceiverActivity"></activity>
     </application>
 
 </manifest>

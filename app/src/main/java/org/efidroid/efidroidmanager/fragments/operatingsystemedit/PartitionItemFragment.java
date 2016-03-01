@@ -3,25 +3,67 @@ package org.efidroid.efidroidmanager.fragments.operatingsystemedit;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import org.efidroid.efidroidmanager.R;
-import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
-import org.efidroid.efidroidmanager.models.OperatingSystem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
-public class PartitionItemFragment extends Fragment {
+import org.efidroid.efidroidmanager.R;
+import org.efidroid.efidroidmanager.Util;
+import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
+import org.efidroid.efidroidmanager.models.FSTab;
+import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.types.FSTabEntry;
+import org.efidroid.efidroidmanager.types.OSEditFragmentInteractionListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class PartitionItemFragment extends Fragment implements OperatingSystem.OperatingSystemChangeListener {
+    // data,status
     private OperatingSystem mOperatingSystem = null;
-    private OperatingSystemEditActivity mListener;
+    private String mPreviousOSType = null;
+    private OperatingSystemEditActivity.MultibootDir mPreviousLocation = null;
+
+    // listener
+    private OSEditFragmentInteractionListener mListener = null;
+
+    // scheme id's
+    private static final int SCHEMEID_ANDROID_DYNSYS_BINDOTHER = 0;
+    private static final int SCHEMEID_ANDROID_BINDALL = 1;
+    private static final int SCHEMEID_ANDROID_DYNSYS_LOOPOTHER = 2;
+    private static final int SCHEMEID_ANDROID_LOOPALL = 3;
+
+    // schemes
+    private final HashMap<Integer, PartitionScheme> SCHEMES = new HashMap<>();
+
+    // UI
+    private AppCompatSpinner mSpinnerPartitionScheme = null;
+    private ArrayList<PartitionScheme> mSpinnerSchemes = new ArrayList<>();
+
+    private static class PartitionScheme {
+        private final Context mContext;
+        private final int mNameId;
+        private final Callback mCallback;
+
+        public interface Callback {
+            void onSetDefaults();
+        }
+        public PartitionScheme(Context context, int nameId, Callback cb) {
+            mContext = context;
+            mNameId = nameId;
+            mCallback = cb;
+        }
+
+        @Override
+        public String toString() {
+            return mContext.getString(mNameId);
+        }
+    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -31,9 +73,8 @@ public class PartitionItemFragment extends Fragment {
     }
 
     @SuppressWarnings("unused")
-    public static PartitionItemFragment newInstance(OperatingSystem os) {
-        PartitionItemFragment fragment = new PartitionItemFragment();
-        return fragment;
+    public static PartitionItemFragment newInstance() {
+        return new PartitionItemFragment();
     }
 
     @Override
@@ -46,15 +87,30 @@ public class PartitionItemFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_partitionitem_list, container, false);
 
-        mOperatingSystem = mListener.getOperatingSystem();
+        //  get views
+        mSpinnerPartitionScheme = (AppCompatSpinner) view.findViewById(R.id.spinner_partition_scheme);
+
+        // partition scheme
+        mSpinnerPartitionScheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                PartitionScheme scheme = mSpinnerSchemes.get(position);
+                scheme.mCallback.onSetDefaults();
+                mOperatingSystem.notifyChange();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        onOperatingSystemChanged();
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new PartitionItemRecyclerViewAdapter(mOperatingSystem, mListener));
-        }
+        Context context = view.getContext();
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setAdapter(new PartitionItemRecyclerViewAdapter(mOperatingSystem, mListener));
         return view;
     }
 
@@ -62,32 +118,164 @@ public class PartitionItemFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OperatingSystemEditActivity) {
-            mListener = (OperatingSystemEditActivity) context;
+        if (context instanceof OSEditFragmentInteractionListener) {
+            mListener = (OSEditFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must be OSEditFragmentInteractionListener");
         }
+
+        SCHEMES.put(SCHEMEID_ANDROID_DYNSYS_BINDOTHER, new PartitionScheme(getContext(), R.string.scheme_android_dynsystem_bindother, new PartitionScheme.Callback() {
+            @Override
+            public void onSetDefaults() {
+                ArrayList<OperatingSystem.Partition> list = new ArrayList<>();
+                FSTab fsTab = mListener.getDeviceInfo().getFSTab();
+                for(FSTabEntry entry : fsTab.getFSTabEntries()) {
+                    if(!entry.isMultiboot())
+                        continue;
+
+                    String name = entry.getMountPoint().substring(1);
+                    boolean is_bind = entry.getFsType().equals("auto");
+
+                    int type;
+                    if(name.equals("system"))
+                        type = OperatingSystem.Partition.TYPE_DYNFILEFS;
+                    else if(is_bind)
+                        type = OperatingSystem.Partition.TYPE_BIND;
+                    else
+                        type = OperatingSystem.Partition.TYPE_LOOP;
+
+                    long size = -1;
+                    OperatingSystemEditActivity.MultibootPartitionInfo info = Util.getPartitionInfoByName(mListener.getMultibootPartitionInfo(), name);
+                    if(info!=null && type!=OperatingSystem.Partition.TYPE_BIND)
+                        size = info.size;
+
+                    list.add(new OperatingSystem.Partition(name, name, type, size));
+                }
+                mOperatingSystem.setPartitions(list);
+            }
+        }));
+
+        SCHEMES.put(SCHEMEID_ANDROID_BINDALL, new PartitionScheme(getContext(), R.string.scheme_android_bindall, new PartitionScheme.Callback() {
+            @Override
+            public void onSetDefaults() {
+                ArrayList<OperatingSystem.Partition> list = new ArrayList<>();
+                FSTab fsTab = mListener.getDeviceInfo().getFSTab();
+                for(FSTabEntry entry : fsTab.getFSTabEntries()) {
+                    if(!entry.isMultiboot())
+                        continue;
+
+                    String name = entry.getMountPoint().substring(1);
+                    boolean is_bind = entry.getFsType().equals("auto");
+
+                    int type;
+                    if(is_bind)
+                        type = OperatingSystem.Partition.TYPE_BIND;
+                    else
+                        type = OperatingSystem.Partition.TYPE_LOOP;
+
+                    long size = -1;
+                    OperatingSystemEditActivity.MultibootPartitionInfo info = Util.getPartitionInfoByName(mListener.getMultibootPartitionInfo(), name);
+                    if(info!=null && type!=OperatingSystem.Partition.TYPE_BIND)
+                        size = info.size;
+
+                    list.add(new OperatingSystem.Partition(name, name, type, size));
+                }
+                mOperatingSystem.setPartitions(list);
+            }
+        }));
+
+        SCHEMES.put(SCHEMEID_ANDROID_DYNSYS_LOOPOTHER, new PartitionScheme(getContext(), R.string.scheme_android_dynsystem_loopother, new PartitionScheme.Callback() {
+            @Override
+            public void onSetDefaults() {
+                ArrayList<OperatingSystem.Partition> list = new ArrayList<>();
+                FSTab fsTab = mListener.getDeviceInfo().getFSTab();
+                for(FSTabEntry entry : fsTab.getFSTabEntries()) {
+                    if(!entry.isMultiboot())
+                        continue;
+
+                    String name = entry.getMountPoint().substring(1);
+                    int type;
+                    if(name.equals("system"))
+                        type = OperatingSystem.Partition.TYPE_DYNFILEFS;
+                    else
+                        type = OperatingSystem.Partition.TYPE_LOOP;
+
+                    long size = -1;
+                    OperatingSystemEditActivity.MultibootPartitionInfo info = Util.getPartitionInfoByName(mListener.getMultibootPartitionInfo(), name);
+                    if(info!=null)
+                        size = info.size;
+
+                    list.add(new OperatingSystem.Partition(name, name, type, size));
+                }
+                mOperatingSystem.setPartitions(list);
+            }
+        }));
+
+        SCHEMES.put(SCHEMEID_ANDROID_LOOPALL, new PartitionScheme(getContext(), R.string.scheme_android_loopall, new PartitionScheme.Callback() {
+            @Override
+            public void onSetDefaults() {
+                ArrayList<OperatingSystem.Partition> list = new ArrayList<>();
+                FSTab fsTab = mListener.getDeviceInfo().getFSTab();
+                for(FSTabEntry entry : fsTab.getFSTabEntries()) {
+                    if(!entry.isMultiboot())
+                        continue;
+
+                    String name = entry.getMountPoint().substring(1);
+
+                    long size = -1;
+                    OperatingSystemEditActivity.MultibootPartitionInfo info = Util.getPartitionInfoByName(mListener.getMultibootPartitionInfo(), name);
+                    if(info!=null)
+                        size = info.size;
+
+                    list.add(new OperatingSystem.Partition(name, name, OperatingSystem.Partition.TYPE_LOOP, size));
+                }
+                mOperatingSystem.setPartitions(list);
+            }
+        }));
+
+        mOperatingSystem = mListener.getOperatingSystem();
+        mOperatingSystem.addChangeListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mOperatingSystem.removeChangeListener(this);
         mOperatingSystem = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        void onPartitionItemClicked(OperatingSystem.Partition item);
+    @Override
+    public void onOperatingSystemChanged() {
+        if(mSpinnerPartitionScheme==null)
+            return;
+
+        OperatingSystemEditActivity.MultibootDir location = mOperatingSystem.getLocation();
+        String osType = mOperatingSystem.getOperatingSystemType();
+
+        // check if sth. has changed
+        if(mPreviousOSType!=null && mPreviousLocation!=null) {
+            if(mPreviousOSType.equals(osType) && mPreviousLocation==location)
+                return;
+        }
+
+        // spinner schemes
+        mSpinnerSchemes.clear();
+        if(location!=null) {
+            boolean bindSupported = OperatingSystem.isBindAllowed(mOperatingSystem.getLocation().mountEntry.getFsType());
+
+            if (bindSupported)
+                mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_DYNSYS_BINDOTHER));
+            if (bindSupported)
+                mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_BINDALL));
+            mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_DYNSYS_LOOPOTHER));
+            mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_LOOPALL));
+        }
+        mSpinnerPartitionScheme.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, mSpinnerSchemes));
+
+        // update previous data
+        mPreviousOSType = osType;
+        mPreviousLocation = location;
     }
 }

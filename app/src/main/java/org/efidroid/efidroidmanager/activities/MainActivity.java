@@ -1,37 +1,29 @@
 package org.efidroid.efidroidmanager.activities;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.melnykov.fab.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.MotionEvent;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.stericson.RootTools.RootTools;
-
-import org.ini4j.Ini;
-
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import com.melnykov.fab.FloatingActionButton;
+import com.stericson.rootshell.RootShell;
+import com.stericson.roottools.RootTools;
 
 import org.efidroid.efidroidmanager.DataHelper;
 import org.efidroid.efidroidmanager.R;
@@ -40,8 +32,11 @@ import org.efidroid.efidroidmanager.fragments.EmptyFragment;
 import org.efidroid.efidroidmanager.fragments.OperatingSystemFragment;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.MountInfo;
-import org.efidroid.efidroidmanager.types.MountEntry;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.types.MountEntry;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -64,6 +59,11 @@ public class MainActivity extends AppCompatActivity
     private int mActiveMenuItemIndex = 0;
     private MenuItem mPreviousMenuItem;
 
+    static {
+        RootTools.debugMode = true;
+        RootShell.debugMode = true;
+    }
+
     public static class DataFragment extends Fragment {
         public DeviceInfo device_info = null;
         public ArrayList<OperatingSystem> operating_systems = null;
@@ -78,49 +78,43 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                String string = bundle.getString("FILEPATH");
-                Toast.makeText(MainActivity.this, string,
-                        Toast.LENGTH_LONG).show();
-            }
-
-            removeStickyBroadcast(intent);
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // get views
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mFragmentProgress = (ProgressBar)findViewById(R.id.progressBar);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+
+        // actionbar
         setSupportActionBar(toolbar);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        // drawer
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        // FAB
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(MainActivity.this, OperatingSystemEditActivity.class);
+                intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, new OperatingSystem());
+                intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
+                startActivity(intent);
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        // navigation view
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        mFragmentProgress = (ProgressBar)findViewById(R.id.progressBar);
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        // SRL
         mSwipeRefreshLayout.setEnabled(false);
 
         // get data fragment
@@ -129,16 +123,18 @@ public class MainActivity extends AppCompatActivity
 
         // create the fragment and data the first time
         if (dataFragment == null) {
-            // load device info
+            // show progress dialog
             mProgressDialog = new MaterialDialog.Builder(this)
                     .title("Loading device info")
                     .content("Please wait")
+                    .cancelable(false)
                     .progress(true, 0)
                     .show();
 
             dataFragment = new DataFragment();
             fm.beginTransaction().add(dataFragment, "data").commit();
 
+            // load device info
             DataHelper.loadDeviceInfo(this, this);
         }
 
@@ -171,7 +167,7 @@ public class MainActivity extends AppCompatActivity
                 .positiveText("Try again")
                 .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
-            public void onClick(MaterialDialog dialog, DialogAction which) {
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 DataHelper.loadDeviceInfo(MainActivity.this, MainActivity.this);
             }
         }).show();
@@ -186,13 +182,13 @@ public class MainActivity extends AppCompatActivity
                     .neutralText("Try again")
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             RootTools.offerBusyBox(MainActivity.this);
                         }
                     })
                     .onNeutral(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             onLoadUiData();
                         }
                     }).show();
@@ -207,7 +203,7 @@ public class MainActivity extends AppCompatActivity
                     .positiveText("Try again")
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             onLoadUiData();
                         }
                     }).show();
@@ -228,7 +224,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(receiver, new IntentFilter("NOTIFICATION"));
 
         // we got paused by offering the busybox, so resume loading now
         if(!hasBusybox) {
@@ -239,7 +234,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
 
         // cancel current task and disable loading animations
         if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled()) {
@@ -301,38 +295,42 @@ public class MainActivity extends AppCompatActivity
 
                     // load block devices
                     List<String> blockDevices = RootToolsEx.getBlockDevices();
-                    if (isCancelled()) return null;
 
                     for (String blkDevice : blockDevices) {
                         if (isCancelled()) return null;
 
-                        // get mountpoint
-                        int[] majmin = RootToolsEx.getDeviceNode(blkDevice);
-                        MountEntry mountEntry = mountInfo.getByMajorMinor(majmin[0], majmin[1]);
-                        if (mountEntry == null)
+                        try {
+                            // get mountpoint
+                            int[] majmin = RootToolsEx.getDeviceNode(blkDevice);
+                            MountEntry mountEntry = mountInfo.getByMajorMinor(majmin[0], majmin[1]);
+                            if (mountEntry == null)
+                                continue;
+                            String mountPoint = mountEntry.getMountPoint();
+                            String multibootDir;
+
+                            // find multiboot directory
+                            if (RootToolsEx.fileExists(mountPoint + "/media/0/multiboot"))
+                                multibootDir = mountPoint + "/media/0/multiboot";
+                            else if (RootToolsEx.fileExists(mountPoint + "/media/multiboot"))
+                                multibootDir = mountPoint + "/media/multiboot";
+                            else if (RootToolsEx.fileExists(mountPoint + "/multiboot"))
+                                multibootDir = mountPoint + "/multiboot";
+                            else
+                                continue;
+
+                            // get multiboot.ini's
+                            List<String> directories = RootToolsEx.getMultibootSystems(multibootDir);
+                            for (String directory : directories) {
+                                String path = directory + "/multiboot.ini";
+                                list.add(new OperatingSystem(path));
+                            }
+                        }
+                        catch (Exception e) {
                             continue;
-                        String mountPoint = mountEntry.getMountPoint();
-                        String multibootDir = null;
-
-                        // find multiboot directory
-                        if (RootToolsEx.fileExists(mountPoint + "/media/0/multiboot"))
-                            multibootDir = mountPoint + "/media/0/multiboot";
-                        else if (RootToolsEx.fileExists(mountPoint + "/media/multiboot"))
-                            multibootDir = mountPoint + "/media/multiboot";
-                        else if (RootToolsEx.fileExists(mountPoint + "/multiboot"))
-                            multibootDir = mountPoint + "/multiboot";
-                        else
-                            continue;
-
-                        // get multiboot.ini's
-                        List<String> directories = RootToolsEx.getMultibootSystems(multibootDir);
-                        for (String directory : directories) {
-                            String path = directory + "/multiboot.ini";
-                            list.add(new OperatingSystem(path));
-
                         }
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return e;
                 }
                 return null;
@@ -346,7 +344,7 @@ public class MainActivity extends AppCompatActivity
                 if (e != null) {
                     new MaterialDialog.Builder(MainActivity.this)
                             .title("Title")
-                            .content("Can't operating systems." + e.getLocalizedMessage())
+                            .content("Can't load operating systems. " + e.getLocalizedMessage())
                             .positiveText("ok").show();
                     return;
                 }
@@ -364,7 +362,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        return mTouchDisabled?true:super.dispatchTouchEvent(ev);
+        return mTouchDisabled || super.dispatchTouchEvent(ev);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -463,6 +461,7 @@ public class MainActivity extends AppCompatActivity
     public void onListFragmentInteraction(OperatingSystem item) {
         Intent intent = new Intent(this, OperatingSystemEditActivity.class);
         intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, item);
+        intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
         startActivity(intent);
     }
 

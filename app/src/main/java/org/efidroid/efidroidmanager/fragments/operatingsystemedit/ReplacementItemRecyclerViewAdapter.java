@@ -1,7 +1,6 @@
 package org.efidroid.efidroidmanager.fragments.operatingsystemedit;
 
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.AdapterDataObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,32 +8,24 @@ import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
-import org.efidroid.efidroidmanager.types.RootFileChooserDialog;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link OperatingSystem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<ReplacementItemRecyclerViewAdapter.ViewHolder> implements OperatingSystem.OperatingSystemChangeListener {
+    // data
+    private final OperatingSystem mOperatingSystem;
+    private final List<Object> mValues = new ArrayList<>();
+
+    // status
+    private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
+
+    // listener
+    private final OnListFragmentInteractionListener mListener;
+
+    // types
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
-
-    private final List<Object> mValues = new ArrayList<>();
-    private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
-    private final OnListFragmentInteractionListener mListener;
-    private final OperatingSystem mOperatingSystem;
-    private RecyclerView mRecyclerView = null;
-
-    @Override
-    public void onOperatingSystemChanged() {
-        rebuildItems();
-    }
 
     public static class ReplacementItem {
         private String mName;
@@ -124,7 +115,6 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        mRecyclerView = recyclerView;
         mOperatingSystem.addChangeListener(this);
     }
 
@@ -132,22 +122,23 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         mOperatingSystem.removeChangeListener(this);
-        mRecyclerView = null;
     }
 
     private void rebuildItems() {
         mValues.clear();
 
-        mValues.add(new HeaderItem("Binaries"));
+        if(!mOperatingSystem.isCreationMode()) {
+            mValues.add(new HeaderItem("Binaries"));
 
-        String value = mOperatingSystem.getReplacementKernel();
-        mValues.add(new KernelReplacementItem(mOperatingSystem, "kernel", value));
+            String value = mOperatingSystem.getReplacementKernel();
+            mValues.add(new KernelReplacementItem(mOperatingSystem, "kernel", value));
 
-        value = mOperatingSystem.getReplacementRamdisk();
-        mValues.add(new RamdiskReplacementItem(mOperatingSystem, "ramdisk", value));
+            value = mOperatingSystem.getReplacementRamdisk();
+            mValues.add(new RamdiskReplacementItem(mOperatingSystem, "ramdisk", value));
 
-        value = mOperatingSystem.getReplacementDT();
-        mValues.add(new DTReplacementItem(mOperatingSystem, "dt", value));
+            value = mOperatingSystem.getReplacementDT();
+            mValues.add(new DTReplacementItem(mOperatingSystem, "dt", value));
+        }
 
         mValues.add(new HeaderItem("Commandline"));
         mValues.addAll(mOperatingSystem.getCmdline());
@@ -256,13 +247,12 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
     }
 
     public void setSelected(int position, boolean selected) {
-        mSelectedItems.remove(new Integer(position));
-        if(selected)
-            mSelectedItems.add(new Integer(position));
+        if(selected && !isSelected(position))
+            mSelectedItems.add(position);
     }
 
     public boolean isSelected(int position) {
-        return mSelectedItems.indexOf(new Integer(position))>=0;
+        return mSelectedItems.indexOf(position)>=0;
     }
 
     public int getItemPosition(Object item) {
@@ -279,7 +269,7 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
 
     public void removeSelectedItems() {
         for(Integer position : mSelectedItems) {
-            Object item = mValues.get(position);
+            OperatingSystem.CmdlineItem item = (OperatingSystem.CmdlineItem)mValues.get(position);
             mOperatingSystem.getCmdline().remove(item);
         }
         mSelectedItems.clear();
@@ -314,20 +304,15 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
         void onCmdlineItemClicked(View v, OperatingSystem.CmdlineItem item);
         void onCmdlineItemLongClicked(View v, OperatingSystem.CmdlineItem item);
         void onReplacementItemClicked(View v, ReplacementItem item);
         void onReplacementItemLongClicked(View v, ReplacementItem item);
+    }
+
+    @Override
+    public void onOperatingSystemChanged() {
+        rebuildItems();
     }
 }
