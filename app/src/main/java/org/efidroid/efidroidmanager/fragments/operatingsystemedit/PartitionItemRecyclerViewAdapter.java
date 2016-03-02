@@ -65,14 +65,16 @@ public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<Parti
         holder.mIconLetter.setText(letter);
 
         // onclick
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    mListener.onPartitionItemClicked(holder.mItem);
+        if(mOperatingSystem.isCreationMode()) {
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (null != mListener) {
+                        mListener.onPartitionItemClicked(holder.mItem);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

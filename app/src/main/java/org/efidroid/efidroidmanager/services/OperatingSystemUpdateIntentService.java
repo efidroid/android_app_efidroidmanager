@@ -10,12 +10,18 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.stericson.rootshell.RootShell;
+import com.stericson.roottools.RootTools;
+
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
+import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.activities.MainActivity;
 import org.efidroid.efidroidmanager.activities.NotificationReceiverActivity;
 import org.efidroid.efidroidmanager.activities.OSUpdateProgressActivity;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -140,28 +146,96 @@ public class OperatingSystemUpdateIntentService extends IntentServiceEx {
         mShowNotifications = false;
 
         boolean success = false;
-        for(int i=0; i<=100; i++) {
-            if(shouldStop()) {
-                publishProgress(i, "Aborted");
-                break;
+        int progress = 0;
+        try {
+            String romDir = null;
+            if(os.isCreationMode()) {
+                progress = publishProgress(1, "Creating OS directory");
+
+                // create multiboot directory
+                String multibootDir = os.getLocation().path;
+                if (!RootToolsEx.isDirectory(multibootDir)) {
+                    if (!RootToolsEx.mkdir(multibootDir, true)) {
+                        throw new Exception("Can't create multiboot directory");
+                    }
+                }
+
+                // get available rom directory
+                String _romDir = multibootDir + "/" + Util.name2path(os.getName());
+                if (RootToolsEx.nodeExists(_romDir)) {
+                    long unixTime = System.currentTimeMillis() / 1000L;
+                    _romDir += "-" + unixTime;
+
+                    if (RootToolsEx.nodeExists(_romDir)) {
+                        throw new Exception("ROM directory does already exist");
+                    }
+                }
+
+                // create ROM directory
+                if (!RootToolsEx.mkdir(_romDir, false)) {
+                    throw new Exception("Can't create ROM directory");
+                }
+
+                romDir = _romDir;
+            }
+            else {
+                romDir = os.getDirectory();
             }
 
-            publishProgress(i, "Doing "+i+"/"+100);
-            try {
-                Thread.sleep(50, 0);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            // write multiboot.ini
+            os.saveToFile(getApplicationContext(), romDir+"/multiboot.ini");
+
+            // create partitions
+            if(os.isCreationMode()) {
+                List<OperatingSystem.Partition> partitions = mOperatingSystem.getPartitions();
+
+                for (int i=0; i<partitions.size(); i++) {
+                    if (shouldStop()) {
+                        throw new Exception("Aborted");
+                    }
+
+                    OperatingSystem.Partition partition = partitions.get(i);
+                    String filename = partition.toIniPath();
+                    String filename_abs = romDir+"/"+filename;
+
+                    // publich progress
+                    progress = publishProgress(100/partitions.size()*i, "setup partition '"+partition.getPartitionName()+"'");
+
+                    switch (partition.getType()) {
+                        case OperatingSystem.Partition.TYPE_BIND:
+                            if (!RootToolsEx.mkdir(filename_abs, false)) {
+                                throw new Exception("Can't create directory '"+filename+"'");
+                            }
+                            break;
+
+                        case OperatingSystem.Partition.TYPE_DYNFILEFS:
+                            try {
+                                RootToolsEx.createDynFileFsImage(this, filename_abs, partition.getSize());
+                            } catch (InterruptedException e) {
+                                throw new Exception("Aborted");
+                            } catch (Exception e) {
+                                throw new Exception("Can't create DynfileFS2 image '"+filename+"'");
+                            }
+                            break;
+
+                        case OperatingSystem.Partition.TYPE_LOOP:
+                            try {
+                                RootToolsEx.createLoopImage(this, filename_abs, partition.getSize());
+                            } catch (InterruptedException e) {
+                                throw new Exception("Aborted");
+                            } catch (Exception e) {
+                                throw new Exception("Can't create loop image '"+filename+"'");
+                            }
+                            break;
+                    }
+                }
             }
 
-            // error
-            if(i==80 && simulateError) {
-                success = false;
-                publishProgress(i, "Unknown Error");
-                break;
-            }
-
-            if(i==100)
-                success = true;
+            success = true;
+        }
+        catch (Exception e) {
+            success = false;
+            publishProgress(progress, e.getLocalizedMessage());
         }
 
         // publish status
@@ -183,12 +257,14 @@ public class OperatingSystemUpdateIntentService extends IntentServiceEx {
         mOperatingSystem = null;
     }
 
-    private void publishProgress(int percent, String text) {
+    private int publishProgress(int percent, String text) {
         Intent intent = new Intent();
         intent.setAction(OSUpdateProgressActivity.ACTION_OPUPDATE_PROGRESS);
         intent.putExtra(OSUpdateProgressActivity.ARG_OPUPDATE_PROGRESS, percent);
         intent.putExtra(OSUpdateProgressActivity.ARG_OPUPDATE_TEXT, text);
         sendBroadcast(intent);
+
+        return percent;
     }
 
     private void publishFinish(boolean success) {

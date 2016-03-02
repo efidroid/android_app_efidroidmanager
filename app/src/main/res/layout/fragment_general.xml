@@ -72,6 +72,16 @@
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
                 android:layout_weight="1"></android.support.v7.widget.AppCompatSpinner>
+
+            <TextView
+                android:id="@+id/text_location"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                style="?attr/spinnerDropDownItemStyle"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                ></TextView>
         </LinearLayout>
 
         <!-- OSTYPE -->
@@ -95,6 +105,16 @@
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
                 android:layout_weight="1"></android.support.v7.widget.AppCompatSpinner>
+
+            <TextView
+                android:id="@+id/text_ostype"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                style="?attr/spinnerDropDownItemStyle"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                ></TextView>
         </LinearLayout>
 
         <include layout="@layout/divider" />

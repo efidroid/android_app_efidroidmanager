@@ -12,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
@@ -156,9 +157,9 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                             String multibootDir;
 
                             // find multiboot directory
-                            if (RootToolsEx.fileExists(mountPoint + "/media/0"))
+                            if (RootToolsEx.isDirectory(mountPoint + "/media/0"))
                                 multibootDir = mountPoint + "/media/0/multiboot";
-                            else if (RootToolsEx.fileExists(mountPoint + "/media") && RootToolsEx.fileExists(mountPoint + "/.layout_version"))
+                            else if (RootToolsEx.isDirectory(mountPoint + "/media") && RootToolsEx.isFile(mountPoint + "/.layout_version"))
                                 multibootDir = mountPoint + "/media/multiboot";
                             else
                                 multibootDir = mountPoint + "/multiboot";
@@ -246,7 +247,12 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     private void init() {
         // layout
         setContentView(R.layout.activity_operating_system_edit);
-        setTitle(mOperatingSystem.getName());
+
+        // title
+        if(mOperatingSystem.isCreationMode())
+            setTitle("Create Operating System");
+        else
+            setTitle(mOperatingSystem.getName());
 
         // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -340,8 +346,11 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==OSUpdateProgressActivity.RESULT_CODE_OK)
+        if(resultCode==OSUpdateProgressActivity.RESULT_CODE_OK) {
+            // this causes the parent activity to get recreated
+            NavUtils.navigateUpFromSameTask(this);
             finish();
+        }
     }
 
     @Override

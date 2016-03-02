@@ -50,7 +50,7 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         holder.mImageView.setImageDrawable(icon);
 
         String desc = os.getDescription();
-        if(desc.length()>0) {
+        if(desc!=null && desc.length()>0) {
             holder.mSubtitleView.setText(desc);
             holder.mSubtitleView.setVisibility(View.VISIBLE);
         }

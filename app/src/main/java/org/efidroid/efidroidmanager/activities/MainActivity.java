@@ -281,11 +281,11 @@ public class MainActivity extends AppCompatActivity
                             String multibootDir;
 
                             // find multiboot directory
-                            if (RootToolsEx.fileExists(mountPoint + "/media/0/multiboot"))
+                            if (RootToolsEx.isDirectory(mountPoint + "/media/0/multiboot"))
                                 multibootDir = mountPoint + "/media/0/multiboot";
-                            else if (RootToolsEx.fileExists(mountPoint + "/media/multiboot"))
+                            else if (RootToolsEx.isDirectory(mountPoint + "/media/multiboot"))
                                 multibootDir = mountPoint + "/media/multiboot";
-                            else if (RootToolsEx.fileExists(mountPoint + "/multiboot"))
+                            else if (RootToolsEx.isDirectory(mountPoint + "/multiboot"))
                                 multibootDir = mountPoint + "/multiboot";
                             else
                                 continue;
@@ -294,7 +294,10 @@ public class MainActivity extends AppCompatActivity
                             List<String> directories = RootToolsEx.getMultibootSystems(multibootDir);
                             for (String directory : directories) {
                                 String path = directory + "/multiboot.ini";
-                                list.add(new OperatingSystem(path));
+
+                                try {
+                                    list.add(new OperatingSystem(path));
+                                } catch (Exception e){}
                             }
                         }
                         catch (Exception e) {

@@ -191,7 +191,7 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
         }
 
         // title
-        mTextTitle.setText("Creating system\n"+mOperatingSystem.getName());
+        mTextTitle.setText((mOperatingSystem.isCreationMode()?"Creating":"Updating") + " system\n"+mOperatingSystem.getName());
     }
 
     @Override

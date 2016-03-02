@@ -13,7 +13,8 @@
         android:layout_height="56dp"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingLeft="@dimen/activity_horizontal_margin">
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:id="@+id/scheme_container">
 
         <TextView
             android:layout_width="75dp"

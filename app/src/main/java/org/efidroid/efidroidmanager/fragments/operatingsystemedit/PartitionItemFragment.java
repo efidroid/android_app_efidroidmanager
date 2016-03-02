@@ -89,22 +89,27 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
 
         //  get views
         mSpinnerPartitionScheme = (AppCompatSpinner) view.findViewById(R.id.spinner_partition_scheme);
+        View schemeContainer = view.findViewById(R.id.scheme_container);
 
-        // partition scheme
-        mSpinnerPartitionScheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                PartitionScheme scheme = mSpinnerSchemes.get(position);
-                scheme.mCallback.onSetDefaults();
-                mOperatingSystem.notifyChange();
-            }
+        if(mOperatingSystem.isCreationMode()) {
+            // partition scheme
+            mSpinnerPartitionScheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    PartitionScheme scheme = mSpinnerSchemes.get(position);
+                    scheme.mCallback.onSetDefaults();
+                    mOperatingSystem.notifyChange();
+                }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-            }
-        });
-        onOperatingSystemChanged();
+                }
+            });
+            onOperatingSystemChanged();
+        } else {
+            schemeContainer.setVisibility(View.GONE);
+        }
 
         // Set the adapter
         Context context = view.getContext();
@@ -248,7 +253,7 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
 
     @Override
     public void onOperatingSystemChanged() {
-        if(mSpinnerPartitionScheme==null)
+        if(mSpinnerPartitionScheme==null || !mOperatingSystem.isCreationMode())
             return;
 
         OperatingSystemEditActivity.MultibootDir location = mOperatingSystem.getLocation();

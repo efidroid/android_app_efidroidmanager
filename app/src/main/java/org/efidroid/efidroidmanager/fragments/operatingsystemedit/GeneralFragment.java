@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
@@ -87,43 +88,59 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
 
         // get views
         View iconEntry = view.findViewById(R.id.icon_entry);
-        AppCompatSpinner mLocationSpinner = (AppCompatSpinner) view.findViewById(R.id.spinner_location);
-        AppCompatSpinner mOSTypeSpinner = (AppCompatSpinner) view.findViewById(R.id.spinner_ostype);
+        AppCompatSpinner locationSpinner = (AppCompatSpinner) view.findViewById(R.id.spinner_location);
+        TextView locationTextView = (TextView) view.findViewById(R.id.text_location);
+        AppCompatSpinner OSTypeSpinner = (AppCompatSpinner) view.findViewById(R.id.spinner_ostype);
+        TextView OSTypeTextView = (TextView) view.findViewById(R.id.text_ostype);
         mIcon = (ImageView) view.findViewById(R.id.image);
         mEditTextName = (EditText) view.findViewById(R.id.name);
         mEditTextDescription = (EditText) view.findViewById(R.id.description);
 
-        // location spinner
-        final ArrayList<OperatingSystemEditActivity.MultibootDir> multibootDirectories = mListener.getMultibootDirectories();
-        mLocationSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, multibootDirectories));
-        mLocationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                OperatingSystemEditActivity.MultibootDir multibootDir = multibootDirectories.get(position);
-                mOperatingSystem.setLocation(multibootDir);
-                mOperatingSystem.notifyChange();
-            }
+        // location
+        if(mOperatingSystem.isCreationMode()) {
+            locationTextView.setVisibility(View.GONE);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            final ArrayList<OperatingSystemEditActivity.MultibootDir> multibootDirectories = mListener.getMultibootDirectories();
+            locationSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, multibootDirectories));
+            locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    OperatingSystemEditActivity.MultibootDir multibootDir = multibootDirectories.get(position);
+                    mOperatingSystem.setLocation(multibootDir);
+                    mOperatingSystem.notifyChange();
+                }
 
-            }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-        // ostype spinner
-        mOSTypeSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, OperatingSystem.getLocalizedOSTypeList(getContext())));
-        mOSTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mOperatingSystem.setOperatingSystemType(OperatingSystem.ALL_OS_TYPES.get(position));
-                mOperatingSystem.notifyChange();
-            }
+                }
+            });
+        } else {
+            locationSpinner.setVisibility(View.GONE);
+            locationTextView.setText(mOperatingSystem.getDirectory());
+        }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        // ostype
+        if(mOperatingSystem.isCreationMode()) {
+            OSTypeTextView.setVisibility(View.GONE);
 
-            }
-        });
+            OSTypeSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, OperatingSystem.getLocalizedOSTypeList(getContext())));
+            OSTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    mOperatingSystem.setOperatingSystemType(OperatingSystem.ALL_OS_TYPES.get(position));
+                    mOperatingSystem.notifyChange();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        } else {
+            OSTypeSpinner.setVisibility(View.GONE);
+            OSTypeTextView.setText(mOperatingSystem.getLocalizedOperatingSystemType(getContext()));
+        }
 
         // icon entry
         iconEntry.setOnClickListener(new View.OnClickListener() {

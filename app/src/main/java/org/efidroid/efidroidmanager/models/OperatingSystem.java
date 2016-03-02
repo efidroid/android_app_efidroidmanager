@@ -311,14 +311,23 @@ public class OperatingSystem implements Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    private void writeCmdLine() {
         // write cmdline back to ini
         StringWriter cmdlineWriter = new StringWriter();
         for (CmdlineItem item : mCmdline) {
             cmdlineWriter.write(" "+item.name+"="+item.value);
         }
-        mIni.put("replacements", "cmdline", cmdlineWriter.getBuffer().toString());
+
+        String cmdline = cmdlineWriter.getBuffer().toString();
+        if(cmdline.equals(""))
+            mIni.remove("replacements", "cmdline");
+        else
+            mIni.put("replacements", "cmdline", cmdline);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        writeCmdLine();
 
         // write filename to parcel
         dest.writeString(mFilename);
@@ -351,12 +360,15 @@ public class OperatingSystem implements Parcelable {
         }
     }
 
-    void saveToFile() throws IOException{
-        File f = new File(mFilename);
+    public void saveToFile(Context context, String filename) throws Exception {
+        writeCmdLine();
 
-        FileOutputStream os = new FileOutputStream(f);
-        mIni.store(os);
-        os.close();
+        // write ini data to buffer
+        StringWriter writer = new StringWriter();
+        mIni.store(writer);
+
+        // write ini to file
+        RootToolsEx.writeDataToFile(context, filename, writer.getBuffer().toString());
     }
 
     public interface OperatingSystemChangeListener {
@@ -405,6 +417,14 @@ public class OperatingSystem implements Parcelable {
         return mIni.get("config", "type");
     }
 
+    public String getLocalizedOperatingSystemType(Context context) {
+        String osType = getOperatingSystemType();
+        if(osType==null)
+            return null;
+
+        return context.getResources().getString(ALL_OS_TYPES_NAMES.get(ALL_OS_TYPES.indexOf(osType)));
+    }
+
     public void setOperatingSystemType(String type) {
         mIni.put("config", "type", type);
     }
@@ -431,7 +451,14 @@ public class OperatingSystem implements Parcelable {
         Profile.Section list = mIni.get("partitions");
         if(list!=null) {
             for (Map.Entry<String, String> entry : new TreeMap<String, String>(list).entrySet()) {
-                partitions.add(new Partition(entry.getKey(), entry.getValue()));
+                Partition partition = new Partition(entry.getKey(), entry.getValue());
+
+                try {
+                    if(partition.getType()!=Partition.TYPE_BIND)
+                        partition.setSize(RootToolsEx.getFileSize(getDirectory()+"/"+partition.toIniPath()));
+                } catch (Exception e){}
+
+                partitions.add(partition);
             }
         }
 
