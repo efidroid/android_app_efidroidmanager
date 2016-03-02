@@ -18,6 +18,7 @@ package org.efidroid.efidroidmanager.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -60,17 +61,27 @@ public abstract class IntentServiceEx extends Service {
 
     private static final String ACTION_CLEAR_QUEUE = "internal_action_clear_queue";
     private static final String ACTION_STOP_CURRENT = "internal_action_stop_current";
+    private static final String ACTION_SEND_MESSAGE = "internal_action_send_message";
 
-    public static void startActionClearQueue(Context context) {
-        Intent intent = new Intent(context, OperatingSystemUpdateIntentService.class);
+    private static final String ARG_MESSAGE_INTENT = "internal_message_intent";
+
+    public static void startActionClearQueue(Context context, Class<?> cls) {
+        Intent intent = new Intent(context, cls);
         intent.setAction(ACTION_CLEAR_QUEUE);
         context.startService(intent);
     }
 
-    public static void stopCurrentTask(Context context) {
-        Intent intent = new Intent(context, OperatingSystemUpdateIntentService.class);
+    public static void stopCurrentTask(Context context, Class<?> cls) {
+        Intent intent = new Intent(context, cls);
         intent.setAction(ACTION_STOP_CURRENT);
         context.startService(intent);
+    }
+
+    public static void sendMessage(Context context, Class<?> cls, Intent intent) {
+        Intent internal_intent = new Intent(context, cls);
+        internal_intent.setAction(ACTION_SEND_MESSAGE);
+        internal_intent.putExtra(ARG_MESSAGE_INTENT, intent);
+        context.startService(internal_intent);
     }
 
     /**
@@ -128,6 +139,12 @@ public abstract class IntentServiceEx extends Service {
             return;
         }
 
+        if(intent.getAction().equals(ACTION_SEND_MESSAGE)) {
+            Intent msgIntent = intent.getParcelableExtra(ARG_MESSAGE_INTENT);
+            onHandleMessage(msgIntent);
+            return;
+        }
+
         Message msg = mServiceHandler.obtainMessage();
         msg.arg1 = startId;
         msg.obj = intent;
@@ -176,6 +193,10 @@ public abstract class IntentServiceEx extends Service {
      *               android.content.Context#startService(Intent)}.
      */
     protected abstract void onHandleIntent(Intent intent);
+
+    protected void onHandleMessage(Intent intent) {
+
+    }
 
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {

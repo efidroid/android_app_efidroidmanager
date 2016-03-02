@@ -2,8 +2,10 @@ package org.efidroid.efidroidmanager.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -314,12 +316,21 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                OperatingSystemUpdateIntentService.startActionUpdateOperatingSystem(this, mOperatingSystem);
-                finish();
+                Intent intent = new Intent(OperatingSystemEditActivity.this, OSUpdateProgressActivity.class);
+                intent.putExtra(OSUpdateProgressActivity.ARG_OPERATING_SYSTEM, mOperatingSystem);
+                startActivityForResult(intent, 0);
+                overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.abc_slide_out_left_full);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==OSUpdateProgressActivity.RESULT_CODE_OK)
+            finish();
     }
 
     @Override

@@ -25,7 +25,7 @@
 
         <service
             android:name=".services.OperatingSystemUpdateIntentService"
-            android:exported="false" />
+            android:exported="false"/>
 
         <activity
             android:name=".activities.OperatingSystemEditActivity"
@@ -35,7 +35,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.efidroid.efidroidmanager.activities.MainActivity" />
         </activity>
-        <activity android:name=".activities.NotificationReceiverActivity"></activity>
+        <activity android:name=".activities.NotificationReceiverActivity" />
+        <activity
+            android:name=".activities.OSUpdateProgressActivity"
+            android:label="@string/title_activity_osupdate_progress"
+            android:parentActivityName=".activities.OperatingSystemEditActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity" />
+        </activity>
     </application>
 
 </manifest>

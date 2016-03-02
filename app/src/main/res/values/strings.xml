@@ -19,4 +19,5 @@
     <string name="scheme_android_bindall">BindAll</string>
     <string name="scheme_android_dynsystem_loopother">DynSystem + LoopOther</string>
     <string name="scheme_android_loopall">LoopAll</string>
+    <string name="title_activity_osupdate_progress">OSUpdateProgressActivity</string>
 </resources>
