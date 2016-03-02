@@ -59,6 +59,9 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     private ArrayList<MultibootDir> mMultibootDirectories = null;
     private ArrayList<OSEditFragmentInteractionListener.MultibootPartitionInfo> mMultibootPartitionInfo = null;
 
+    // listeners
+    private ArrayList<CommitListener> mCommitListeners = new ArrayList<>();
+
     // UI
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private FloatingActionButton mFab;
@@ -316,10 +319,18 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                Intent intent = new Intent(OperatingSystemEditActivity.this, OSUpdateProgressActivity.class);
-                intent.putExtra(OSUpdateProgressActivity.ARG_OPERATING_SYSTEM, mOperatingSystem);
-                startActivityForResult(intent, 0);
-                overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.abc_slide_out_left_full);
+                boolean error = false;
+                for(CommitListener l : mCommitListeners) {
+                    if(!l.onCommit())
+                        error = true;
+                }
+
+                if(!error) {
+                    Intent intent = new Intent(OperatingSystemEditActivity.this, OSUpdateProgressActivity.class);
+                    intent.putExtra(OSUpdateProgressActivity.ARG_OPERATING_SYSTEM, mOperatingSystem);
+                    startActivityForResult(intent, 0);
+                    overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.abc_slide_out_left_full);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -418,6 +429,16 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
 
         // show
         dialog.show();
+    }
+
+    @Override
+    public void addOnCommitListener(CommitListener listener) {
+        mCommitListeners.add(listener);
+    }
+
+    @Override
+    public void removeOnCommitListener(CommitListener listener) {
+        mCommitListeners.remove(listener);
     }
 
     @Override

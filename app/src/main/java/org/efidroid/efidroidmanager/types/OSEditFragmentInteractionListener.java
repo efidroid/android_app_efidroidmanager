@@ -91,6 +91,10 @@ public interface OSEditFragmentInteractionListener {
         }
     }
 
+    interface CommitListener {
+        boolean onCommit();
+    }
+
     // data methods
     DeviceInfo getDeviceInfo();
     OperatingSystem getOperatingSystem();
@@ -99,6 +103,10 @@ public interface OSEditFragmentInteractionListener {
 
     // callbacks
     void onPartitionItemClicked(OperatingSystem.Partition item);
+
+    // listeners
+    void addOnCommitListener(CommitListener listener);
+    void removeOnCommitListener(CommitListener listener);
 
     // UI
     CustomViewPager getViewPager();

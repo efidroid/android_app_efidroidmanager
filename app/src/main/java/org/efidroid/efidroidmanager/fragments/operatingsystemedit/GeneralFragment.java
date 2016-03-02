@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.AppCompatSpinner;
@@ -27,7 +28,7 @@ import org.efidroid.efidroidmanager.types.OSEditFragmentInteractionListener;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class GeneralFragment extends Fragment {
+public class GeneralFragment extends Fragment implements OSEditFragmentInteractionListener.CommitListener {
     // data
     private OperatingSystem mOperatingSystem = null;
 
@@ -66,10 +67,14 @@ public class GeneralFragment extends Fragment {
         }
 
         mOperatingSystem = mListener.getOperatingSystem();
+
+        mListener.addOnCommitListener(this);
     }
 
     @Override
     public void onDetach() {
+        mListener.removeOnCommitListener(this);
+
         super.onDetach();
         mListener = null;
         mOperatingSystem = null;
@@ -155,7 +160,11 @@ public class GeneralFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mOperatingSystem.setName(mEditTextName.getText().toString());
+                String text = mEditTextName.getText().toString();
+                mOperatingSystem.setName(text);
+
+                if(!text.equals(""))
+                    mEditTextName.setError(null);
             }
         });
 
@@ -212,5 +221,17 @@ public class GeneralFragment extends Fragment {
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean onCommit() {
+        String name = mOperatingSystem.getName();
+        if(name==null || name.equals("")) {
+            mListener.getTabLayout().getTabAt(0).select();
+            mEditTextName.setError("Name must not be empty");
+            return false;
+        }
+
+        return true;
     }
 }
