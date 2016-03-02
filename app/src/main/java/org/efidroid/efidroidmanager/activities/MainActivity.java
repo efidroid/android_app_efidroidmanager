@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity
     private AsyncTask<?, ?, ?> mFragmentLoadingTask = null;
     private ArrayList<OperatingSystem> mOperatingSystems;
     private boolean mTouchDisabled = false;
-    private DataFragment dataFragment;
     private int mActiveMenuItemIndex = 0;
     private MenuItem mPreviousMenuItem;
 
@@ -64,19 +63,11 @@ public class MainActivity extends AppCompatActivity
         RootShell.debugMode = true;
     }
 
-    public static class DataFragment extends Fragment {
-        public DeviceInfo device_info = null;
-        public ArrayList<OperatingSystem> operating_systems = null;
-        public int active_menu_item_index = 0;
-        public boolean has_busybox = false;
-        public boolean has_root = false;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setRetainInstance(true);
-        }
-    }
+    private static final String ARG_DEVICE_INFO = "deviceinfo";
+    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
+    private static final String ARG_ACTIVEMENU_INDEX = "activemenu_index";
+    private static final String ARG_HAS_BUSYBOX = "has_busybox";
+    private static final String ARG_HAS_ROOT = "has_root";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,12 +108,8 @@ public class MainActivity extends AppCompatActivity
         // SRL
         mSwipeRefreshLayout.setEnabled(false);
 
-        // get data fragment
-        FragmentManager fm = getSupportFragmentManager();
-        dataFragment = (DataFragment) fm.findFragmentByTag("data");
-
-        // create the fragment and data the first time
-        if (dataFragment == null) {
+        // load data the first time
+        if (savedInstanceState == null) {
             // show progress dialog
             mProgressDialog = new MaterialDialog.Builder(this)
                     .title("Loading device info")
@@ -131,33 +118,18 @@ public class MainActivity extends AppCompatActivity
                     .progress(true, 0)
                     .show();
 
-            dataFragment = new DataFragment();
-            fm.beginTransaction().add(dataFragment, "data").commit();
-
             // load device info
             DataHelper.loadDeviceInfo(this, this);
         }
 
         else {
-            getDataFragmentData();
+            mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
+            mOperatingSystems = savedInstanceState.getParcelableArrayList(ARG_OPERATING_SYSTEMS);
+            mActiveMenuItemIndex = savedInstanceState.getInt(ARG_ACTIVEMENU_INDEX);
+            hasBusybox = savedInstanceState.getBoolean(ARG_HAS_BUSYBOX);
+            hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
             onLoadUiData();
         }
-    }
-
-    private void getDataFragmentData() {
-        mDeviceInfo = dataFragment.device_info;
-        mOperatingSystems = dataFragment.operating_systems;
-        mActiveMenuItemIndex = dataFragment.active_menu_item_index;
-        hasBusybox = dataFragment.has_busybox;
-        hasRoot = dataFragment.has_root;
-    }
-
-    private void setDataFragmentData() {
-        dataFragment.device_info = mDeviceInfo;
-        dataFragment.operating_systems = mOperatingSystems;
-        dataFragment.active_menu_item_index = mActiveMenuItemIndex;
-        dataFragment.has_busybox = hasBusybox;
-        dataFragment.has_root = hasRoot;
     }
 
     public void onDeviceInfoLoadError(Exception e) {
@@ -245,9 +217,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        setDataFragmentData();
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(ARG_DEVICE_INFO, mDeviceInfo);
+        outState.putParcelableArrayList(ARG_OPERATING_SYSTEMS, mOperatingSystems);
+        outState.putInt(ARG_ACTIVEMENU_INDEX, mActiveMenuItemIndex);
+        outState.putBoolean(ARG_HAS_BUSYBOX, hasBusybox);
+        outState.putBoolean(ARG_HAS_ROOT, hasRoot);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
