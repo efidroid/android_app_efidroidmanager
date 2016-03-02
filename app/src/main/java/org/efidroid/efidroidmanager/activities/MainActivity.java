@@ -58,11 +58,6 @@ public class MainActivity extends AppCompatActivity
     private int mActiveMenuItemIndex = 0;
     private MenuItem mPreviousMenuItem;
 
-    static {
-        RootTools.debugMode = true;
-        RootShell.debugMode = true;
-    }
-
     private static final String ARG_DEVICE_INFO = "deviceinfo";
     private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
     private static final String ARG_ACTIVEMENU_INDEX = "activemenu_index";
