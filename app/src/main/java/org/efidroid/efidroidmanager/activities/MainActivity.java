@@ -197,6 +197,9 @@ public class MainActivity extends AppCompatActivity
             onLoadUiData();
         }
 
+        if(mOperatingSystems==null)
+            reloadOperatingSystems();
+
     }
     @Override
     protected void onPause() {
@@ -434,10 +437,22 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, OperatingSystemEditActivity.class);
         intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, item);
         intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode) {
+            case 0:
+                if(resultCode==OperatingSystemEditActivity.RESULT_UPDATED)
+                    mOperatingSystems = null;
+                break;
+
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     public DeviceInfo getDeviceInfo() {
         return mDeviceInfo;
     }
@@ -448,5 +463,11 @@ public class MainActivity extends AppCompatActivity
 
     public FloatingActionButton getFAB() {
         return mFab;
+    }
+
+    @Override
+    public void reloadOperatingSystems() {
+        mOperatingSystems = null;
+        onNavigationItemSelected(mNavigationView.getMenu().getItem(mActiveMenuItemIndex));
     }
 }

@@ -89,6 +89,7 @@ public class OperatingSystemFragment extends Fragment {
         void onListFragmentInteraction(OperatingSystem item);
         DeviceInfo getDeviceInfo();
         List<OperatingSystem> getOperatingSystems();
-        public FloatingActionButton getFAB();
+        FloatingActionButton getFAB();
+        void reloadOperatingSystems();
     }
 }

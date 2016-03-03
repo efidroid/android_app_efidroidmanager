@@ -5,14 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
@@ -48,6 +46,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class OperatingSystemEditActivity extends AppCompatActivity implements OSEditFragmentInteractionListener {
+    // result codes
+    public static final int RESULT_UPDATED = 0;
+    public static final int RESULT_ABORTED = 1;
+
     // argument names
     public static final String ARG_OPERATING_SYSTEM = "operatingsystem";
     public static final String ARG_DEVICE_INFO = "deviceinfo";
@@ -347,6 +349,10 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                     overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.abc_slide_out_left_full);
                 }
                 return true;
+            case android.R.id.home:
+                setResult(RESULT_ABORTED);
+                finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -355,9 +361,8 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==0 && resultCode==OSUpdateProgressActivity.RESULT_CODE_OK) {
-            // this causes the parent activity to get recreated
-            NavUtils.navigateUpFromSameTask(this);
+        setResult(RESULT_UPDATED);
+        if(requestCode==0 && resultCode==GenericProgressActivity.RESULT_CODE_OK) {
             finish();
         }
     }
@@ -484,5 +489,11 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                 mFab.setVisibility(visible ? View.VISIBLE : View.GONE);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_ABORTED);
+        super.onBackPressed();
     }
 }
