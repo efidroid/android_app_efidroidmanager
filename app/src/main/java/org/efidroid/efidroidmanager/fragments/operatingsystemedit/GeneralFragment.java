@@ -157,8 +157,8 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
             @Override
             public boolean onLongClick(View v) {
                 mOperatingSystem.setIconUri(null);
-                mOperatingSystem.notifyChange();
                 mOperatingSystem.setDeleteIcon(true);
+                mOperatingSystem.notifyChange();
                 loadImage();
                 return true;
             }
