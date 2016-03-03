@@ -33,6 +33,7 @@ public class OperatingSystem implements Parcelable {
     private Ini mIni = null;
     private Uri mIconUri = null;
     private boolean mDeleteIcon = false;
+    private Bitmap mIconBitmapCache = null;
 
     // data: edit mode
     private String mFilename = null;
@@ -547,15 +548,20 @@ public class OperatingSystem implements Parcelable {
 
     public void setIconUri(Uri uri) {
         mIconUri = uri;
+        mIconBitmapCache = null;
     }
 
     public Bitmap getIconBitmap(Context context) throws Exception {
+        Bitmap bitmap = null;
+
+        if(mIconBitmapCache!=null)
+            return mIconBitmapCache;
+
         if(isCreationMode() || mIconUri!=null) {
             if (mIconUri == null)
                 return null;
 
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), mIconUri);
-            return bitmap;
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), mIconUri);
         }
         else {
             if(mDeleteIcon)
@@ -565,17 +571,18 @@ public class OperatingSystem implements Parcelable {
             String iconPath = getDirectory()+"/icon.png";
             if (RootToolsEx.isFile(iconPath)) {
                 File cacheFile = RootToolsEx.copyFileToTemp(context, iconPath);
-                Bitmap bitmap = BitmapFactory.decodeFile(cacheFile.getAbsolutePath());
+                bitmap = BitmapFactory.decodeFile(cacheFile.getAbsolutePath());
                 RootTools.deleteFileOrDirectory(cacheFile.getAbsolutePath(), false);
-                return  bitmap;
             }
-
-            return null;
         }
+
+        mIconBitmapCache = bitmap;
+        return bitmap;
     }
 
     public void setDeleteIcon(boolean delete) {
         mDeleteIcon = delete;
+        mIconBitmapCache = null;
     }
 
     public OperatingSystemEditActivity.MultibootDir getLocation() {
