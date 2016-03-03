@@ -129,20 +129,22 @@ public abstract class IntentServiceEx extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
-        if(intent.getAction().equals(ACTION_CLEAR_QUEUE)) {
-            clearQueue();
-            return;
-        }
+        if(intent.getAction()!=null) {
+            if (intent.getAction().equals(ACTION_CLEAR_QUEUE)) {
+                clearQueue();
+                return;
+            }
 
-        if(intent.getAction().equals(ACTION_STOP_CURRENT)) {
-            mShouldStop = true;
-            return;
-        }
+            if (intent.getAction().equals(ACTION_STOP_CURRENT)) {
+                mShouldStop = true;
+                return;
+            }
 
-        if(intent.getAction().equals(ACTION_SEND_MESSAGE)) {
-            Intent msgIntent = intent.getParcelableExtra(ARG_MESSAGE_INTENT);
-            onHandleMessage(msgIntent);
-            return;
+            if (intent.getAction().equals(ACTION_SEND_MESSAGE)) {
+                Intent msgIntent = intent.getParcelableExtra(ARG_MESSAGE_INTENT);
+                onHandleMessage(msgIntent);
+                return;
+            }
         }
 
         Message msg = mServiceHandler.obtainMessage();

@@ -24,7 +24,7 @@
         </activity>
 
         <service
-            android:name=".services.OperatingSystemUpdateIntentService"
+            android:name=".services.GenericProgressIntentService"
             android:exported="false"/>
 
         <activity
@@ -37,13 +37,9 @@
         </activity>
         <activity android:name=".activities.NotificationReceiverActivity" />
         <activity
-            android:name=".activities.OSUpdateProgressActivity"
+            android:name=".activities.GenericProgressActivity"
             android:label="@string/title_activity_osupdate_progress"
-            android:parentActivityName=".activities.OperatingSystemEditActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity" />
         </activity>
     </application>
 

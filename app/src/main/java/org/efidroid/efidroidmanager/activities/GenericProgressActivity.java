@@ -14,20 +14,35 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
-import org.efidroid.efidroidmanager.models.OperatingSystem;
-import org.efidroid.efidroidmanager.services.OperatingSystemUpdateIntentService;
+import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
 import org.efidroid.efidroidmanager.view.ColorArcProgressBar;
 
-public class OSUpdateProgressActivity extends AppCompatActivity {
+public class GenericProgressActivity extends AppCompatActivity {
+    // argument values
+    private Class<?> mServiceClass = null;
+    private Bundle mServiceBundle = null;
+    private Class<?> mServiceHandler = null;
+    private String mTitle = null;
+    private int mAnimSuccessEnter = 0;
+    private int mAnimSuccessExit = 0;
+    private int mAnimErrorEnter = 0;
+    private int mAnimErrorExit = 0;
+
     // argument names
-    public static final String ARG_OPERATING_SYSTEM = "operatingsystem";
+    public static final String ARG_SERVICE_CLASS = "service_class";
+    public static final String ARG_SERVICE_BUNDLE = "service_bundle";
+    public static final String ARG_SERVICE_HANDLER = "service_handler";
+    public static final String ARG_TITLE = "activity_title";
+    public static final String ARG_ANIM_SUCCESS_ENTER = "animation_success_enter";
+    public static final String ARG_ANIM_SUCCESS_EXIT = "animation_success_exit";
+    public static final String ARG_ANIM_ERROR_ENTER = "animation_error_enter";
+    public static final String ARG_ANIM_ERROR_EXIT = "animation_error_exit";
+
+    // private argument names
     private static final String ARG_PROGRESS = "progress";
     private static final String ARG_PROGRESS_TEXT = "progress_text";
     private static final String ARG_SUCCESS = "success";
     private static final String ARG_FINISHED = "finished";
-
-    // argument values
-    private OperatingSystem mOperatingSystem;
 
     // result codes
     public static final int RESULT_CODE_OK = 0;
@@ -48,7 +63,7 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
     private int mProgress = 0;
 
     // UI
-    private TextView mTextTitle;
+    protected TextView mTextTitle;
     private TextView mTextHint;
     private ColorArcProgressBar mProgressCircle;
     private Button mButtonCancel;
@@ -88,6 +103,19 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
         }
     };
 
+    public static Intent makeIntent(Context context, Class<?> serviceHandler, Bundle serviceBundle, String title, int animSuccessEnter, int animSuccessExit, int animErrorEnter, int animErrorExit) {
+        Intent intent = new Intent(context, GenericProgressActivity.class);
+        intent.putExtra(ARG_SERVICE_CLASS, GenericProgressIntentService.class);
+        intent.putExtra(ARG_SERVICE_BUNDLE, serviceBundle);
+        intent.putExtra(ARG_SERVICE_HANDLER, serviceHandler);
+        intent.putExtra(ARG_TITLE, title);
+        intent.putExtra(ARG_ANIM_SUCCESS_ENTER, animSuccessEnter);
+        intent.putExtra(ARG_ANIM_SUCCESS_EXIT, animSuccessExit);
+        intent.putExtra(ARG_ANIM_ERROR_ENTER, animErrorEnter);
+        intent.putExtra(ARG_ANIM_ERROR_EXIT, animErrorExit);
+        return intent;
+    }
+
     private void finishProgressbar() {
         // hide cancel button
         mButtonCancel.setVisibility(View.GONE);
@@ -123,6 +151,27 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
         mSuccess = false;
         mFinishOnResume = false;
 
+        Bundle extras;
+        if(savedInstanceState==null)
+            extras = getIntent().getExtras();
+        else
+            extras = savedInstanceState;
+
+        // get data
+        mServiceClass = (Class<?>) extras.getSerializable(ARG_SERVICE_CLASS);
+        mServiceBundle = extras.getBundle(ARG_SERVICE_BUNDLE);
+        mServiceHandler = (Class<?>) extras.getSerializable(ARG_SERVICE_HANDLER);
+        mTitle = extras.getString(ARG_TITLE);
+        mAnimSuccessEnter = extras.getInt(ARG_ANIM_SUCCESS_ENTER, 0);
+        mAnimSuccessExit = extras.getInt(ARG_ANIM_SUCCESS_EXIT, 0);
+        mAnimErrorEnter = extras.getInt(ARG_ANIM_ERROR_ENTER, 0);
+        mAnimErrorExit = extras.getInt(ARG_ANIM_ERROR_EXIT, 0);
+
+        if(mServiceClass==null)
+            mServiceClass = GenericProgressIntentService.class;
+        if(mServiceBundle==null)
+            mServiceBundle = new Bundle();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_osupdate_progress);
 
@@ -147,7 +196,7 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OperatingSystemUpdateIntentService.stopCurrentTask(OSUpdateProgressActivity.this, OperatingSystemUpdateIntentService.class);
+                GenericProgressIntentService.stopCurrentTask(GenericProgressActivity.this, mServiceClass);
             }
         });
         mButtonBack.setOnClickListener(new View.OnClickListener() {
@@ -172,14 +221,14 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
 
         // start service
         if (savedInstanceState == null) {
-            mOperatingSystem = getIntent().getParcelableExtra(ARG_OPERATING_SYSTEM);
-
-            OperatingSystemUpdateIntentService.startActionUpdateOperatingSystem(this, mOperatingSystem);
+            Intent intent = new Intent(this, mServiceClass);
+            intent.putExtra(GenericProgressIntentService.ARG_BUNDLE, mServiceBundle);
+            intent.putExtra(GenericProgressIntentService.ARG_HANDLER, mServiceHandler);
+            startService(intent);
         }
 
         // restore ui status
         else {
-            mOperatingSystem = savedInstanceState.getParcelable(ARG_OPERATING_SYSTEM);
             mProgress = savedInstanceState.getInt(ARG_PROGRESS);
             mSuccess = savedInstanceState.getBoolean(ARG_SUCCESS);
             mFinished = savedInstanceState.getBoolean(ARG_FINISHED);
@@ -190,8 +239,7 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
                 finishProgressbar();
         }
 
-        // title
-        mTextTitle.setText((mOperatingSystem.isCreationMode()?"Creating":"Updating") + " system\n"+mOperatingSystem.getName());
+        mTextTitle.setText(mTitle);
     }
 
     @Override
@@ -212,21 +260,31 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
         // finish
         super.finish();
 
-        // set animation
         if(mSuccess) {
-            overridePendingTransition(R.anim.hold, R.anim.abc_slide_out_bottom_full);
+            overridePendingTransition(mAnimSuccessEnter, mAnimSuccessExit);
         } else {
-            overridePendingTransition(R.anim.abc_slide_in_left_full, R.anim.abc_slide_out_right_full);
+            overridePendingTransition(mAnimErrorEnter, mAnimErrorExit);
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(ARG_OPERATING_SYSTEM, mOperatingSystem);
+        // restore public args
+        outState.putSerializable(ARG_SERVICE_CLASS, mServiceClass);
+        outState.putBundle(ARG_SERVICE_BUNDLE, mServiceBundle);
+        outState.putSerializable(ARG_SERVICE_HANDLER, mServiceHandler);
+        outState.putString(ARG_TITLE, mTitle);
+        outState.putInt(ARG_ANIM_SUCCESS_ENTER, mAnimSuccessEnter);
+        outState.putInt(ARG_ANIM_SUCCESS_EXIT, mAnimSuccessExit);
+        outState.putInt(ARG_ANIM_ERROR_ENTER, mAnimErrorEnter);
+        outState.putInt(ARG_ANIM_ERROR_EXIT, mAnimErrorExit);
+
+        // restore private args
         outState.putInt(ARG_PROGRESS, mProgress);
         outState.putString(ARG_PROGRESS_TEXT, mTextHint.getText().toString());
         outState.putBoolean(ARG_SUCCESS, mSuccess);
         outState.putBoolean(ARG_FINISHED, mFinished);
+
         super.onSaveInstanceState(outState);
     }
 
@@ -237,7 +295,7 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
 
         // show notification
         if(!mFinished)
-            OperatingSystemUpdateIntentService.showNotification(this, true);
+            GenericProgressIntentService.showNotification(this, mServiceClass, true);
     }
 
     @Override
@@ -247,7 +305,7 @@ public class OSUpdateProgressActivity extends AppCompatActivity {
 
         // hide notification
         if(!mFinished)
-            OperatingSystemUpdateIntentService.showNotification(this, false);
+            GenericProgressIntentService.showNotification(this, mServiceClass, false);
 
         // finish
         if(mFinishOnResume) {

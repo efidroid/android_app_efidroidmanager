@@ -36,11 +36,11 @@ import org.efidroid.efidroidmanager.fragments.operatingsystemedit.ReplacementIte
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.MountInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
-import org.efidroid.efidroidmanager.services.OperatingSystemUpdateIntentService;
 import org.efidroid.efidroidmanager.types.FABListener;
 import org.efidroid.efidroidmanager.types.FSTabEntry;
 import org.efidroid.efidroidmanager.types.MountEntry;
 import org.efidroid.efidroidmanager.types.OSEditFragmentInteractionListener;
+import org.efidroid.efidroidmanager.types.OSUpdateProgressServiceTask;
 import org.efidroid.efidroidmanager.view.CustomViewPager;
 
 import java.util.ArrayList;
@@ -332,8 +332,17 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                 }
 
                 if(!error) {
-                    Intent intent = new Intent(OperatingSystemEditActivity.this, OSUpdateProgressActivity.class);
-                    intent.putExtra(OSUpdateProgressActivity.ARG_OPERATING_SYSTEM, mOperatingSystem);
+                    Bundle extras = new Bundle();
+                    Intent intent = GenericProgressActivity.makeIntent(
+                            this,
+                            OSUpdateProgressServiceTask.class,
+                            extras,
+                            (mOperatingSystem.isCreationMode()?"Creating":"Updating") + " system\n"+mOperatingSystem.getName(),
+                            R.anim.hold, R.anim.abc_slide_out_bottom_full,
+                            R.anim.abc_slide_in_left_full, R.anim.abc_slide_out_right_full
+                    );
+
+                    extras.putParcelable(OSUpdateProgressServiceTask.ARG_OPERATING_SYSTEM, mOperatingSystem);
                     startActivityForResult(intent, 0);
                     overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.abc_slide_out_left_full);
                 }
