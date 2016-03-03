@@ -3,6 +3,7 @@ package org.efidroid.efidroidmanager.fragments.operatingsystemedit;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -157,6 +158,7 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
             public boolean onLongClick(View v) {
                 mOperatingSystem.setIconUri(null);
                 mOperatingSystem.notifyChange();
+                mOperatingSystem.setDeleteIcon(true);
                 loadImage();
                 return true;
             }
@@ -211,17 +213,24 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
     }
 
     private void loadImage() {
-        Drawable drawable;
-        Uri imageUri = mOperatingSystem.getIconUri();
-
         try {
-            InputStream inputStream = getActivity().getContentResolver().openInputStream(imageUri);
-            drawable = Drawable.createFromStream(inputStream, imageUri.toString());
-        } catch (Exception e) {
-            drawable = ResourcesCompat.getDrawable(getResources(), android.R.mipmap.sym_def_app_icon, getActivity().getTheme());
-        }
+            Uri imageUri = mOperatingSystem.getIconUri();
+            if(mOperatingSystem.isCreationMode() || imageUri!=null) {
+                InputStream inputStream = getActivity().getContentResolver().openInputStream(imageUri);
+                Drawable drawable = Drawable.createFromStream(inputStream, imageUri.toString());
+                mIcon.setImageDrawable(drawable);
+            }
+            else {
+                Bitmap bitmap = mOperatingSystem.getIconBitmap(getContext());
+                if(bitmap==null)
+                    throw new Exception();
 
-        mIcon.setImageDrawable(drawable);
+                mIcon.setImageBitmap(bitmap);
+            }
+        } catch (Exception e) {
+            Drawable drawable = ResourcesCompat.getDrawable(getResources(), android.R.mipmap.sym_def_app_icon, getActivity().getTheme());
+            mIcon.setImageDrawable(drawable);
+        }
     }
 
     @Override

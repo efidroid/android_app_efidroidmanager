@@ -1,5 +1,6 @@
 package org.efidroid.efidroidmanager.fragments;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
@@ -42,12 +43,24 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
 
         holder.mItem = os;
         holder.mTitleView.setText(os.getName());
-        Drawable icon = ResourcesCompat.getDrawable(
-                holder.mView.getResources(),
-                android.R.mipmap.sym_def_app_icon,
-                holder.mView.getContext().getTheme()
-        );
-        holder.mImageView.setImageDrawable(icon);
+        Bitmap iconBitmap = null;
+        try {
+            iconBitmap = os.getIconBitmap(holder.mView.getContext());
+            if(iconBitmap!=null)
+                holder.mImageView.setImageBitmap(iconBitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(iconBitmap==null) {
+            Drawable icon = ResourcesCompat.getDrawable(
+                    holder.mView.getResources(),
+                    android.R.mipmap.sym_def_app_icon,
+                    holder.mView.getContext().getTheme()
+            );
+            holder.mImageView.setImageDrawable(icon);
+        }
+
 
         String desc = os.getDescription();
         if(desc!=null && desc.length()>0) {

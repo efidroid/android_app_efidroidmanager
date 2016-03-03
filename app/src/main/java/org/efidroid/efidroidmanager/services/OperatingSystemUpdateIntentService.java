@@ -6,8 +6,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 
 import com.stericson.rootshell.RootShell;
@@ -21,6 +28,7 @@ import org.efidroid.efidroidmanager.activities.NotificationReceiverActivity;
 import org.efidroid.efidroidmanager.activities.OSUpdateProgressActivity;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -184,6 +192,38 @@ public class OperatingSystemUpdateIntentService extends IntentServiceEx {
 
             // write multiboot.ini
             os.saveToFile(getApplicationContext(), romDir+"/multiboot.ini");
+
+            // write icon
+            Bitmap iconBitmap = os.getIconBitmap(this);
+            String iconPath = romDir + "/icon.png";
+            // 960 x 540
+            if(iconBitmap!=null) {
+                try {
+                    double width = iconBitmap.getWidth();
+                    double height = iconBitmap.getHeight();
+
+                    // scale down
+                    if (width > 192) {
+                        height = height / width * 192f;
+                        width = 192f;
+                    }
+                    if (height > 192) {
+                        width = width / height * 192f;
+                        height = 192f;
+                    }
+
+                    iconBitmap = Bitmap.createScaledBitmap(iconBitmap, (int)width, (int)height, false);
+                    RootToolsEx.writeBitmapToPngFile(this, iconPath, iconBitmap);
+                }
+                catch (Exception e) {
+                    throw new Exception("Can't write icon: "+e.getLocalizedMessage());
+                }
+            }
+            else if(RootToolsEx.nodeExists(iconPath)) {
+                if(!RootTools.deleteFileOrDirectory(iconPath, false)) {
+                    throw new Exception("Can't delete old icon");
+                }
+            }
 
             // create partitions
             if(os.isCreationMode()) {

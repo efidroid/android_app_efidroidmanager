@@ -1,9 +1,14 @@
 package org.efidroid.efidroidmanager.models;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore;
+
+import com.stericson.roottools.RootTools;
 
 import org.apache.commons.io.FilenameUtils;
 import org.efidroid.efidroidmanager.R;
@@ -26,13 +31,14 @@ public class OperatingSystem implements Parcelable {
     // data: common
     // parsed on edit, data on creation
     private Ini mIni = null;
+    private Uri mIconUri = null;
+    private boolean mDeleteIcon = false;
 
     // data: edit mode
     private String mFilename = null;
 
     // data: creation mode
     private boolean mCreationMode = false;
-    private Uri mIconUri = null;
     private OperatingSystemEditActivity.MultibootDir mLocation = null;
     private ArrayList<Partition> mPartitions = new ArrayList<>();
 
@@ -277,17 +283,20 @@ public class OperatingSystem implements Parcelable {
         }
         initCmdline();
 
+        // icon uri
+        if (in.readByte() == 0) {
+            mIconUri = null;
+        } else {
+            mIconUri = Uri.parse(in.readString());
+        }
+
+        // delete icon
+        mDeleteIcon = in.readByte() != 0;
+
         // creation mode
         mCreationMode = in.readByte() != 0;
 
         if (mCreationMode) {
-            // icon uri
-            if (in.readByte() == 0) {
-                mIconUri = null;
-            } else {
-                mIconUri = Uri.parse(in.readString());
-            }
-
             // location
             if (in.readByte() == 0) {
                 mLocation = null;
@@ -348,15 +357,18 @@ public class OperatingSystem implements Parcelable {
         }
         dest.writeString(writer.getBuffer().toString());
 
+        // icon uri
+        dest.writeByte((byte) (mIconUri != null ? 1 : 0));
+        if (mIconUri != null)
+            dest.writeString(mIconUri.toString());
+
+        // delete icon
+        dest.writeByte((byte) (mDeleteIcon ? 1 : 0));
+
         // creation mode
         dest.writeByte((byte) (mCreationMode ? 1 : 0));
 
         if(mCreationMode) {
-            // icon uri
-            dest.writeByte((byte) (mIconUri != null ? 1 : 0));
-            if (mIconUri != null)
-                dest.writeString(mIconUri.toString());
-
             // location
             dest.writeByte((byte) (mLocation != null ? 1 : 0));
             if (mLocation != null)
@@ -535,6 +547,35 @@ public class OperatingSystem implements Parcelable {
 
     public void setIconUri(Uri uri) {
         mIconUri = uri;
+    }
+
+    public Bitmap getIconBitmap(Context context) throws Exception {
+        if(isCreationMode() || mIconUri!=null) {
+            if (mIconUri == null)
+                return null;
+
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), mIconUri);
+            return bitmap;
+        }
+        else {
+            if(mDeleteIcon)
+                return null;
+
+            // get icon
+            String iconPath = getDirectory()+"/icon.png";
+            if (RootToolsEx.isFile(iconPath)) {
+                File cacheFile = RootToolsEx.copyFileToTemp(context, iconPath);
+                Bitmap bitmap = BitmapFactory.decodeFile(cacheFile.getAbsolutePath());
+                RootTools.deleteFileOrDirectory(cacheFile.getAbsolutePath(), false);
+                return  bitmap;
+            }
+
+            return null;
+        }
+    }
+
+    public void setDeleteIcon(boolean delete) {
+        mDeleteIcon = delete;
     }
 
     public OperatingSystemEditActivity.MultibootDir getLocation() {
