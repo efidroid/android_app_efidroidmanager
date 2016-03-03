@@ -227,7 +227,7 @@ public class OperatingSystemUpdateIntentService extends IntentServiceEx {
 
             // create partitions
             if(os.isCreationMode()) {
-                List<OperatingSystem.Partition> partitions = mOperatingSystem.getPartitions();
+                List<OperatingSystem.Partition> partitions = os.getPartitions();
 
                 for (int i=0; i<partitions.size(); i++) {
                     if (shouldStop()) {
