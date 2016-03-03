@@ -254,7 +254,7 @@ public class OperatingSystemUpdateIntentService extends IntentServiceEx {
                             } catch (InterruptedException e) {
                                 throw new Exception("Aborted");
                             } catch (Exception e) {
-                                throw new Exception("Can't create DynfileFS2 image '"+filename+"'");
+                                throw new Exception("Can't create DynfileFS2 image '"+filename+"': "+e.getLocalizedMessage());
                             }
                             break;
 
@@ -264,7 +264,7 @@ public class OperatingSystemUpdateIntentService extends IntentServiceEx {
                             } catch (InterruptedException e) {
                                 throw new Exception("Aborted");
                             } catch (Exception e) {
-                                throw new Exception("Can't create loop image '"+filename+"'");
+                                throw new Exception("Can't create loop image '"+filename+"': "+e.getLocalizedMessage());
                             }
                             break;
                     }
