@@ -1,4 +1,4 @@
-package org.efidroid.efidroidmanager.types;
+package org.efidroid.efidroidmanager.tasks;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
+import org.efidroid.efidroidmanager.types.ProgressServiceTask;
 
 import java.util.List;
 

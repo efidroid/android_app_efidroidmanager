@@ -22,7 +22,6 @@ import android.widget.ProgressBar;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.melnykov.fab.FloatingActionButton;
-import com.stericson.rootshell.RootShell;
 import com.stericson.roottools.RootTools;
 
 import org.efidroid.efidroidmanager.DataHelper;
@@ -33,6 +32,7 @@ import org.efidroid.efidroidmanager.fragments.OperatingSystemFragment;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.MountInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.tasks.OSRemovalProgressServiceTask;
 import org.efidroid.efidroidmanager.types.MountEntry;
 
 import java.util.ArrayList;
@@ -43,26 +43,37 @@ public class MainActivity extends AppCompatActivity
         OperatingSystemFragment.OnListFragmentInteractionListener,
         DataHelper.DeviceInfoLoadCallback {
 
+    // status
+    private boolean hasBusybox = false;
+    private boolean hasRoot = false;
+    private boolean mTouchDisabled = false;
+    private int mActiveMenuItemIndex = 0;
+    private MenuItem mPreviousMenuItem;
+    private AsyncTask<?, ?, ?> mFragmentLoadingTask = null;
+
+    // data
+    private DeviceInfo mDeviceInfo = null;
+    private ArrayList<OperatingSystem> mOperatingSystems;
+
+    // args
+    private static final String ARG_DEVICE_INFO = "deviceinfo";
+    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
+    private static final String ARG_ACTIVEMENU_INDEX = "activemenu_index";
+    private static final String ARG_HAS_BUSYBOX = "has_busybox";
+    private static final String ARG_HAS_ROOT = "has_root";
+
+    // request codes
+    private static final int REQUEST_EDIT_OS = 0;
+    private static final int REQUEST_CREATE_OS = 1;
+    private static final int REQUEST_DELETE_OS = 2;
+
+    // UI
     private NavigationView mNavigationView;
     private FloatingActionButton mFab;
     private ProgressBar mFragmentProgress;
     private DrawerLayout mDrawer;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private MaterialDialog mProgressDialog = null;
-    private boolean hasBusybox = false;
-    private boolean hasRoot = false;
-    private DeviceInfo mDeviceInfo = null;
-    private AsyncTask<?, ?, ?> mFragmentLoadingTask = null;
-    private ArrayList<OperatingSystem> mOperatingSystems;
-    private boolean mTouchDisabled = false;
-    private int mActiveMenuItemIndex = 0;
-    private MenuItem mPreviousMenuItem;
-
-    private static final String ARG_DEVICE_INFO = "deviceinfo";
-    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
-    private static final String ARG_ACTIVEMENU_INDEX = "activemenu_index";
-    private static final String ARG_HAS_BUSYBOX = "has_busybox";
-    private static final String ARG_HAS_ROOT = "has_root";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +104,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(MainActivity.this, OperatingSystemEditActivity.class);
                 intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, new OperatingSystem());
                 intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CREATE_OS);
             }
         });
 
@@ -433,19 +444,25 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void onListFragmentInteraction(OperatingSystem item) {
+    @Override
+    public void onOperatingSystemClicked(OperatingSystem item) {
         Intent intent = new Intent(this, OperatingSystemEditActivity.class);
         intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, item);
         intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, REQUEST_EDIT_OS);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
-            case 0:
+            case REQUEST_EDIT_OS:
+            case REQUEST_CREATE_OS:
                 if(resultCode==OperatingSystemEditActivity.RESULT_UPDATED)
                     mOperatingSystems = null;
+                break;
+
+            case REQUEST_DELETE_OS:
+                mOperatingSystems = null;
                 break;
 
             default:
@@ -453,6 +470,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onOperatingSystemLongClicked(final OperatingSystem item) {
+        new MaterialDialog.Builder(this)
+                .title("Delete")
+                .content("Do you want to delete '"+item.getName()+"'?")
+                .positiveText("Delete")
+                .negativeText("Cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                Bundle extras = new Bundle();
+                Intent intent = GenericProgressActivity.makeIntent(
+                        MainActivity.this,
+                        OSRemovalProgressServiceTask.class,
+                        extras,
+                        "Deleting system\n"+item.getName(),
+                        R.anim.hold, R.anim.abc_slide_out_right_full,
+                        R.anim.hold, R.anim.abc_slide_out_right_full
+                );
+
+                extras.putParcelable(OSRemovalProgressServiceTask.ARG_OPERATING_SYSTEM, item);
+                startActivityForResult(intent, REQUEST_DELETE_OS);
+                overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.hold);
+            }
+        }).show();
+    }
+
+    @Override
     public DeviceInfo getDeviceInfo() {
         return mDeviceInfo;
     }

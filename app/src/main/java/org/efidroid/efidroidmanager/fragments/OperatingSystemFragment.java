@@ -86,7 +86,8 @@ public class OperatingSystemFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(OperatingSystem item);
+        void onOperatingSystemClicked(OperatingSystem item);
+        void onOperatingSystemLongClicked(OperatingSystem item);
         DeviceInfo getDeviceInfo();
         List<OperatingSystem> getOperatingSystems();
         FloatingActionButton getFAB();

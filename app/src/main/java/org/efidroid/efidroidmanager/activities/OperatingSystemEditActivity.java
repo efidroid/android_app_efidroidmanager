@@ -38,7 +38,7 @@ import org.efidroid.efidroidmanager.types.FABListener;
 import org.efidroid.efidroidmanager.types.FSTabEntry;
 import org.efidroid.efidroidmanager.types.MountEntry;
 import org.efidroid.efidroidmanager.types.OSEditFragmentInteractionListener;
-import org.efidroid.efidroidmanager.types.OSUpdateProgressServiceTask;
+import org.efidroid.efidroidmanager.tasks.OSUpdateProgressServiceTask;
 import org.efidroid.efidroidmanager.view.CustomViewPager;
 
 import java.util.ArrayList;

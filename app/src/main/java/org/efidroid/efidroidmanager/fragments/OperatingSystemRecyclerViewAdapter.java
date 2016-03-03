@@ -120,8 +120,21 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onOperatingSystemClicked(holder.mItem);
                 }
+            }
+        });
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (null != mListener) {
+                    // Notify the active callbacks interface (the activity, if the
+                    // fragment is attached to one) that an item has been selected.
+                    mListener.onOperatingSystemLongClicked(holder.mItem);
+                    return true;
+                }
+                return false;
             }
         });
     }
