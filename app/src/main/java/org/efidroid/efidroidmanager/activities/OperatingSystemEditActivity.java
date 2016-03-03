@@ -346,7 +346,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==OSUpdateProgressActivity.RESULT_CODE_OK) {
+        if(requestCode==0 && resultCode==OSUpdateProgressActivity.RESULT_CODE_OK) {
             // this causes the parent activity to get recreated
             NavUtils.navigateUpFromSameTask(this);
             finish();
