@@ -59,4 +59,8 @@ public class Util {
             throw e;
         }
     }
+
+    public static long ROUNDUP(long number, long alignment) {
+        return (((number) + ((alignment)-1)) & ~((alignment)-1));
+    }
 }
