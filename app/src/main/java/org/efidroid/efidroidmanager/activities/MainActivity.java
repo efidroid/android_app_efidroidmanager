@@ -278,26 +278,23 @@ public class MainActivity extends AppCompatActivity
                             if (mountEntry == null)
                                 continue;
                             String mountPoint = mountEntry.getMountPoint();
-                            String multibootDir;
 
-                            // find multiboot directory
-                            if (RootToolsEx.isDirectory(mountPoint + "/media/0/multiboot"))
-                                multibootDir = mountPoint + "/media/0/multiboot";
-                            else if (RootToolsEx.isDirectory(mountPoint + "/media/multiboot"))
-                                multibootDir = mountPoint + "/media/multiboot";
-                            else if (RootToolsEx.isDirectory(mountPoint + "/multiboot"))
-                                multibootDir = mountPoint + "/multiboot";
-                            else
-                                continue;
+                            // find multiboot directories
+                            for(String multibootPath : OperatingSystem.MULTIBOOT_PATHS) {
+                                String multibootDir = mountPoint + multibootPath;
 
-                            // get multiboot.ini's
-                            List<String> directories = RootToolsEx.getMultibootSystems(multibootDir);
-                            for (String directory : directories) {
-                                String path = directory + "/multiboot.ini";
+                                if (!RootToolsEx.isDirectory(multibootDir))
+                                    continue;
 
-                                try {
-                                    list.add(new OperatingSystem(path));
-                                } catch (Exception e){}
+                                // get multiboot.ini's
+                                List<String> directories = RootToolsEx.getMultibootSystems(multibootDir);
+                                for (String directory : directories) {
+                                    String path = directory + "/multiboot.ini";
+
+                                    try {
+                                        list.add(new OperatingSystem(path));
+                                    } catch (Exception e){}
+                                }
                             }
                         }
                         catch (Exception e) {

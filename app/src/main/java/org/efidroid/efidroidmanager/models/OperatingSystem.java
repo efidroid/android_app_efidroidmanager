@@ -50,6 +50,8 @@ public class OperatingSystem implements Parcelable {
     public static final ArrayList<String> ALL_OS_TYPES = new ArrayList<>();
     public static final ArrayList<Integer> ALL_OS_TYPES_NAMES = new ArrayList<>();
 
+    public static final ArrayList<String> MULTIBOOT_PATHS = new ArrayList<>();
+
     public static class Partition implements Parcelable {
         private String mPartitionName;
         private String mFileName;
@@ -189,6 +191,11 @@ public class OperatingSystem implements Parcelable {
 
         ALL_OS_TYPES_NAMES.add(R.string.ostype_android);
         ALL_OS_TYPES_NAMES.add(R.string.ostype_ubuntu);
+
+        // the order is important
+        MULTIBOOT_PATHS.add("/media/0/multiboot");
+        MULTIBOOT_PATHS.add("/media/multiboot");
+        MULTIBOOT_PATHS.add("/multiboot");
     }
 
     public static boolean isBindAllowed(String fsType) {
