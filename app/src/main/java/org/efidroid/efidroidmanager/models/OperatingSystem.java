@@ -580,6 +580,21 @@ public class OperatingSystem implements Parcelable {
         return bitmap;
     }
 
+    public boolean hasLoadedIcon() {
+        if(mIconBitmapCache!=null)
+            return true;
+
+        if(isCreationMode() || mIconUri!=null) {
+            return false;
+        }
+        else {
+            if(mDeleteIcon)
+                return true;
+
+            return false;
+        }
+    }
+
     public void setDeleteIcon(boolean delete) {
         mDeleteIcon = delete;
         mIconBitmapCache = null;

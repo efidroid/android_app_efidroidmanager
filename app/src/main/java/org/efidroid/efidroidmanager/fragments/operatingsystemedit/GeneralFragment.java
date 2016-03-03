@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -212,7 +213,29 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
         return view;
     }
 
-    private void loadImage() {
+    private void loadIconAsync(final Context context) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    if(!mOperatingSystem.hasLoadedIcon()) {
+                        mOperatingSystem.getIconBitmap(context);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                loadImageDirect();
+            }
+        }.execute();
+    }
+
+    private void loadImageDirect() {
         try {
             Uri imageUri = mOperatingSystem.getIconUri();
             if(mOperatingSystem.isCreationMode() || imageUri!=null) {
@@ -231,6 +254,18 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
             Drawable drawable = ResourcesCompat.getDrawable(getResources(), android.R.mipmap.sym_def_app_icon, getActivity().getTheme());
             mIcon.setImageDrawable(drawable);
         }
+    }
+
+    private void loadImage() {
+        if(!mOperatingSystem.hasLoadedIcon()) {
+            Drawable drawable = ResourcesCompat.getDrawable(getResources(), android.R.mipmap.sym_def_app_icon, getActivity().getTheme());
+            mIcon.setImageDrawable(drawable);
+
+            loadIconAsync(getContext());
+            return;
+        }
+
+        loadImageDirect();
     }
 
     @Override
