@@ -8,4 +8,7 @@
 
     <color name="colorActionmode">#757575</color>
     <color name="colorActionmodeDark">#616161</color>
+
+    <color name="colorToolBarGrey">#455A64</color>
+    <color name="colorToolBarGreyDark">#374850</color>
 </resources>

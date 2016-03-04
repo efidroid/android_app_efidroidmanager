@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,26 +12,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import org.efidroid.efidroidmanager.R;
-import org.efidroid.efidroidmanager.RootToolsEx;
-import org.efidroid.efidroidmanager.fragments.OperatingSystemFragment.OnListFragmentInteractionListener;
-import org.efidroid.efidroidmanager.models.MountInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
-import org.efidroid.efidroidmanager.types.MountEntry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link OperatingSystem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener}.
  */
 public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<OperatingSystemRecyclerViewAdapter.ViewHolder> {
 
     private final List<OperatingSystem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener mListener;
 
     private void loadIconsAsync(final Context context) {
         new AsyncTask<Void, Integer, Void>() {
@@ -63,7 +55,7 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         }.execute();
     }
 
-    public OperatingSystemRecyclerViewAdapter(List<OperatingSystem> items, OnListFragmentInteractionListener listener) {
+    public OperatingSystemRecyclerViewAdapter(List<OperatingSystem> items, OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

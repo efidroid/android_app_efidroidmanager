@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -27,7 +31,9 @@ import com.stericson.roottools.RootTools;
 import org.efidroid.efidroidmanager.DataHelper;
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
+import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.fragments.EmptyFragment;
+import org.efidroid.efidroidmanager.fragments.InstallFragment;
 import org.efidroid.efidroidmanager.fragments.OperatingSystemFragment;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.MountInfo;
@@ -40,14 +46,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        OperatingSystemFragment.OnListFragmentInteractionListener,
-        DataHelper.DeviceInfoLoadCallback {
+        OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener,
+        DataHelper.DeviceInfoLoadCallback, InstallFragment.OnInstallFragmentInteractionListener {
 
     // status
     private boolean hasBusybox = false;
     private boolean hasRoot = false;
     private boolean mTouchDisabled = false;
-    private int mActiveMenuItemIndex = 0;
+    private int mActiveMenuItemId = 0;
     private MenuItem mPreviousMenuItem;
     private AsyncTask<?, ?, ?> mFragmentLoadingTask = null;
 
@@ -58,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     // args
     private static final String ARG_DEVICE_INFO = "deviceinfo";
     private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
-    private static final String ARG_ACTIVEMENU_INDEX = "activemenu_index";
+    private static final String ARG_ACTIVEMENU_ID = "activemenu_id";
     private static final String ARG_HAS_BUSYBOX = "has_busybox";
     private static final String ARG_HAS_ROOT = "has_root";
 
@@ -74,6 +80,9 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout mDrawer;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private MaterialDialog mProgressDialog = null;
+    private Toolbar mToolbar;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+    private AppBarLayout mAppBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,20 +90,29 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         // get views
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mFragmentProgress = (ProgressBar)findViewById(R.id.progressBar);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+
+        // set initial toolbar height
+        int initialHeight = Util.getStatusBarHeight(this) + Util.getToolBarHeight(this);
+        ViewGroup.LayoutParams layoutParams = mAppBarLayout.getLayoutParams();
+        layoutParams.height = initialHeight;
+        mAppBarLayout.setLayoutParams(layoutParams);
+        mAppBarLayout.setExpanded(false, false);
 
         // actionbar
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
 
         // drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.setDrawerListener(toggle);
+                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
         // FAB
@@ -131,7 +149,7 @@ public class MainActivity extends AppCompatActivity
         else {
             mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
             mOperatingSystems = savedInstanceState.getParcelableArrayList(ARG_OPERATING_SYSTEMS);
-            mActiveMenuItemIndex = savedInstanceState.getInt(ARG_ACTIVEMENU_INDEX);
+            mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
             hasBusybox = savedInstanceState.getBoolean(ARG_HAS_BUSYBOX);
             hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
             onLoadUiData();
@@ -159,11 +177,11 @@ public class MainActivity extends AppCompatActivity
                     .positiveText("Install")
                     .neutralText("Try again")
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            RootTools.offerBusyBox(MainActivity.this);
-                        }
-                    })
+                @Override
+                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    RootTools.offerBusyBox(MainActivity.this);
+                }
+            })
                     .onNeutral(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -188,8 +206,11 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        // show first tab
-        onNavigationItemSelected(mNavigationView.getMenu().getItem(mActiveMenuItemIndex));
+        // restore old tab
+        if(mActiveMenuItemId==0)
+            mActiveMenuItemId = R.id.nav_operating_systems;
+
+        onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
     }
 
     @Override
@@ -208,7 +229,7 @@ public class MainActivity extends AppCompatActivity
             onLoadUiData();
         }
 
-        if(mOperatingSystems==null)
+        if(mActiveMenuItemId==R.id.nav_operating_systems && mOperatingSystems==null)
             reloadOperatingSystems();
 
     }
@@ -229,7 +250,7 @@ public class MainActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(ARG_DEVICE_INFO, mDeviceInfo);
         outState.putParcelableArrayList(ARG_OPERATING_SYSTEMS, mOperatingSystems);
-        outState.putInt(ARG_ACTIVEMENU_INDEX, mActiveMenuItemIndex);
+        outState.putInt(ARG_ACTIVEMENU_ID, mActiveMenuItemId);
         outState.putBoolean(ARG_HAS_BUSYBOX, hasBusybox);
         outState.putBoolean(ARG_HAS_ROOT, hasRoot);
 
@@ -307,7 +328,7 @@ public class MainActivity extends AppCompatActivity
 
                                     try {
                                         list.add(new OperatingSystem(path));
-                                    } catch (Exception e){}
+                                    } catch (Exception ignored){}
                                 }
                             }
                         }
@@ -372,9 +393,12 @@ public class MainActivity extends AppCompatActivity
         // hide FAB
         mFab.setVisibility(View.GONE);
 
-        if (id == R.id.nav_operating_systems) {
-            mActiveMenuItemIndex = 0;
+        // reset appbar settings
+        mCollapsingToolbarLayout.setTitleEnabled(false);
+        mCollapsingToolbarLayout.setContentScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
+        mCollapsingToolbarLayout.setStatusBarScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, getTheme()));
 
+        if (id == R.id.nav_operating_systems) {
             // start loading
             if(mOperatingSystems==null) {
                 // show progressbar
@@ -397,29 +421,19 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             mSwipeRefreshLayout.setEnabled(true);
-
-            // show fab
-            mFab.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_recovery_tools) {
-            mActiveMenuItemIndex = 1;
-
-            // show fab
-            mFab.setVisibility(View.VISIBLE);
         } else if (id == R.id.nav_uefi_apps) {
-            mActiveMenuItemIndex = 2;
         } else if (id == R.id.nav_plugins) {
-            mActiveMenuItemIndex = 3;
+        } else if (id == R.id.nav_themes) {
         } else if (id == R.id.nav_install) {
-            mActiveMenuItemIndex = 4;
+            fragment = new InstallFragment();
         } else if (id == R.id.nav_share) {
-            mActiveMenuItemIndex = 5;
         } else if (id == R.id.nav_troubleshoot) {
-            mActiveMenuItemIndex = 6;
         } else if (id == R.id.nav_bug_report) {
-            mActiveMenuItemIndex = 7;
         } else if (id == R.id.nav_about) {
-            mActiveMenuItemIndex = 8;
         }
+
+        mActiveMenuItemId = item.getItemId();
 
         // use empty fragment
         if(fragment == null) {
@@ -502,17 +516,35 @@ public class MainActivity extends AppCompatActivity
         return mDeviceInfo;
     }
 
+    @Override
     public List<OperatingSystem> getOperatingSystems() {
         return mOperatingSystems;
     }
 
+    @Override
     public FloatingActionButton getFAB() {
         return mFab;
     }
 
     @Override
+    public Toolbar getToolbar() {
+        return mToolbar;
+    }
+
+    @Override
+    public CollapsingToolbarLayout getCollapsingToolbarLayout() {
+        return mCollapsingToolbarLayout;
+    }
+
+    @Override
+    public AppBarLayout getAppBarLayout() {
+        return mAppBarLayout;
+    }
+
+    @Override
     public void reloadOperatingSystems() {
         mOperatingSystems = null;
-        onNavigationItemSelected(mNavigationView.getMenu().getItem(mActiveMenuItemIndex));
+        if(mActiveMenuItemId>0)
+            onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
     }
 }

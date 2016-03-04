@@ -41,6 +41,10 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
     // request codes
     private static final int RESULT_IMAGE_PICKER = 1;
 
+    // task
+    AsyncTask<Void, Void, Void> mIconLoadingTask = null;
+
+    // UI
     private EditText mEditTextName;
     private EditText mEditTextDescription;
     private ImageView mIcon = null;
@@ -77,6 +81,12 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
     @Override
     public void onDetach() {
         mListener.removeOnCommitListener(this);
+
+        // stop running tasks
+        if(mIconLoadingTask!=null) {
+            mIconLoadingTask.cancel(true);
+            mIconLoadingTask = null;
+        }
 
         super.onDetach();
         mListener = null;
@@ -214,7 +224,10 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
     }
 
     private void loadIconAsync(final Context context) {
-        new AsyncTask<Void, Void, Void>() {
+        if(mIconLoadingTask!=null)
+            return;
+
+        mIconLoadingTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
@@ -231,6 +244,7 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
             @Override
             protected void onPostExecute(Void aVoid) {
                 loadImageDirect();
+                mIconLoadingTask = null;
             }
         }.execute();
     }
