@@ -1,6 +1,5 @@
 package org.efidroid.efidroidmanager.activities;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,11 +15,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -38,7 +37,6 @@ import org.efidroid.efidroidmanager.fragments.OperatingSystemFragment;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.MountInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
-import org.efidroid.efidroidmanager.tasks.OSRemovalProgressServiceTask;
 import org.efidroid.efidroidmanager.types.MountEntry;
 
 import java.util.ArrayList;
@@ -68,11 +66,6 @@ public class MainActivity extends AppCompatActivity
     private static final String ARG_HAS_BUSYBOX = "has_busybox";
     private static final String ARG_HAS_ROOT = "has_root";
 
-    // request codes
-    private static final int REQUEST_EDIT_OS = 0;
-    private static final int REQUEST_CREATE_OS = 1;
-    private static final int REQUEST_DELETE_OS = 2;
-
     // UI
     private NavigationView mNavigationView;
     private FloatingActionButton mFab;
@@ -83,6 +76,10 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private AppBarLayout mAppBarLayout;
+    private FrameLayout mToolbarFrameLayout;
+
+    // UI data
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        mToolbarFrameLayout = (FrameLayout) findViewById(R.id.toolbar_frame_layout);
 
         // set initial toolbar height
         int initialHeight = Util.getStatusBarHeight(this) + Util.getToolBarHeight(this);
@@ -109,22 +107,13 @@ public class MainActivity extends AppCompatActivity
         // actionbar
         setSupportActionBar(mToolbar);
 
+        // FAB
+
         // drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        // FAB
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, OperatingSystemEditActivity.class);
-                intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, new OperatingSystem());
-                intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
-                startActivityForResult(intent, REQUEST_CREATE_OS);
-            }
-        });
 
         // navigation view
         mNavigationView.setNavigationItemSelectedListener(this);
@@ -267,28 +256,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     private AsyncTask<Void, Void, Exception> makeOperatingSystemsTask() {
         final ArrayList<OperatingSystem> list = new ArrayList<>();
 
@@ -390,13 +357,15 @@ public class MainActivity extends AppCompatActivity
         mSwipeRefreshLayout.setOnRefreshListener(null);
         mSwipeRefreshLayout.setEnabled(false);
 
-        // hide FAB
+        // reset FAB
         mFab.setVisibility(View.GONE);
+        mFab.setOnClickListener(null);
 
         // reset appbar settings
         mCollapsingToolbarLayout.setTitleEnabled(false);
         mCollapsingToolbarLayout.setContentScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
         mCollapsingToolbarLayout.setStatusBarScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, getTheme()));
+        mToolbarFrameLayout.removeAllViews();
 
         if (id == R.id.nav_operating_systems) {
             // start loading
@@ -459,59 +428,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onOperatingSystemClicked(OperatingSystem item) {
-        Intent intent = new Intent(this, OperatingSystemEditActivity.class);
-        intent.putExtra(OperatingSystemEditActivity.ARG_OPERATING_SYSTEM, item);
-        intent.putExtra(OperatingSystemEditActivity.ARG_DEVICE_INFO, mDeviceInfo);
-        startActivityForResult(intent, REQUEST_EDIT_OS);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
-            case REQUEST_EDIT_OS:
-            case REQUEST_CREATE_OS:
-                if(resultCode==OperatingSystemEditActivity.RESULT_UPDATED)
-                    mOperatingSystems = null;
-                break;
-
-            case REQUEST_DELETE_OS:
-                mOperatingSystems = null;
-                break;
-
-            default:
-                super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
-    public void onOperatingSystemLongClicked(final OperatingSystem item) {
-        new MaterialDialog.Builder(this)
-                .title("Delete")
-                .content("Do you want to delete '"+item.getName()+"'?")
-                .positiveText("Delete")
-                .negativeText("Cancel")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-            @Override
-            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                Bundle extras = new Bundle();
-                Intent intent = GenericProgressActivity.makeIntent(
-                        MainActivity.this,
-                        OSRemovalProgressServiceTask.class,
-                        extras,
-                        "Deleting system\n"+item.getName(),
-                        R.anim.hold, R.anim.abc_slide_out_right_full,
-                        R.anim.hold, R.anim.abc_slide_out_right_full
-                );
-
-                extras.putParcelable(OSRemovalProgressServiceTask.ARG_OPERATING_SYSTEM, item);
-                startActivityForResult(intent, REQUEST_DELETE_OS);
-                overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.hold);
-            }
-        }).show();
-    }
-
-    @Override
     public DeviceInfo getDeviceInfo() {
         return mDeviceInfo;
     }
@@ -539,6 +455,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public AppBarLayout getAppBarLayout() {
         return mAppBarLayout;
+    }
+
+    @Override
+    public FrameLayout getToolbarFrameLayout() {
+        return mToolbarFrameLayout;
+    }
+
+    @Override
+    public DrawerLayout getDrawerLayout() {
+        return mDrawer;
     }
 
     @Override

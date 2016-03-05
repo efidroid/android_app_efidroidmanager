@@ -9,9 +9,9 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import org.efidroid.efidroidmanager.R;
-import org.efidroid.efidroidmanager.activities.GenericProgressActivity;
 import org.efidroid.efidroidmanager.activities.MainActivity;
 import org.efidroid.efidroidmanager.activities.NotificationReceiverActivity;
+import org.efidroid.efidroidmanager.types.ProgressReceiver;
 import org.efidroid.efidroidmanager.types.ProgressServiceTask;
 
 public class GenericProgressIntentService extends IntentServiceEx {
@@ -127,9 +127,9 @@ public class GenericProgressIntentService extends IntentServiceEx {
 
     public int publishProgress(int percent, String text) {
         Intent intent = new Intent();
-        intent.setAction(GenericProgressActivity.ACTION_OPUPDATE_PROGRESS);
-        intent.putExtra(GenericProgressActivity.ARG_OPUPDATE_PROGRESS, percent);
-        intent.putExtra(GenericProgressActivity.ARG_OPUPDATE_TEXT, text);
+        intent.setAction(ProgressReceiver.ACTION_OPUPDATE_PROGRESS);
+        intent.putExtra(ProgressReceiver.ARG_OPUPDATE_PROGRESS, percent);
+        intent.putExtra(ProgressReceiver.ARG_OPUPDATE_TEXT, text);
         sendBroadcast(intent);
 
         return percent;
@@ -137,8 +137,8 @@ public class GenericProgressIntentService extends IntentServiceEx {
 
     public void publishFinish(boolean success) {
         Intent intent = new Intent();
-        intent.setAction(GenericProgressActivity.ACTION_OPUPDATE_FINISH);
-        intent.putExtra(GenericProgressActivity.ARG_OPUPDATE_SUCCESS, success);
+        intent.setAction(ProgressReceiver.ACTION_OPUPDATE_FINISH);
+        intent.putExtra(ProgressReceiver.ARG_OPUPDATE_SUCCESS, success);
         sendBroadcast(intent);
     }
 

@@ -1,9 +1,7 @@
 package org.efidroid.efidroidmanager.activities;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,9 +13,10 @@ import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
+import org.efidroid.efidroidmanager.types.ProgressReceiver;
 import org.efidroid.efidroidmanager.view.ColorArcProgressBar;
 
-public class GenericProgressActivity extends AppCompatActivity {
+public class GenericProgressActivity extends AppCompatActivity implements ProgressReceiver.OnStatusChangeListener {
     // argument values
     private Class<?> mServiceClass = null;
     private Bundle mServiceBundle = null;
@@ -38,29 +37,15 @@ public class GenericProgressActivity extends AppCompatActivity {
     public static final String ARG_ANIM_ERROR_ENTER = "animation_error_enter";
     public static final String ARG_ANIM_ERROR_EXIT = "animation_error_exit";
 
-    // private argument names
-    private static final String ARG_PROGRESS = "progress";
-    private static final String ARG_PROGRESS_TEXT = "progress_text";
-    private static final String ARG_SUCCESS = "success";
-    private static final String ARG_FINISHED = "finished";
-
     // result codes
     public static final int RESULT_CODE_OK = 0;
     public static final int RESULT_CODE_ERROR = 1;
 
-    // broadcast actions
-    public static final String ACTION_OPUPDATE_PROGRESS = "action_opupdate_progress";
-    public static final String ARG_OPUPDATE_PROGRESS = "arg_opupdate_progress";
-    public static final String ARG_OPUPDATE_TEXT = "arg_opupdate_text";
-    public static final String ACTION_OPUPDATE_FINISH = "action_opupdate_finish";
-    public static final String ARG_OPUPDATE_SUCCESS = "arg_opupdate_success";
-
     // status
     private boolean mIsForeground = false;
-    private boolean mSuccess = false;
-    private boolean mFinished = false;
     private boolean mFinishOnResume = false;
-    private int mProgress = 0;
+    private ProgressReceiver mProgressReceiver;
+    private int mResultCode = RESULT_CODE_ERROR;
 
     // UI
     protected TextView mTextTitle;
@@ -69,39 +54,6 @@ public class GenericProgressActivity extends AppCompatActivity {
     private Button mButtonCancel;
     private Button mButtonBack;
     private Button mButtonOk;
-
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch(intent.getAction()) {
-                case ACTION_OPUPDATE_PROGRESS:
-                    if(!mFinished) {
-                        mProgress = intent.getIntExtra(ARG_OPUPDATE_PROGRESS, -1);
-                        mProgressCircle.setCurrentValues(mProgress);
-
-                        mTextHint.setText(intent.getStringExtra(ARG_OPUPDATE_TEXT));
-                    }
-                    break;
-
-                case ACTION_OPUPDATE_FINISH:
-                    mSuccess = intent.getBooleanExtra(ARG_OPUPDATE_SUCCESS, false);
-                    mFinished = true;
-                    finishProgressbar();
-
-                    if(mSuccess) {
-                        // finish now
-                        if (mIsForeground) {
-                            finishDelayed(1000);
-                        }
-
-                        // finish on resume
-                        else
-                            mFinishOnResume = true;
-                    }
-                    break;
-            }
-        }
-    };
 
     public static Intent makeIntent(Context context, Class<?> serviceHandler, Bundle serviceBundle, String title, int animSuccessEnter, int animSuccessExit, int animErrorEnter, int animErrorExit) {
         Intent intent = new Intent(context, GenericProgressActivity.class);
@@ -121,7 +73,7 @@ public class GenericProgressActivity extends AppCompatActivity {
         mButtonCancel.setVisibility(View.GONE);
 
         // indicate status
-        if(mSuccess) {
+        if(mProgressReceiver.wasSuccessful()) {
             mProgressCircle.setFrontArcColor(Color.parseColor("#E6EE9C"));
             mProgressCircle.setUnitColor(Color.parseColor("#E6EE9C"));
         } else {
@@ -147,8 +99,6 @@ public class GenericProgressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // reset variables
-        mFinished = false;
-        mSuccess = false;
         mFinishOnResume = false;
 
         Bundle extras;
@@ -208,35 +158,23 @@ public class GenericProgressActivity extends AppCompatActivity {
         mButtonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSuccess = true;
+                // this gets us back to the main activity
+                mResultCode = RESULT_CODE_OK;
                 finish();
             }
         });
 
-        // register broadcast receiver
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_OPUPDATE_PROGRESS);
-        filter.addAction(ACTION_OPUPDATE_FINISH);
-        registerReceiver(receiver, filter);
+        // create progress receiver
+        mProgressReceiver = new ProgressReceiver(this, this, mServiceClass, mServiceHandler, mServiceBundle);
 
         // start service
         if (savedInstanceState == null) {
-            Intent intent = new Intent(this, mServiceClass);
-            intent.putExtra(GenericProgressIntentService.ARG_BUNDLE, mServiceBundle);
-            intent.putExtra(GenericProgressIntentService.ARG_HANDLER, mServiceHandler);
-            startService(intent);
+            mProgressReceiver.startService();
         }
 
-        // restore ui status
+        // restore status
         else {
-            mProgress = savedInstanceState.getInt(ARG_PROGRESS);
-            mSuccess = savedInstanceState.getBoolean(ARG_SUCCESS);
-            mFinished = savedInstanceState.getBoolean(ARG_FINISHED);
-
-            mTextHint.setText(savedInstanceState.getString(ARG_PROGRESS_TEXT));
-            mProgressCircle.setCurrentValues(mProgress);
-            if(mFinished)
-                finishProgressbar();
+            mProgressReceiver.onRestoreInstanceState(savedInstanceState);
         }
 
         mTextTitle.setText(mTitle);
@@ -244,23 +182,19 @@ public class GenericProgressActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(receiver);
+        mProgressReceiver.notifyDestroy();
         super.onDestroy();
     }
 
     @Override
     public void finish() {
         // set result
-        if(mSuccess) {
-            setResult(RESULT_CODE_OK);
-        } else {
-            setResult(RESULT_CODE_ERROR);
-        }
+        setResult(mResultCode);
 
         // finish
         super.finish();
 
-        if(mSuccess) {
+        if(mResultCode==RESULT_CODE_OK) {
             overridePendingTransition(mAnimSuccessEnter, mAnimSuccessExit);
         } else {
             overridePendingTransition(mAnimErrorEnter, mAnimErrorExit);
@@ -279,12 +213,7 @@ public class GenericProgressActivity extends AppCompatActivity {
         outState.putInt(ARG_ANIM_ERROR_ENTER, mAnimErrorEnter);
         outState.putInt(ARG_ANIM_ERROR_EXIT, mAnimErrorExit);
 
-        // restore private args
-        outState.putInt(ARG_PROGRESS, mProgress);
-        outState.putString(ARG_PROGRESS_TEXT, mTextHint.getText().toString());
-        outState.putBoolean(ARG_SUCCESS, mSuccess);
-        outState.putBoolean(ARG_FINISHED, mFinished);
-
+        mProgressReceiver.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -292,20 +221,14 @@ public class GenericProgressActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mIsForeground = false;
-
-        // show notification
-        if(!mFinished)
-            GenericProgressIntentService.showNotification(this, mServiceClass, true);
+        mProgressReceiver.notifyPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mIsForeground = true;
-
-        // hide notification
-        if(!mFinished)
-            GenericProgressIntentService.showNotification(this, mServiceClass, false);
+        mProgressReceiver.notifyResume();
 
         // finish
         if(mFinishOnResume) {
@@ -317,5 +240,27 @@ public class GenericProgressActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // block back button
+    }
+
+    @Override
+    public void onStatusUpdate(int progress, String text) {
+        mProgressCircle.setCurrentValues(progress);
+        mTextHint.setText(text);
+    }
+
+    @Override
+    public void onCompleted(boolean success) {
+        finishProgressbar();
+
+        if(success) {
+            // finish now
+            if (!mFinishOnResume && mIsForeground) {
+                finishDelayed(1000);
+            }
+
+            // finish on resume
+            else
+                mFinishOnResume = true;
+        }
     }
 }

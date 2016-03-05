@@ -24,7 +24,7 @@ import java.util.List;
 public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<OperatingSystemRecyclerViewAdapter.ViewHolder> {
 
     private final List<OperatingSystem> mValues;
-    private final OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener mListener;
+    private final OnInteractionListener mListener;
 
     private void loadIconsAsync(final Context context) {
         new AsyncTask<Void, Integer, Void>() {
@@ -55,7 +55,7 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         }.execute();
     }
 
-    public OperatingSystemRecyclerViewAdapter(List<OperatingSystem> items, OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener listener) {
+    public OperatingSystemRecyclerViewAdapter(List<OperatingSystem> items, OnInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -150,5 +150,10 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
             mSubtitleView = (TextView) view.findViewById(R.id.text2);
             mImageView = (ImageView) view.findViewById(R.id.image);
         }
+    }
+
+    public interface OnInteractionListener {
+        void onOperatingSystemClicked(OperatingSystem item);
+        void onOperatingSystemLongClicked(OperatingSystem item);
     }
 }

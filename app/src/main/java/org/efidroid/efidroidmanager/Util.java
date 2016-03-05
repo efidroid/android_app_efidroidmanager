@@ -1,5 +1,6 @@
 package org.efidroid.efidroidmanager;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -103,20 +104,40 @@ public class Util {
         }
 
         // create value animator
+        final ViewGroup.LayoutParams layoutParams = appBarLayout.getLayoutParams();
         ValueAnimator anim = ValueAnimator.ofInt(startHeightPx, totalHeightPX);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = appBarLayout.getLayoutParams();
                 layoutParams.height = val;
                 appBarLayout.setLayoutParams(layoutParams);
+            }
+        });
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                appBarLayout.setExpanded(expand, false);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
             }
         });
 
         // start animation
         anim.setDuration(animTime);
-        appBarLayout.setExpanded(expand, animTime>0);
         anim.start();
     }
 }
