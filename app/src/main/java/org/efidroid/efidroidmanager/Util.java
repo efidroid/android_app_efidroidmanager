@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
+import org.efidroid.efidroidmanager.types.ArgbEvaluator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -139,5 +140,23 @@ public class Util {
         // start animation
         anim.setDuration(animTime);
         anim.start();
+    }
+
+    /**
+     * Constructs and returns a ValueAnimator that animates between color values. A single
+     * value implies that that value is the one being animated to. However, this is not typically
+     * useful in a ValueAnimator object because there is no way for the object to determine the
+     * starting value for the animation (unlike ObjectAnimator, which can derive that value
+     * from the target object and property being animated). Therefore, there should typically
+     * be two or more values.
+     *
+     * @param values A set of values that the animation will animate between over time.
+     * @return A ValueAnimator object that is set up to animate between the given values.
+     */
+    public static ValueAnimator CompatAnimatorOfArgb(int... values) {
+        ValueAnimator anim = new ValueAnimator();
+        anim.setIntValues(values);
+        anim.setEvaluator(ArgbEvaluator.getInstance());
+        return anim;
     }
 }

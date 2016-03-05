@@ -37,6 +37,13 @@ public class ProgressReceiver {
     private Context mContext;
     private OnStatusChangeListener mListener;
 
+    public void reset() {
+        mProgress = 0;
+        mProgressText = "";
+        mSuccess = false;
+        mFinished = false;
+    }
+
     public interface OnStatusChangeListener {
         void onStatusUpdate(int progress, String text);
         void onCompleted(boolean success);

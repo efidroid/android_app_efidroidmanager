@@ -19,7 +19,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         int progress = 0;
         try {
             for(int i=0; i<=100; i++) {
-                publishProgress(1, "Progess "+i+"/100");
+                publishProgress(i, "Progess "+i+"/100");
                 Thread.sleep(100, 0);
             }
 

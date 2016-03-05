@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="ColorArcProgressBar">
-        <attr name="back_color" format="color"/>
-        <attr name="front_color1" format="color"/>
-        <attr name="front_color2" format="color"/>
-        <attr name="front_color3" format="color"/>
-        <attr name="back_width" format="dimension"/>
-        <attr name="front_width" format="dimension"/>
-        <attr name="is_need_title" format="boolean"/>
-        <attr name="is_need_content" format="boolean"/>
-        <attr name="is_need_unit" format="boolean"/>
-        <attr name="is_need_dial" format="boolean"/>
-        <attr name="string_title" format="string"/>
-        <attr name="string_unit" format="string"/>
-        <attr name="unit_color" format="color"/>
-        <attr name="hint_color" format="color"/>
-        <attr name="total_engle" format="integer"/>
-        <attr name="current_value" format="float"/>
-        <attr name="max_value" format="float"/>
+    <declare-styleable name="ProgressCircle">
+        <attr name="baseStrokeWidth" format="dimension"/>
+        <attr name="progressStrokeWidth" format="dimension"/>
+        <attr name="baseStrokeColor" format="color"/>
+        <attr name="progressStrokeColor" format="color"/>
+        <attr name="minValue" format="float"/>
+        <attr name="maxValue" format="float"/>
+        <attr name="currentValue" format="float"/>
+        <attr name="startAngle" format="integer"/>
+        <attr name="sweepAngle" format="integer"/>
+        <attr name="fillColor" format="color"/>
+        <attr name="contentText" format="string"/>
+        <attr name="contentTextSize" format="dimension"/>
+        <attr name="contentTextColor" format="color"/>
+        <attr name="hideProgress" format="boolean"/>
     </declare-styleable>
 </resources>

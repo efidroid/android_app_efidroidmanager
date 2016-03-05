@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:paddingTop="@dimen/activity_vertical_margin">
 
-    <Button
-        android:id="@+id/circle_button"
+    <org.efidroid.efidroidmanager.view.ProgressCircle
+        android:id="@+id/progressCircle"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:background="@drawable/md_circle"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="35sp"
-        android:textAllCaps="false"
-        android:text="Install"/>
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        app:baseStrokeWidth="1dp"
+        app:progressStrokeWidth="10dp"
+        app:baseStrokeColor="@android:color/white"
+        app:progressStrokeColor="@android:color/white"
+        app:fillColor="@color/colorPrimary"
+        app:contentText="Install"
+        app:contentTextColor="@android:color/white"
+        app:contentTextSize="35sp"
+        app:hideProgress="true"/>
 
-</LinearLayout>
+</RelativeLayout>

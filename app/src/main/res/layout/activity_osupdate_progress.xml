@@ -27,22 +27,18 @@
         android:layout_centerVertical="true"
         android:orientation="vertical">
 
-        <org.efidroid.efidroidmanager.view.ColorArcProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
+        <org.efidroid.efidroidmanager.view.ProgressCircle
+            android:id="@+id/progressCircle"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:back_color="@android:color/white"
-            app:back_width="1dp"
-            app:front_color1="@android:color/white"
-            app:front_width="10dp"
-            app:hint_color="@android:color/white"
-            app:is_need_content="true"
-            app:is_need_unit="true"
-            app:max_value="100"
-            app:string_unit=""
-            app:total_engle="360"
-            app:unit_color="@android:color/white" />
+            app:baseStrokeWidth="1dp"
+            app:baseStrokeColor="@android:color/white"
+            app:progressStrokeWidth="10dp"
+            app:progressStrokeColor="@android:color/white"
+            app:contentTextColor="@android:color/white"
+            app:contentTextSize="70sp"
+            android:layout_marginBottom="10dp"/>
 
         <TextView
             android:id="@+id/textHint"
@@ -55,10 +51,8 @@
 
     </LinearLayout>
 
-
-
-
     <LinearLayout
+        android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -71,7 +65,6 @@
             android:background="@android:color/white" />
 
         <LinearLayout
-            android:id="@+id/button_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

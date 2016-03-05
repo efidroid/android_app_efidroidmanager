@@ -8,13 +8,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
 import org.efidroid.efidroidmanager.types.ProgressReceiver;
-import org.efidroid.efidroidmanager.view.ColorArcProgressBar;
+import org.efidroid.efidroidmanager.view.ProgressCircle;
 
 public class GenericProgressActivity extends AppCompatActivity implements ProgressReceiver.OnStatusChangeListener {
     // argument values
@@ -50,10 +51,11 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
     // UI
     protected TextView mTextTitle;
     private TextView mTextHint;
-    private ColorArcProgressBar mProgressCircle;
+    private ProgressCircle mProgressCircle;
     private Button mButtonCancel;
     private Button mButtonBack;
     private Button mButtonOk;
+    private ViewGroup mButtonContainer;
 
     public static Intent makeIntent(Context context, Class<?> serviceHandler, Bundle serviceBundle, String title, int animSuccessEnter, int animSuccessExit, int animErrorEnter, int animErrorExit) {
         Intent intent = new Intent(context, GenericProgressActivity.class);
@@ -74,11 +76,13 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
 
         // indicate status
         if(mProgressReceiver.wasSuccessful()) {
-            mProgressCircle.setFrontArcColor(Color.parseColor("#E6EE9C"));
-            mProgressCircle.setUnitColor(Color.parseColor("#E6EE9C"));
+            mButtonContainer.setVisibility(View.GONE);
+            mProgressCircle.setProgressStrokeColor(Color.parseColor("#E6EE9C"), true, 200);
+            mProgressCircle.setProgressStrokeColor(Color.parseColor("#E6EE9C"), true, 200);
         } else {
-            mProgressCircle.setFrontArcColor(Color.parseColor("#FFAB91"));
-            mProgressCircle.setUnitColor(Color.parseColor("#FFAB91"));
+            mButtonContainer.setVisibility(View.VISIBLE);
+            mProgressCircle.setProgressStrokeColor(Color.parseColor("#FFAB91"), true, 200);
+            mProgressCircle.setProgressStrokeColor(Color.parseColor("#FFAB91"), true, 200);
 
             // show back/ok buttons
             mButtonBack.setVisibility(View.VISIBLE);
@@ -128,10 +132,11 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         // get views
         mTextTitle = (TextView) findViewById(R.id.textTitle);
         mTextHint = (TextView) findViewById(R.id.textHint);
-        mProgressCircle = (ColorArcProgressBar) findViewById(R.id.progressBar);
+        mProgressCircle = (ProgressCircle) findViewById(R.id.progressCircle);
         mButtonCancel = (Button)findViewById(R.id.button_cancel);
         mButtonBack= (Button)findViewById(R.id.button_back);
         mButtonOk = (Button)findViewById(R.id.button_ok);
+        mButtonContainer = (ViewGroup)findViewById(R.id.button_container);
 
         // set statusbar color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -244,7 +249,8 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
 
     @Override
     public void onStatusUpdate(int progress, String text) {
-        mProgressCircle.setCurrentValues(progress);
+        mProgressCircle.setValue(progress, true, 100);
+        mProgressCircle.setContentText(progress+"%");
         mTextHint.setText(text);
     }
 

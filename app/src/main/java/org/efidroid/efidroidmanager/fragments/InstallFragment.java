@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.melnykov.fab.FloatingActionButton;
 
@@ -29,14 +30,15 @@ import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.tasks.EFIDroidInstallServiceTask;
 import org.efidroid.efidroidmanager.types.ProgressReceiver;
+import org.efidroid.efidroidmanager.view.ProgressCircle;
 
 public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener, ProgressReceiver.OnStatusChangeListener {
     // listener
     private OnInstallFragmentInteractionListener mListener;
 
     // UI
-    private Button mCircleButton;
     private ProgressReceiver mProgressReceiver;
+    private ProgressCircle mProgressCircle;
 
     public InstallFragment() {
     }
@@ -53,6 +55,10 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_install, menu);
+    }
+
+    private int getColor(int id) {
+        return ResourcesCompat.getColor(getResources(), id, getActivity().getTheme());
     }
 
     @Nullable
@@ -81,10 +87,23 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
         // inflate toolbar layout
         FrameLayout toolbarFrameLayout = mListener.getToolbarFrameLayout();
         LayoutInflater tbInflater = LayoutInflater.from(toolbarFrameLayout.getContext());
+
         View toolbarView = tbInflater.inflate(R.layout.toolbar_layout_install, toolbarFrameLayout, true);
 
-        // get views
-        mCircleButton = (Button) toolbarView.findViewById(R.id.circle_button);
+        // progress circle
+        mProgressCircle = (ProgressCircle) toolbarView.findViewById(R.id.progressCircle);
+        mProgressCircle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mProgressReceiver.isFinished()) {
+                    mListener.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                    mProgressCircle.setClickable(false);
+                    mProgressCircle.setValue(0, false, 0);
+                    mProgressCircle.setProgressHidden(false, true, 200);
+                    mProgressReceiver.startService();
+                }
+            }
+        });
 
         // menu
         setHasOptionsMenu(true);
@@ -97,20 +116,12 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
 
         // circle button
-        GradientDrawable bgShape = (GradientDrawable)mCircleButton.getBackground();
+        //GradientDrawable bgShape = (GradientDrawable)mCircleButton.getIm();
         //bgShape.setColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getActivity().getTheme()));
         //bgShape.setColor(Color.parseColor("#4CAF50")); // green - installed + updated
         //bgShape.setColor(Color.parseColor("#FFC107")); // orange - installed + update available
-        bgShape.setColor(Color.parseColor("#FF5722")); // red - not installed
-        mCircleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!mProgressReceiver.isFinished()) {
-                    mListener.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                    mProgressReceiver.startService();
-                }
-            }
-        });
+        //bgShape.setColor(Color.parseColor("#FF5722")); // red - not installed
+        mProgressCircle.setFillColor(Color.parseColor("#9E9E9E"), false, 0); // grey - loading
 
         return view;
     }
@@ -168,12 +179,17 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     @Override
     public void onStatusUpdate(int progress, String text) {
-        mCircleButton.setText(text);
+        mProgressCircle.setValue(progress, true, 100);
+        mProgressCircle.setContentText(text);
     }
 
     @Override
     public void onCompleted(boolean success) {
+        mProgressCircle.setClickable(true);
         mListener.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        mProgressCircle.setProgressHidden(true, true, 1000);
+        mProgressCircle.setFillColor(Color.parseColor("#4CAF50"), true, 1000);
+        mProgressReceiver.reset();
     }
 
     public interface OnInstallFragmentInteractionListener {
