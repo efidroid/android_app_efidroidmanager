@@ -259,6 +259,8 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         finishProgressbar();
 
         if(success) {
+            mResultCode = RESULT_CODE_OK;
+
             // finish now
             if (!mFinishOnResume && mIsForeground) {
                 finishDelayed(1000);
