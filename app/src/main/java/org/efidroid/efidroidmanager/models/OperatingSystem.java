@@ -570,9 +570,8 @@ public class OperatingSystem implements Parcelable {
             // get icon
             String iconPath = getDirectory()+"/icon.png";
             if (RootToolsEx.isFile(iconPath)) {
-                File cacheFile = RootToolsEx.copyFileToTemp(context, iconPath);
-                bitmap = BitmapFactory.decodeFile(cacheFile.getAbsolutePath());
-                RootTools.deleteFileOrDirectory(cacheFile.getAbsolutePath(), false);
+                byte[] bytes = RootToolsEx.readBinaryFile(iconPath);
+                bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             }
         }
 

@@ -2,6 +2,7 @@ package org.efidroid.efidroidmanager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Base64;
 import android.util.Log;
 
 import com.stericson.rootshell.RootShell;
@@ -388,6 +389,29 @@ public final class RootToolsEx {
             return null;
 
         return stringWriter.getBuffer().toString();
+    }
+
+    public static byte[] readBinaryFile(String path) throws Exception {
+        final StringBuffer sb = new StringBuffer();
+
+        final Command command = new Command(0, false, "busybox cat \""+path+"\" | busybox base64")
+        {
+            @Override
+            public void commandOutput(int id, String line) {
+                super.commandOutput(id, line);
+                sb.append(line);
+            }
+        };
+
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
+
+        if(command.getExitCode()!=0)
+            return null;
+
+        return Base64.decode(sb.toString(), Base64.DEFAULT);
     }
 
     public static void copyFileNoRoot(String source, String destination) throws Exception {
