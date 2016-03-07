@@ -4,10 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.efidroid.efidroidmanager.AppConstants;
+import org.efidroid.efidroidmanager.RootToolsEx;
+import org.efidroid.efidroidmanager.types.FSTabEntry;
+import org.efidroid.efidroidmanager.types.MountEntry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 public class DeviceInfo implements Parcelable {
 
@@ -69,5 +73,50 @@ public class DeviceInfo implements Parcelable {
 
     public FSTab getFSTab() {
         return mFSTab;
+    }
+
+    public String getESPDir(boolean requireUEFIESPDir) {
+        for(FSTabEntry entry : mFSTab.getFSTabEntries()) {
+            String espFlag = entry.getESP();
+            if (espFlag == null)
+                continue;
+
+            try {
+                // load mount info
+                MountInfo mountInfo = RootToolsEx.getMountInfo();
+
+                int[] majmin = RootToolsEx.getDeviceNode(entry.getBlkDevice());
+                MountEntry mountEntry = mountInfo.getByMajorMinor(majmin[0], majmin[1]);
+                if (mountEntry == null)
+                    return null;
+                String mountPoint = mountEntry.getMountPoint();
+
+                // absolute path
+                if(espFlag.startsWith("/"))
+                    return mountPoint+espFlag;
+
+                if(espFlag.equals("datamedia")) {
+                    String path;
+
+                    if(requireUEFIESPDir)
+                        path = mountPoint + "/media/0/UEFIESP";
+                    else
+                        path = mountPoint + "/media/0";
+                    if (RootToolsEx.isDirectory(path))
+                        return path;
+
+                    if(requireUEFIESPDir)
+                        path = mountPoint + "/media/UEFIESP";
+                    else
+                        path = mountPoint + "/media";
+                    if (RootToolsEx.isDirectory(path))
+                        return path;
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }

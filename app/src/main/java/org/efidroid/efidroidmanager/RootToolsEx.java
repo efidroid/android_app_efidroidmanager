@@ -414,6 +414,29 @@ public final class RootToolsEx {
         return Base64.decode(sb.toString(), Base64.DEFAULT);
     }
 
+    public static byte[] readBinaryFileEx(String path, long offset, long size) throws Exception {
+        final StringBuffer sb = new StringBuffer();
+
+        final Command command = new Command(0, false, "busybox dd if=\""+path+"\" bs=1 count="+size+" skip="+offset+" status=none | busybox base64")
+        {
+            @Override
+            public void commandOutput(int id, String line) {
+                super.commandOutput(id, line);
+                sb.append(line);
+            }
+        };
+
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
+
+        if(command.getExitCode()!=0)
+            return null;
+
+        return Base64.decode(sb.toString(), Base64.NO_WRAP);
+    }
+
     public static void copyFileNoRoot(String source, String destination) throws Exception {
         final Command command = new Command(0, false, "su -c 'busybox cat \""+source+"\"' > \""+destination+"\"");
 
@@ -478,6 +501,14 @@ public final class RootToolsEx {
 
     public static void createLoopImage(IntentServiceEx service, String filename, long size) throws Exception {
         final Command command = new Command(0, false, 0, "busybox dd if=/dev/zero of=\""+filename+"\" bs=512 count="+(Util.ROUNDUP(size,512)/512)+"");
+        int rc = runServiceCommand(service, command);
+        ReturnCodeException.check(rc);
+    }
+
+    public static void createPartitionBackup(IntentServiceEx service, String device, String filename) throws Exception {
+        long size = getDeviceSize(device);
+
+        final Command command = new Command(0, false, 0, "busybox dd if=\""+device+"\" of=\""+filename+"\" bs=512 count="+(Util.ROUNDUP(size,512)/512)+"");
         int rc = runServiceCommand(service, command);
         ReturnCodeException.check(rc);
     }
@@ -626,5 +657,23 @@ public final class RootToolsEx {
 
         // delete cache file
         cacheFile.delete();
+    }
+
+    public static int unzip(String zip, String destination) throws Exception {
+        mkdir(destination, true);
+
+        final Command command = new Command(0, false, "busybox unzip -oq \""+zip+"\" -d \""+destination+"\"");
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+        return command.getExitCode();
+    }
+
+    public static void dd(String source, String destination) throws Exception {
+        final Command command = new Command(0, false, "busybox dd if=\""+source+"\" of=\""+destination+"\"");
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+        ReturnCodeException.check(command.getExitCode());
     }
 }

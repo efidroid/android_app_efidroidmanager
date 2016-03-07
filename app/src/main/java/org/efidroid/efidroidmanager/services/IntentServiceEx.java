@@ -127,6 +127,10 @@ public abstract class IntentServiceEx extends Service {
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
 
+    protected void earlyStop() {
+
+    }
+
     @Override
     public void onStart(Intent intent, int startId) {
         if(intent.getAction()!=null) {
@@ -209,6 +213,9 @@ public abstract class IntentServiceEx extends Service {
         public void handleMessage(Message msg) {
             if(!shouldStop()) {
                 onHandleIntent((Intent) msg.obj);
+            }
+            else {
+                earlyStop();
             }
 
             mShouldStop = false;

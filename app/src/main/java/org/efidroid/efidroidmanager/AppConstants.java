@@ -18,4 +18,8 @@ public final class AppConstants {
     public static String getDeviceRepoUrl(DeviceInfo deviceInfo) {
         return "https://raw.githubusercontent.com/efidroid/device/"+deviceInfo.getDeviceName();
     }
+
+    public static String getUpdatesUrl(DeviceInfo deviceInfo) {
+        return URL_OTA+"/"+deviceInfo.getDeviceName()+"/info.json";
+    }
 }

@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.support.design.widget.AppBarLayout;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.ViewGroup;
 
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
@@ -139,6 +140,49 @@ public class Util {
 
         // start animation
         anim.setDuration(animTime);
+        anim.start();
+    }
+
+    public static void animateVisibility(final View v, final int visibility, int duration) {
+        ValueAnimator anim = ValueAnimator.ofFloat(v.getVisibility() == View.VISIBLE ? 1 : 0, visibility == View.VISIBLE ? 1 : 0);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float val = (Float) valueAnimator.getAnimatedValue();
+                v.setAlpha(val);
+            }
+        });
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                v.setAlpha(1);
+                v.setVisibility(visibility);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.setDuration(duration);
+
+        // show view now
+        if(v.getVisibility() != View.VISIBLE)
+            v.setAlpha(0);
+        else v.setAlpha(1);
+        v.setVisibility(View.VISIBLE);
+
+        // start animation
         anim.start();
     }
 

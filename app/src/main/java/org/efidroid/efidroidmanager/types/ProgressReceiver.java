@@ -26,18 +26,25 @@ public class ProgressReceiver {
     private static final String ARG_PROGRESS_TEXT = "progressreceiver_progress_text";
     private static final String ARG_SUCCESS = "progressreceiver_success";
     private static final String ARG_FINISHED = "progressreceiver_finished";
+    private static final String ARG_RUNNING = "progressreceiver_running";
+    private static final String ARG_SERVICE_CLASS = "progressreceiver_service_class";
+    private static final String ARG_SERVICE_HANDLER = "progressreceiver_service_handler";
 
     // status
     private int mProgress = 0;
     private String mProgressText = "";
     private boolean mSuccess = false;
     private boolean mFinished = false;
+    private boolean mIsRunning = false;
 
     // context, listener
     private Context mContext;
     private OnStatusChangeListener mListener;
 
     public void reset() {
+        if(mIsRunning)
+            throw new RuntimeException("service is still running");
+
         mProgress = 0;
         mProgressText = "";
         mSuccess = false;
@@ -65,6 +72,7 @@ public class ProgressReceiver {
                 case ACTION_OPUPDATE_FINISH:
                     mSuccess = intent.getBooleanExtra(ARG_OPUPDATE_SUCCESS, false);
                     mFinished = true;
+                    mIsRunning = false;
 
                     mListener.onCompleted(mSuccess);
                     break;
@@ -76,6 +84,7 @@ public class ProgressReceiver {
         // initialize variables
         mFinished = false;
         mSuccess = false;
+        mIsRunning = false;
         mContext = context;
         mListener = listener;
 
@@ -112,20 +121,49 @@ public class ProgressReceiver {
             GenericProgressIntentService.showNotification(mContext, mServiceClass, false);
     }
 
+    public void setServiceClass(Class<?> serviceClass) {
+        if(mIsRunning)
+            throw new RuntimeException("service is still running");
+
+        mServiceClass = serviceClass;
+    }
+
+    public void setServiceHandler(Class<?> serviceHandler) {
+        if(mIsRunning)
+            throw new RuntimeException("service is still running");
+
+        mServiceHandler = serviceHandler;
+    }
+
+    public void setServiceBundle(Bundle bundle) {
+        if(mIsRunning)
+            throw new RuntimeException("service is still running");
+
+        mServiceBundle = bundle;
+    }
+
     public void onSaveInstanceState(Bundle outState) {
         // store private data
         outState.putInt(ARG_PROGRESS, mProgress);
         outState.putString(ARG_PROGRESS_TEXT, mProgressText);
         outState.putBoolean(ARG_SUCCESS, mSuccess);
         outState.putBoolean(ARG_FINISHED, mFinished);
+        outState.putBoolean(ARG_RUNNING, mIsRunning);
+
+        outState.putSerializable(ARG_SERVICE_CLASS, mServiceClass);
+        outState.putSerializable(ARG_SERVICE_HANDLER, mServiceHandler);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        // restore private dta
+        // restore private data
         mProgress = savedInstanceState.getInt(ARG_PROGRESS);
         mProgressText = savedInstanceState.getString(ARG_PROGRESS_TEXT);
         mSuccess = savedInstanceState.getBoolean(ARG_SUCCESS);
         mFinished = savedInstanceState.getBoolean(ARG_FINISHED);
+        mIsRunning = savedInstanceState.getBoolean(ARG_RUNNING);
+
+        mServiceClass = (Class<?>) savedInstanceState.getSerializable(ARG_SERVICE_CLASS);
+        mServiceHandler = (Class<?>) savedInstanceState.getSerializable(ARG_SERVICE_HANDLER);
 
         mListener.onStatusUpdate(mProgress, mProgressText);
         if(mFinished)
@@ -133,13 +171,15 @@ public class ProgressReceiver {
     }
 
     public void startService() {
-        if(!mFinished) {
-            // start service
-            Intent serviceIntent = new Intent(mContext, mServiceClass);
-            serviceIntent.putExtra(GenericProgressIntentService.ARG_BUNDLE, mServiceBundle);
-            serviceIntent.putExtra(GenericProgressIntentService.ARG_HANDLER, mServiceHandler);
-            mContext.startService(serviceIntent);
-        }
+        if(mIsRunning)
+            throw new RuntimeException("service is still running");
+
+        // start service
+        Intent serviceIntent = new Intent(mContext, mServiceClass);
+        serviceIntent.putExtra(GenericProgressIntentService.ARG_BUNDLE, mServiceBundle);
+        serviceIntent.putExtra(GenericProgressIntentService.ARG_HANDLER, mServiceHandler);
+        mIsRunning = true;
+        mContext.startService(serviceIntent);
     }
 
     public boolean wasSuccessful() {

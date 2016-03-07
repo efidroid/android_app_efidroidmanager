@@ -169,6 +169,12 @@ public class GenericProgressIntentService extends IntentServiceEx {
         }
     }
 
+    @Override
+    protected void earlyStop() {
+        publishProgress(0, "Aborted");
+        publishFinish(false);
+    }
+
     public static void handleNotificationIntent(Activity activity, Class<?> clazz) {
         switch(activity.getIntent().getAction()) {
             case BUTTON_ACTION_STOP:

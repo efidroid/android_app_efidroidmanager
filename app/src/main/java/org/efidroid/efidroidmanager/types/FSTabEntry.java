@@ -3,6 +3,8 @@ package org.efidroid.efidroidmanager.types;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.efidroid.efidroidmanager.RootToolsEx;
+
 public class FSTabEntry implements Parcelable {
     final String mBlkDevice;
     final String mMountPoint;
@@ -11,11 +13,22 @@ public class FSTabEntry implements Parcelable {
     final String mFfMgrFlags;
 
     public FSTabEntry(String blkDevice, String mountPoint, String fsType, String mountFlags, String fsMgrFlags) {
-        mBlkDevice = blkDevice;
         mMountPoint = mountPoint;
         mFsType = fsType;
         mMountFlags = mountFlags;
         mFfMgrFlags = fsMgrFlags;
+
+        // use backup node if it exists
+        String new_blkDevice = blkDevice;
+        try {
+            String backup = "/multiboot/dev/replacement_backup_"+getName();
+            if(RootToolsEx.nodeExists(backup)) {
+                new_blkDevice = backup;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mBlkDevice = new_blkDevice;
     }
 
     protected FSTabEntry(Parcel in) {
@@ -60,6 +73,10 @@ public class FSTabEntry implements Parcelable {
         return mMountPoint;
     }
 
+    public String getName() {
+        return getMountPoint().substring(1);
+    }
+
     public String getFsType() {
         return mFsType;
     }
@@ -80,5 +97,27 @@ public class FSTabEntry implements Parcelable {
         }
 
         return false;
+    }
+
+    public boolean isUEFI() {
+        String[] parts = mFfMgrFlags.split(",");
+        for(String part : parts) {
+            if(part.equals("uefi"))
+                return true;
+        }
+
+        return false;
+    }
+
+    public String getESP() {
+        String[] parts = mFfMgrFlags.split(",");
+        for(String part : parts) {
+            if(!part.startsWith("esp"))
+                continue;
+
+            return part.substring(4);
+        }
+
+        return null;
     }
 }

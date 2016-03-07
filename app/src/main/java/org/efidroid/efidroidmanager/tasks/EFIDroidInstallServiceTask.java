@@ -2,32 +2,215 @@ package org.efidroid.efidroidmanager.tasks;
 
 import android.os.Bundle;
 
+import com.stericson.rootshell.RootShell;
+import com.stericson.roottools.RootTools;
+
+import org.efidroid.efidroidmanager.AppConstants;
+import org.efidroid.efidroidmanager.RootToolsEx;
+import org.efidroid.efidroidmanager.Util;
+import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
+import org.efidroid.efidroidmanager.types.FSTabEntry;
+import org.efidroid.efidroidmanager.types.InstallationEntry;
+import org.efidroid.efidroidmanager.types.InstallationStatus;
 import org.efidroid.efidroidmanager.types.ProgressServiceTask;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class EFIDroidInstallServiceTask extends ProgressServiceTask {
+    // args
+    public static final String ARG_DEVICE_INFO = "device_info";
+    public static final String ARG_INSTALL_STATUS = "installation_status";
+
+    // data
+    private DeviceInfo mDeviceInfo = null;
+    private InstallationStatus mInstallationStatus = null;
+
+    // status
     private boolean mSuccess = false;
+    private int mProgress = 0;
+
 
     @SuppressWarnings("unused")
     public EFIDroidInstallServiceTask(GenericProgressIntentService service) {
         super(service);
     }
 
-    public void onProcess(Bundle extras) {
-        mSuccess = false;
+    private JSONArray getUpdateList() throws Exception {
+        StringBuilder sb = new StringBuilder();
 
-        int progress = 0;
-        try {
-            for(int i=0; i<=100; i++) {
-                publishProgress(i, "Progess "+i+"/100");
-                Thread.sleep(100, 0);
+        // connect
+        URL url = new URL(AppConstants.getUpdatesUrl(mDeviceInfo));
+        URLConnection connection = url.openConnection();
+        connection.connect();
+        int fileLength = connection.getContentLength();
+
+        // open stream
+        InputStream input = new BufferedInputStream(connection.getInputStream());
+
+        // copy data
+        byte data[] = new byte[1024];
+        int count;
+        publishProgress(mProgress, "Downloading");
+        while ((count = input.read(data)) != -1) {
+            if(shouldStop()) {
+                input.close();
+                throw new Exception("Aborted");
             }
 
-            mSuccess = true;
+            sb.append(new String(data, 0, count));
         }
-        catch (Exception e) {
+        input.close();
+
+
+        return new JSONArray(sb.toString());
+    }
+
+    private String downloadUpdate(String urlString) throws Exception {
+        // connect
+        URL url = new URL(urlString);
+        URLConnection connection = url.openConnection();
+        connection.connect();
+        int fileLength = connection.getContentLength();
+
+        // open streams
+        InputStream input = new BufferedInputStream(connection.getInputStream());
+        String downloadFile = getService().getCacheDir().getAbsolutePath()+"/update.zip";
+        OutputStream output = new FileOutputStream(downloadFile);
+
+        // copy data
+        byte data[] = new byte[1024];
+        //long total = 0;
+        int count;
+        //publishProgress(mProgress, "Downloading");
+        while ((count = input.read(data)) != -1) {
+            if(shouldStop()) {
+                output.close();
+                input.close();
+                throw new Exception("Aborted");
+            }
+
+            //total += count;
+
+            // publishing the progress....
+            //mProgress = (int) (total * 100 / fileLength);
+            //publishProgress(mProgress, "Downloading");
+
+            output.write(data, 0, count);
+        }
+
+        output.flush();
+        output.close();
+        input.close();
+
+        // extract
+        String downloadDir = getService().getCacheDir()+"/update";
+        if(RootToolsEx.unzip(downloadFile, downloadDir)!=0)
+            throw new Exception("Can't extract update");
+
+        return downloadDir;
+    }
+
+    private void doInstall(String updateDir) throws Exception {
+        // get esp parent directory
+        String espParent = mDeviceInfo.getESPDir(false);
+        if(espParent==null)
+            throw new Exception("Can't find ESP partition");
+
+        // create UEFIESP dir
+        String espDir = espParent+"/UEFIESP";
+        if(!RootToolsEx.mkdir(espDir, true)) {
+            throw new Exception("can't create UEFIESP directory");
+        }
+
+        // don't create backups on reinstall or update
+        if(!mInstallationStatus.isInstalled() || mInstallationStatus.isBroken()) {
+            // create backups
+            for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
+                if (!entry.isUEFI())
+                    continue;
+
+                if (!RootToolsEx.isFile(updateDir + "/" + entry.getName() + ".img"))
+                    throw new Exception("Invalid update");
+
+                // repair
+                if (mInstallationStatus.isBroken()) {
+                    InstallationEntry installationEntry = mInstallationStatus.getEntryByName(entry.getName());
+                    int status = installationEntry.getStatus();
+                    switch (status) {
+                        case InstallationEntry.STATUS_OK:
+                        case InstallationEntry.STATUS_WRONG_DEVICE:
+                            // nothing to do
+                            continue;
+
+                        case InstallationEntry.STATUS_ESP_MISSING:
+                            // esp doesn't exist but EFIDroid is installed already, so create an empty image
+                            RootToolsEx.createLoopImage(getService(), espDir + "/partition_" + entry.getName() + ".img", RootToolsEx.getDeviceSize(entry.getBlkDevice()));
+                            continue;
+
+                        case InstallationEntry.STATUS_NOT_INSTALLED:
+                        case InstallationEntry.STATUS_ESP_ONLY:
+                            // continue with normal ESP creation
+                            break;
+                    }
+
+                }
+
+                RootToolsEx.createPartitionBackup(getService(), entry.getBlkDevice(), espDir + "/partition_" + entry.getName() + ".img");
+            }
+        }
+
+        // install
+        for(FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
+            if (!entry.isUEFI())
+                continue;
+
+            String file = updateDir + "/" + entry.getName()+".img";
+            RootToolsEx.dd(file, entry.getBlkDevice());
+        }
+    }
+
+    public void onProcess(Bundle extras) {
+        mDeviceInfo = extras.getParcelable(ARG_DEVICE_INFO);
+        mInstallationStatus = extras.getParcelable(ARG_INSTALL_STATUS);
+
+        mProgress = 0;
+        mSuccess = false;
+        try {
+            // search for update
+            mProgress = publishProgress(1, "search for update");
+            JSONArray updateList = getUpdateList();
+            JSONObject latestUpdate = null;
+            for(int i=0; i<updateList.length(); i++) {
+                JSONObject o = updateList.getJSONObject(i);
+
+                if(latestUpdate==null ||o.getLong("timestamp")>latestUpdate.getLong("timestamp"))
+                    latestUpdate = o;
+            }
+
+            if(latestUpdate==null)
+                throw new Exception("No update available");
+
+            // download update
+            mProgress = publishProgress(30, "downloading update");
+            String updateDir = downloadUpdate(latestUpdate.getString("file"));
+
+            mProgress = publishProgress(50, "installing");
+            doInstall(updateDir);
+
+            mSuccess = true;
+        } catch (Exception e) {
+            e.printStackTrace();
             mSuccess = false;
-            publishProgress(progress, e.getLocalizedMessage());
+            publishProgress(mProgress, e.getLocalizedMessage());
         }
 
         // publish status

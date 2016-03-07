@@ -71,7 +71,7 @@
                 android:id="@+id/spinner_location"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:layout_weight="1"></android.support.v7.widget.AppCompatSpinner>
+                android:layout_weight="1"/>
 
             <TextView
                 android:id="@+id/text_location"
@@ -81,7 +81,7 @@
                 style="?attr/spinnerDropDownItemStyle"
                 android:singleLine="true"
                 android:ellipsize="marquee"
-                ></TextView>
+                />
         </LinearLayout>
 
         <!-- OSTYPE -->
@@ -104,7 +104,7 @@
                 android:id="@+id/spinner_ostype"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:layout_weight="1"></android.support.v7.widget.AppCompatSpinner>
+                android:layout_weight="1"/>
 
             <TextView
                 android:id="@+id/text_ostype"
@@ -114,7 +114,7 @@
                 style="?attr/spinnerDropDownItemStyle"
                 android:singleLine="true"
                 android:ellipsize="marquee"
-                ></TextView>
+                />
         </LinearLayout>
 
         <include layout="@layout/divider" />

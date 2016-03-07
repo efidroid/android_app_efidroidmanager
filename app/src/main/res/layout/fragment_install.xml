@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scroll"
+    android:id="@+id/list"
+    android:name="org.efidroid.efidroidmanager.fragments.InstallFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-    <LinearLayout
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="LOL"/>
-    </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+    app:layoutManager="LinearLayoutManager"
+    tools:context=".fragments.InstallFragment"
+    tools:listitem="@layout/fragment_operatingsystem_item"
+    android:scrollbars="vertical"/>

@@ -37,6 +37,7 @@ import org.efidroid.efidroidmanager.fragments.OperatingSystemFragment;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.MountInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
+import org.efidroid.efidroidmanager.types.InstallationStatus;
 import org.efidroid.efidroidmanager.types.MountEntry;
 
 import java.util.ArrayList;
@@ -57,11 +58,9 @@ public class MainActivity extends AppCompatActivity
 
     // data
     private DeviceInfo mDeviceInfo = null;
-    private ArrayList<OperatingSystem> mOperatingSystems;
 
     // args
     private static final String ARG_DEVICE_INFO = "deviceinfo";
-    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
     private static final String ARG_ACTIVEMENU_ID = "activemenu_id";
     private static final String ARG_HAS_BUSYBOX = "has_busybox";
     private static final String ARG_HAS_ROOT = "has_root";
@@ -78,184 +77,9 @@ public class MainActivity extends AppCompatActivity
     private AppBarLayout mAppBarLayout;
     private FrameLayout mToolbarFrameLayout;
 
-    // UI data
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        // get views
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mFragmentProgress = (ProgressBar)findViewById(R.id.progressBar);
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
-        mToolbarFrameLayout = (FrameLayout) findViewById(R.id.toolbar_frame_layout);
-
-        // set initial toolbar height
-        int initialHeight = Util.getStatusBarHeight(this) + Util.getToolBarHeight(this);
-        ViewGroup.LayoutParams layoutParams = mAppBarLayout.getLayoutParams();
-        layoutParams.height = initialHeight;
-        mAppBarLayout.setLayoutParams(layoutParams);
-        mAppBarLayout.setExpanded(false, false);
-
-        // actionbar
-        setSupportActionBar(mToolbar);
-
-        // FAB
-
-        // drawer
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        // navigation view
-        mNavigationView.setNavigationItemSelectedListener(this);
-
-        // SRL
-        mSwipeRefreshLayout.setEnabled(false);
-
-        // load data the first time
-        if (savedInstanceState == null) {
-            // show progress dialog
-            mProgressDialog = new MaterialDialog.Builder(this)
-                    .title("Loading device info")
-                    .content("Please wait")
-                    .cancelable(false)
-                    .progress(true, 0)
-                    .show();
-
-            // load device info
-            DataHelper.loadDeviceInfo(this, this);
-        }
-
-        else {
-            mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
-            mOperatingSystems = savedInstanceState.getParcelableArrayList(ARG_OPERATING_SYSTEMS);
-            mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
-            hasBusybox = savedInstanceState.getBoolean(ARG_HAS_BUSYBOX);
-            hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
-            onLoadUiData();
-        }
-    }
-
-    public void onDeviceInfoLoadError(Exception e) {
-        new MaterialDialog.Builder(this)
-                .title("Title")
-                .content("Can't load device info. Please check your connection.\n\n"+e.getLocalizedMessage())
-                .positiveText("Try again")
-                .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-            @Override
-            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                DataHelper.loadDeviceInfo(MainActivity.this, MainActivity.this);
-            }
-        }).show();
-    }
-
-    private void onLoadUiData() {
-        if (!hasBusybox && !RootTools.isBusyboxAvailable()) {
-            new MaterialDialog.Builder(this)
-                    .title("Title")
-                    .content("You need BusyBox to use this app.")
-                    .positiveText("Install")
-                    .neutralText("Try again")
-                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-                @Override
-                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                    RootTools.offerBusyBox(MainActivity.this);
-                }
-            })
-                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            onLoadUiData();
-                        }
-                    }).show();
-            return;
-        }
-        hasBusybox = true;
-
-        if (!hasRoot && !RootToolsEx.isAccessGiven(0, 0)) {
-            new MaterialDialog.Builder(this)
-                    .title("Title")
-                    .content("You need Root access to use this app.")
-                    .positiveText("Try again")
-                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            onLoadUiData();
-                        }
-                    }).show();
-            return;
-        }
-
-        // restore old tab
-        if(mActiveMenuItemId==0)
-            mActiveMenuItemId = R.id.nav_operating_systems;
-
-        onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
-    }
-
-    @Override
-    public void onDeviceInfoLoaded(DeviceInfo deviceInfo) {
-        mDeviceInfo = deviceInfo;
-        mProgressDialog.dismiss();
-        onLoadUiData();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // we got paused by offering the busybox, so resume loading now
-        if(!hasBusybox) {
-            onLoadUiData();
-        }
-
-        if(mActiveMenuItemId==R.id.nav_operating_systems && mOperatingSystems==null)
-            reloadOperatingSystems();
-
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // cancel current task and disable loading animations
-        if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled()) {
-            mFragmentLoadingTask.cancel(true);
-            mSwipeRefreshLayout.setRefreshing(false);
-            mFragmentProgress.setVisibility(View.GONE);
-            mTouchDisabled = false;
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(ARG_DEVICE_INFO, mDeviceInfo);
-        outState.putParcelableArrayList(ARG_OPERATING_SYSTEMS, mOperatingSystems);
-        outState.putInt(ARG_ACTIVEMENU_ID, mActiveMenuItemId);
-        outState.putBoolean(ARG_HAS_BUSYBOX, hasBusybox);
-        outState.putBoolean(ARG_HAS_ROOT, hasRoot);
-
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
+    // operating systems
+    private ArrayList<OperatingSystem> mOperatingSystems;
+    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
     private AsyncTask<Void, Void, Exception> makeOperatingSystemsTask() {
         final ArrayList<OperatingSystem> list = new ArrayList<>();
 
@@ -334,6 +158,249 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
+    // installation
+    private InstallationStatus mInstallStatus = null;
+    private static final String ARG_INSTALL_STATUS = "install_status";
+    private AsyncTask<Void, Void, Exception> makeInstallationStatusTask(final InstallFragment.InstallStatusLoadCallback callback) {
+        final InstallationStatus installStatus = new InstallationStatus();
+
+        return new AsyncTask<Void, Void, Exception>() {
+            @Override
+            protected Exception doInBackground(Void... params) {
+                try {
+                    installStatus.doLoad(mDeviceInfo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return e;
+                }
+                return null;
+            }
+
+            protected void onPostExecute(Exception e) {
+                // hide progressbar
+                mFragmentProgress.setVisibility(View.GONE);
+                mSwipeRefreshLayout.setRefreshing(false);
+
+                if (e != null) {
+                    new MaterialDialog.Builder(MainActivity.this)
+                            .title("Title")
+                            .content("Can't load installation info. " + e.getLocalizedMessage())
+                            .positiveText("ok").show();
+                    return;
+                }
+
+                mInstallStatus = installStatus;
+
+                if(callback==null) {
+                    // show fragment
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.flContent, new InstallFragment()).commit();
+
+                    mTouchDisabled = false;
+                }
+
+                else {
+                    callback.onStatusLoaded();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+
+                if(callback!=null) {
+                    callback.onStatusLoadError();
+                }
+            }
+        };
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // get views
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mFragmentProgress = (ProgressBar)findViewById(R.id.progressBar);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        mToolbarFrameLayout = (FrameLayout) findViewById(R.id.toolbar_frame_layout);
+
+        // set initial toolbar height
+        int initialHeight = Util.getStatusBarHeight(this) + Util.getToolBarHeight(this);
+        ViewGroup.LayoutParams layoutParams = mAppBarLayout.getLayoutParams();
+        layoutParams.height = initialHeight;
+        mAppBarLayout.setLayoutParams(layoutParams);
+        mAppBarLayout.setExpanded(false, false);
+
+        // actionbar
+        setSupportActionBar(mToolbar);
+
+        // drawer
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // navigation view
+        mNavigationView.setNavigationItemSelectedListener(this);
+
+        // SRL
+        mSwipeRefreshLayout.setEnabled(false);
+
+        // load data the first time
+        if (savedInstanceState == null) {
+            // show progress dialog
+            mProgressDialog = new MaterialDialog.Builder(this)
+                    .title("Loading device info")
+                    .content("Please wait")
+                    .cancelable(false)
+                    .progress(true, 0)
+                    .show();
+
+            // load device info
+            DataHelper.loadDeviceInfo(this, this);
+        }
+
+        else {
+            mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
+            mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
+            hasBusybox = savedInstanceState.getBoolean(ARG_HAS_BUSYBOX);
+            hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
+
+            // operating systems
+            mOperatingSystems = savedInstanceState.getParcelableArrayList(ARG_OPERATING_SYSTEMS);
+
+            // install status
+            mInstallStatus = savedInstanceState.getParcelable(ARG_INSTALL_STATUS);
+
+            onLoadUiData();
+        }
+    }
+
+    public void onDeviceInfoLoadError(Exception e) {
+        new MaterialDialog.Builder(this)
+                .title("Title")
+                .content("Can't load device info. Please check your connection.\n\n"+e.getLocalizedMessage())
+                .positiveText("Try again")
+                .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                DataHelper.loadDeviceInfo(MainActivity.this, MainActivity.this);
+            }
+        }).show();
+    }
+
+    private void onLoadUiData() {
+        if (!hasBusybox && !RootTools.isBusyboxAvailable()) {
+            new MaterialDialog.Builder(this)
+                    .title("Title")
+                    .content("You need BusyBox to use this app.")
+                    .positiveText("Install")
+                    .neutralText("Try again")
+                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
+                @Override
+                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    RootTools.offerBusyBox(MainActivity.this);
+                }
+            })
+                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            onLoadUiData();
+                        }
+                    }).show();
+            return;
+        }
+        hasBusybox = true;
+
+        if (!hasRoot && !RootToolsEx.isAccessGiven(0, 0)) {
+            new MaterialDialog.Builder(this)
+                    .title("Title")
+                    .content("You need Root access to use this app.")
+                    .positiveText("Try again")
+                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            onLoadUiData();
+                        }
+                    }).show();
+            return;
+        }
+
+        // set default tab
+        if(mActiveMenuItemId==0)
+            mActiveMenuItemId = R.id.nav_operating_systems;
+
+        // restore old tab
+        onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
+    }
+
+    @Override
+    public void onDeviceInfoLoaded(DeviceInfo deviceInfo) {
+        mDeviceInfo = deviceInfo;
+        mProgressDialog.dismiss();
+        onLoadUiData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // we got paused by offering the busybox, so resume loading now
+        if(!hasBusybox) {
+            onLoadUiData();
+        }
+
+        // operating systems got deleted, reload them
+        if(mActiveMenuItemId==R.id.nav_operating_systems && mOperatingSystems==null)
+            reloadOperatingSystems();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // cancel current task and disable loading animations
+        if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled()) {
+            mFragmentLoadingTask.cancel(true);
+            mSwipeRefreshLayout.setRefreshing(false);
+            mFragmentProgress.setVisibility(View.GONE);
+            mTouchDisabled = false;
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(ARG_DEVICE_INFO, mDeviceInfo);
+        outState.putInt(ARG_ACTIVEMENU_ID, mActiveMenuItemId);
+        outState.putBoolean(ARG_HAS_BUSYBOX, hasBusybox);
+        outState.putBoolean(ARG_HAS_ROOT, hasRoot);
+
+        // operating systems
+        outState.putParcelableArrayList(ARG_OPERATING_SYSTEMS, mOperatingSystems);
+
+        // install status
+        outState.putParcelable(ARG_INSTALL_STATUS, mInstallStatus);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         return mTouchDisabled || super.dispatchTouchEvent(ev);
@@ -395,7 +462,17 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_plugins) {
         } else if (id == R.id.nav_themes) {
         } else if (id == R.id.nav_install) {
-            fragment = new InstallFragment();
+            // start loading
+            if(mInstallStatus==null) {
+                // show progressbar
+                mFragmentProgress.setVisibility(View.VISIBLE);
+
+                // run task
+                mFragmentLoadingTask = makeInstallationStatusTask(null).execute();
+            }
+            else {
+                fragment = new InstallFragment();
+            }
         } else if (id == R.id.nav_share) {
         } else if (id == R.id.nav_troubleshoot) {
         } else if (id == R.id.nav_bug_report) {
@@ -433,11 +510,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public List<OperatingSystem> getOperatingSystems() {
-        return mOperatingSystems;
-    }
-
-    @Override
     public FloatingActionButton getFAB() {
         return mFab;
     }
@@ -468,9 +540,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public List<OperatingSystem> getOperatingSystems() {
+        return mOperatingSystems;
+    }
+
+    @Override
     public void reloadOperatingSystems() {
         mOperatingSystems = null;
         if(mActiveMenuItemId>0)
             onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
+    }
+
+    @Override
+    public InstallationStatus getInstallStatus() {
+        return mInstallStatus;
+    }
+
+    @Override
+    public void reloadInstallStatus(InstallFragment.InstallStatusLoadCallback callback) {
+        mInstallStatus = null;
+
+        if(callback==null) {
+            if (mActiveMenuItemId > 0)
+                onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
+        }
+        else {
+            // run task
+            mFragmentLoadingTask = makeInstallationStatusTask(callback).execute();
+        }
     }
 }
