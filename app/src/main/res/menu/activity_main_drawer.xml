@@ -5,23 +5,27 @@
         <item
             android:id="@+id/nav_operating_systems"
             android:icon="@drawable/ic_menu_memory"
-            android:title="Operating Systems" />
+            android:title="Operating Systems"/>
         <item
             android:id="@+id/nav_recovery_tools"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Recovery Tools" />
+            android:title="Recovery Tools"
+            android:visible="false" />
         <item
             android:id="@+id/nav_uefi_apps"
             android:icon="@drawable/ic_menu_archive"
-            android:title="UEFI Apps" />
+            android:title="UEFI Apps"
+            android:visible="false" />
         <item
             android:id="@+id/nav_plugins"
             android:icon="@drawable/ic_menu_extension"
-            android:title="Plugins" />
+            android:title="Plugins"
+            android:visible="false" />
         <item
             android:id="@+id/nav_themes"
             android:icon="@drawable/ic_menu_color_lens"
-            android:title="Themes" />
+            android:title="Themes"
+            android:visible="false" />
     </group>
 
     <group android:id="@+id/nav_group_setup">
