@@ -1,5 +1,7 @@
 package org.efidroid.efidroidmanager.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -413,6 +415,47 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         Fragment fragment = null;
 
+        if (id == R.id.nav_share) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "I'm running EFIDroid on my " + mDeviceInfo.getDeviceName() + "!\nMore info: http://efidroid.github.io");
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
+
+            // close drawer
+            mDrawer.closeDrawer(GravityCompat.START);
+
+            return true;
+        } else if (id == R.id.nav_get_help) {
+            String url = "https://plus.google.com/communities/114053643671219382368";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+
+            // close drawer
+            mDrawer.closeDrawer(GravityCompat.START);
+
+            return true;
+        } else if (id == R.id.nav_bug_report) {
+            String url = "https://github.com/efidroid/projectmanagement/issues";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+
+            // close drawer
+            mDrawer.closeDrawer(GravityCompat.START);
+
+            return true;
+        } else if (id == R.id.nav_about) {
+            Intent i= new Intent(this, AboutActivity.class);
+            startActivity(i);
+
+            // close drawer
+            mDrawer.closeDrawer(GravityCompat.START);
+
+            return true;
+        }
+
         // cancel any running loading task
         if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled())
             mFragmentLoadingTask.cancel(true);
@@ -473,10 +516,6 @@ public class MainActivity extends AppCompatActivity
             else {
                 fragment = new InstallFragment();
             }
-        } else if (id == R.id.nav_share) {
-        } else if (id == R.id.nav_troubleshoot) {
-        } else if (id == R.id.nav_bug_report) {
-        } else if (id == R.id.nav_about) {
         }
 
         mActiveMenuItemId = item.getItemId();

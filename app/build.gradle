@@ -10,6 +10,10 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
+        buildConfigField "String", "USERNAME", "\""+System.getProperty("user.name")+"\""
+        buildConfigField "String", "HOSTNAME", "\""+java.net.InetAddress.getLocalHost().getHostName()+"\""
     }
     buildTypes {
         release {

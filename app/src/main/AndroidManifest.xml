@@ -24,11 +24,10 @@
 
         <service
             android:name=".services.GenericProgressIntentService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".activities.OperatingSystemEditActivity"
-            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -38,7 +37,14 @@
         <activity
             android:name=".activities.GenericProgressActivity"
             android:label="@string/title_activity_osupdate_progress"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.AboutActivity"
+            android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.efidroid.efidroidmanager.activities.MainActivity" />
         </activity>
     </application>
 

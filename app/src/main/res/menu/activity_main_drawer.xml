@@ -41,9 +41,9 @@
             android:icon="@drawable/ic_menu_share"
             android:title="Share" />
         <item
-            android:id="@+id/nav_troubleshoot"
+            android:id="@+id/nav_get_help"
             android:icon="@drawable/ic_menu_hospital"
-            android:title="Troubleshoot" />
+            android:title="Get help" />
         <item
             android:id="@+id/nav_bug_report"
             android:icon="@drawable/ic_menu_bug_report"
