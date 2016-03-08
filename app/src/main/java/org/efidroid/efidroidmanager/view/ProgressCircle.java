@@ -359,6 +359,10 @@ public class ProgressCircle extends ViewGroup {
         invalidate();
     }
 
+    public void setContentText(int id) {
+        setContentText(getContext().getString(id));
+    }
+
     public void setContentTextColor(int color, boolean animate, long duration) {
         if (animate) {
             ValueAnimator anim = Util.CompatAnimatorOfArgb(mContentTextColor, color);

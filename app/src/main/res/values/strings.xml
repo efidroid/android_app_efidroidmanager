@@ -1,16 +1,10 @@
 <resources>
-    <string name="app_name">EFIDroidManager</string>
+    <string name="app_name">EFIDroid Manager</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_login">Sign in</string>
-
-    <string name="section_format">Hello World from section: %1$d</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="ostype_android">Android</string>
     <string name="ostype_ubuntu">Ubuntu</string>
@@ -19,6 +13,118 @@
     <string name="scheme_android_bindall">BindAll</string>
     <string name="scheme_android_dynsystem_loopother">DynSystem + LoopOther</string>
     <string name="scheme_android_loopall">LoopAll</string>
-    <string name="title_activity_osupdate_progress">OSUpdateProgressActivity</string>
-    <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_about">About</string>
+    <string name="ok">OK</string>
+    <string name="name">Name</string>
+    <string name="size">Size</string>
+    <string name="description">Description</string>
+    <string name="contentdescription_operatingsystemicon">Icon</string>
+    <string name="scheme">Scheme</string>
+    <string name="url_efidroid_github_io">https://efidroid.github.io</string>
+    <string name="operating_systems">Operating Systems</string>
+    <string name="recovery_tools">Recovery Tools</string>
+    <string name="uefi_apps">UEFI Apps</string>
+    <string name="plugins">Plugins</string>
+    <string name="themes">Themes</string>
+    <string name="install_update">Install/Update</string>
+    <string name="share">Share</string>
+    <string name="get_help">Get help</string>
+    <string name="report_bug">Report bug</string>
+    <string name="about_efidroid">About EFIDroid</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_done">Done</string>
+    <string name="action_refresh">Refresh</string>
+
+    <string name="app_version">App Version %s</string>
+    <string name="compiled_by" formatted="false">Compiled by %s@%s on %s</string>
+
+    <string name="reloading_info">Reloading info</string>
+    <string name="reloading">Reloading</string>
+    <string name="cant_reload_install_status">Can\'t reload installation status</string>
+    <string name="error">Error</string>
+
+    <string name="efidroid_version">EFIDroid version</string>
+    <string name="build_time">Build time</string>
+    <string name="efi_spec">EFI Specification</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="install">Install</string>
+    <string name="reinstall">Reinstall</string>
+    <string name="repair">Repair</string>
+    <string name="update">Update</string>
+    <string name="and">and</string>
+    <string name="status_esp_only">has an ESP backup only</string>
+    <string name="status_esp_missing">has no ESP backup</string>
+    <string name="status_wrong_device">is for another device</string>
+    <string name="status_not_installed">is not installed</string>
+
+    <string name="installed_and_updated">Installed and updated</string>
+    <string name="save">Save</string>
+    <string name="edit_partition">Edit partition</string>
+    <string name="creating_system">Creating system %s</string>
+    <string name="updating_system">Updating system %s</string>
+    <string name="deleting_system">Deleting system %s</string>
+    <string name="create_operating_system">Create Operating System</string>
+    <string name="loading_device_info">Loading device info</string>
+    <string name="please_wait">Please wait</string>
+    <string name="cancelled_loading_system_info">Cancelled loading system information.</string>
+    <string name="cant_load_system_info">"Can\'t load system information: "</string>
+    <string name="tab_title_general">GENERAL</string>
+    <string name="tab_title_partitions">PARTITIONS</string>
+    <string name="tab_title_replacements">REPLACEMENTS</string>
+    <string name="tab_title_plugins">PLUGINS</string>
+    <string name="cant_load_operating_systems">"Can\'t load operating systems. "</string>
+    <string name="cant_load_install_info">"Can\'t load installation info. "</string>
+    <string name="cant_load_device_info_check_connection">Can\'t load device info. Please check your connection.\n\n</string>
+    <string name="try_again">Try again</string>
+    <string name="you_need_busybox">You need BusyBox to use this app.</string>
+    <string name="you_need_root">You need Root access to use this app.</string>
+    <string name="share_text">I\'m running EFIDroid on my %s!\nMore info: http://efidroid.github.io</string>
+    <string name="os_delete_confirmation">Do you want to delete \'%s\'?</string>
+    <string name="name_must_not_be_empty">Name must not be empty</string>
+    <string name="new_cmdline_override">New cmdline override</string>
+    <string name="edit_cmdline_override">Edit cmdline override</string>
+    <string name="invalid_characters">Invalid characters</string>
+    <string name="binaries">Binaries</string>
+    <string name="kernel">kernel</string>
+    <string name="ramdisk">ramdisk</string>
+    <string name="dt">dt</string>
+    <string name="commandline">Commandline</string>
+    <string name="_disabled_">(disabled)</string>
+    <string name="stop">Stop</string>
+    <string name="aborted">Aborted</string>
+    <string name="downloading">Downloading</string>
+    <string name="cant_extract_update">Can\'t extract update</string>
+    <string name="cant_find_esp_partition">Can\'t find ESP partition</string>
+    <string name="cant_create_uefiesp_dir">can\'t create UEFIESP directory</string>
+    <string name="invalid_update">Invalid update</string>
+    <string name="search_for_update">search for update</string>
+    <string name="no_update_available">No update available</string>
+    <string name="downloading_update">downloading update</string>
+    <string name="installing">installing</string>
+    <string name="installing_efidroid">Installing EFIDroid</string>
+    <string name="installing_efidroid_successful">Installing EFIDroid successful</string>
+    <string name="error_installling_efidroid">Error installing EFIDroid</string>
+    <string name="uninstalling">uninstalling</string>
+    <string name="uninstalling_efidroid">Uninstalling EFIDroid</string>
+    <string name="uninstalling_efidroid_successful">Uninstalling EFIDroid successful</string>
+    <string name="error_uninstalliing_efidroid">Error uninstalling EFIDroid</string>
+    <string name="os_does_not_exist">Operating System does not exist</string>
+    <string name="removing_system" formatted="false">Removing system %s</string>
+    <string name="removed_system" formatted="false">Removed system %s</string>
+    <string name="error_removing_system" formatted="false">Error removing system %s</string>
+    <string name="cant_delete_os">Can\'t delete Operating system</string>
+    <string name="creating_os_dir">Creating OS directory</string>
+    <string name="cant_create_multiboot_dir">Can\'t create multiboot directory</string>
+    <string name="rom_dir_does_already_exist">ROM directory does already exist</string>
+    <string name="cant_create_rom_dir">Can\'t create ROM directory</string>
+    <string name="cant_write_icon">Can\'t create ROM directory</string>
+    <string name="cant_delete_old_icon">Can\'t delete old icon</string>
+    <string name="setup_partition" formatted="false">setup partition \'%s\'</string>
+    <string name="cant_create_dir" formatted="false">Can\'t create directory \'%s\'</string>
+    <string name="cant_create_dynfilefs2_img" formatted="false">Can\'t create DynfileFS2 image \'%s\': </string>
+    <string name="cant_create_loop_img" formatted="false">Can\'t create loop image \'%s\': </string>
+    <string name="created_system" formatted="false">created system %s</string>
+    <string name="updated_system" formatted="false">updated system %s</string>
+    <string name="error_creating_system" formatted="false">Error creating system %s</string>
+    <string name="error_updating_system" formatted="false">Error updating system %s</string>
 </resources>

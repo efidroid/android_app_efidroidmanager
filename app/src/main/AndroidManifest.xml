@@ -36,7 +36,6 @@
         <activity android:name=".activities.NotificationReceiverActivity" />
         <activity
             android:name=".activities.GenericProgressActivity"
-            android:label="@string/title_activity_osupdate_progress"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.AboutActivity"

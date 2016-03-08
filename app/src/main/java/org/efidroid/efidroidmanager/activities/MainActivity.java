@@ -143,9 +143,9 @@ public class MainActivity extends AppCompatActivity
 
                 if (e != null) {
                     new MaterialDialog.Builder(MainActivity.this)
-                            .title("Title")
-                            .content("Can't load operating systems. " + e.getLocalizedMessage())
-                            .positiveText("ok").show();
+                            .title(R.string.error)
+                            .content(getString(R.string.cant_load_operating_systems) + e.getLocalizedMessage())
+                            .positiveText(R.string.ok).show();
                     return;
                 }
 
@@ -185,9 +185,9 @@ public class MainActivity extends AppCompatActivity
 
                 if (e != null) {
                     new MaterialDialog.Builder(MainActivity.this)
-                            .title("Title")
-                            .content("Can't load installation info. " + e.getLocalizedMessage())
-                            .positiveText("ok").show();
+                            .title(R.string.error)
+                            .content(getString(R.string.cant_load_install_info) + e.getLocalizedMessage())
+                            .positiveText(R.string.ok).show();
                     return;
                 }
 
@@ -259,8 +259,8 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             // show progress dialog
             mProgressDialog = new MaterialDialog.Builder(this)
-                    .title("Loading device info")
-                    .content("Please wait")
+                    .title(R.string.loading_device_info)
+                    .content(R.string.please_wait)
                     .cancelable(false)
                     .progress(true, 0)
                     .show();
@@ -287,9 +287,9 @@ public class MainActivity extends AppCompatActivity
 
     public void onDeviceInfoLoadError(Exception e) {
         new MaterialDialog.Builder(this)
-                .title("Title")
-                .content("Can't load device info. Please check your connection.\n\n"+e.getLocalizedMessage())
-                .positiveText("Try again")
+                .title(R.string.error)
+                .content(getString(R.string.cant_load_device_info_check_connection)+e.getLocalizedMessage())
+                .positiveText(R.string.try_again)
                 .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -301,10 +301,10 @@ public class MainActivity extends AppCompatActivity
     private void onLoadUiData() {
         if (!hasBusybox && !RootTools.isBusyboxAvailable()) {
             new MaterialDialog.Builder(this)
-                    .title("Title")
-                    .content("You need BusyBox to use this app.")
-                    .positiveText("Install")
-                    .neutralText("Try again")
+                    .title(R.string.error)
+                    .content(R.string.you_need_busybox)
+                    .positiveText(R.string.install)
+                    .neutralText(R.string.try_again)
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
                 @Override
                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -323,9 +323,9 @@ public class MainActivity extends AppCompatActivity
 
         if (!hasRoot && !RootToolsEx.isAccessGiven(0, 0)) {
             new MaterialDialog.Builder(this)
-                    .title("Title")
-                    .content("You need Root access to use this app.")
-                    .positiveText("Try again")
+                    .title(R.string.error)
+                    .content(R.string.you_need_root)
+                    .positiveText(R.string.try_again)
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -418,7 +418,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, "I'm running EFIDroid on my " + mDeviceInfo.getDeviceName() + "!\nMore info: http://efidroid.github.io");
+            sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text, mDeviceInfo.getDeviceName()));
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
 

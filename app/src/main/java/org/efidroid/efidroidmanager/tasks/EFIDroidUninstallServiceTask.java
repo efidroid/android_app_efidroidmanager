@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.stericson.roottools.RootTools;
 
 import org.efidroid.efidroidmanager.AppConstants;
+import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
@@ -45,12 +46,12 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
         // get esp parent directory
         String espParent = mDeviceInfo.getESPDir(false);
         if(espParent==null)
-            throw new Exception("Can't find ESP partition");
+            throw new Exception(getService().getString(R.string.cant_find_esp_partition));
 
         // create UEFIESP dir
         String espDir = espParent+"/UEFIESP";
         if(!RootToolsEx.mkdir(espDir, true)) {
-            throw new Exception("can't find UEFIESP directory");
+            throw new Exception(getService().getString(R.string.cant_create_uefiesp_dir));
         }
 
         // restore backups
@@ -77,7 +78,7 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
         mProgress = 0;
         mSuccess = false;
         try {
-            mProgress = publishProgress(50, "uninstalling");
+            mProgress = publishProgress(50, getService().getString(R.string.uninstalling));
             doUninstall();
 
             mSuccess = true;
@@ -95,15 +96,15 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
 
     @Override
     public String getNotificationProgressTitle() {
-        return  "Installing EFIDroid";
+        return  getService().getString(R.string.uninstalling_efidroid);
     }
 
     @Override
     public String getNotificationResultTitle() {
         if (mSuccess) {
-            return "Uninstalling EFIDroid successful";
+            return getService().getString(R.string.uninstalling_efidroid_successful);
         } else {
-            return "Error uninstalling EFIDroid";
+            return getService().getString(R.string.error_uninstalliing_efidroid);
         }
     }
 }

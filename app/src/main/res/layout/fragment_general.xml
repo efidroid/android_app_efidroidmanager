@@ -144,8 +144,7 @@
                     android:maxLines="1"
                     android:nextFocusLeft="@id/name"
                     android:nextFocusUp="@id/name"
-                    android:singleLine="true"
-                    android:text="@string/hello_blank_fragment" />
+                    android:singleLine="true" />
             </LinearLayout>
         </LinearLayout>
 
@@ -171,13 +170,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/md_transparent"
-                    android:hint="Description"
+                    android:hint="@string/description"
                     android:inputType="text"
                     android:maxLines="1"
                     android:nextFocusLeft="@id/name"
                     android:nextFocusUp="@id/name"
-                    android:singleLine="true"
-                    android:text="@string/hello_blank_fragment" />
+                    android:singleLine="true" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

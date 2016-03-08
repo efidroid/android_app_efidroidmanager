@@ -108,7 +108,7 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
         Context context = view.getContext();
         RecyclerView recyclerView = (RecyclerView) view;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new ReplacementItemRecyclerViewAdapter(mOperatingSystem, this);
+        mAdapter = new ReplacementItemRecyclerViewAdapter(getContext(), mOperatingSystem, this);
         recyclerView.setAdapter(mAdapter);
         mRecyclerView = recyclerView;
 
@@ -135,10 +135,10 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
     @Override
     public void onFABClicked() {
         final MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("New cmdline override")
+                .title(R.string.new_cmdline_override)
                 .customView(R.layout.dialog_new_cmdline, true)
-                .positiveText("save")
-                .negativeText("cancel")
+                .positiveText(R.string.save)
+                .negativeText(R.string.md_cancel_label)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -176,10 +176,10 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
         final OperatingSystem.CmdlineItem cmdlineItem = item;
 
         final MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("Edit cmdline override")
+                .title(R.string.edit_cmdline_override)
                 .customView(R.layout.dialog_new_cmdline, true)
-                .positiveText("save")
-                .negativeText("cancel")
+                .positiveText(R.string.save)
+                .negativeText(R.string.md_cancel_label)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(MaterialDialog dialog, DialogAction which) {
@@ -383,7 +383,7 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
 
 
             isValid = valid;
-            mEditText.setError(isValid ? null : "Invalid characters");
+            mEditText.setError(isValid ? null : getContext().getString(R.string.invalid_characters));
             mValidator.onValidationChange();
         }
     }

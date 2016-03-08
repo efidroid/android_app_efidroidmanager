@@ -102,13 +102,13 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "GENERAL";
+                    return getString(R.string.tab_title_general);
                 case 1:
-                    return "PARTITIONS";
+                    return getString(R.string.tab_title_partitions);
                 case 2:
-                    return "REPLACEMENTS";
+                    return getString(R.string.tab_title_replacements);
                 case 3:
-                    return "PLUGINS";
+                    return getString(R.string.tab_title_plugins);
             }
             return null;
         }
@@ -185,9 +185,9 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
 
                 if (e != null) {
                     new MaterialDialog.Builder(OperatingSystemEditActivity.this)
-                            .title("Error")
-                            .content("Can't load system information: " + e.getLocalizedMessage())
-                            .positiveText("ok")
+                            .title(R.string.error)
+                            .content(getString(R.string.cant_load_system_info) + e.getLocalizedMessage())
+                            .positiveText(R.string.ok)
                             .cancelable(false)
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
@@ -197,9 +197,9 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                             }).show();
                 } else if (isCancelled()) {
                         new MaterialDialog.Builder(OperatingSystemEditActivity.this)
-                                .title("Error")
-                                .content("Cancelled loading system information.")
-                                .positiveText("ok")
+                                .title(R.string.error)
+                                .content(R.string.cancelled_loading_system_info)
+                                .positiveText(R.string.ok)
                                 .cancelable(false)
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
@@ -235,8 +235,8 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
 
             // show progress dialog
             mProgressDialog = new MaterialDialog.Builder(this)
-                    .title("Loading device info")
-                    .content("Please wait")
+                    .title(R.string.loading_device_info)
+                    .content(R.string.please_wait)
                     .progress(true, 0)
                     .cancelable(false)
                     .show();
@@ -252,7 +252,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
 
         // title
         if(mOperatingSystem.isCreationMode())
-            setTitle("Create Operating System");
+            setTitle(R.string.create_operating_system);
         else
             setTitle(mOperatingSystem.getName());
 
@@ -334,12 +334,13 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                 }
 
                 if(!error) {
+                    int textid = mOperatingSystem.isCreationMode()?R.string.creating_system:R.string.updating_system;
                     Bundle extras = new Bundle();
                     Intent intent = GenericProgressActivity.makeIntent(
                             this,
                             OSUpdateProgressServiceTask.class,
                             extras,
-                            (mOperatingSystem.isCreationMode()?"Creating":"Updating") + " system\n"+mOperatingSystem.getName(),
+                            getString(textid, mOperatingSystem.getName()),
                             R.anim.hold, R.anim.abc_slide_out_bottom_full,
                             R.anim.abc_slide_in_left_full, R.anim.abc_slide_out_right_full
                     );
@@ -390,10 +391,10 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     @Override
     public void onPartitionItemClicked(final OperatingSystem.Partition item) {
         final MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .title("Edit partition")
+                .title(R.string.edit_partition)
                 .customView(R.layout.dialog_edit_partition, true)
-                .positiveText("save")
-                .negativeText("cancel")
+                .positiveText(R.string.save)
+                .negativeText(R.string.md_cancel_label)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,10 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         return intent;
     }
 
+    private int getColorSimple(int id) {
+        return ResourcesCompat.getColor(getResources(), id, getTheme());
+    }
+
     private void finishProgressbar() {
         // hide cancel button
         mButtonCancel.setVisibility(View.GONE);
@@ -77,12 +82,12 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         // indicate status
         if(mProgressReceiver.wasSuccessful()) {
             mButtonContainer.setVisibility(View.GONE);
-            mProgressCircle.setProgressStrokeColor(Color.parseColor("#E6EE9C"), true, 200);
-            mProgressCircle.setProgressStrokeColor(Color.parseColor("#E6EE9C"), true, 200);
+            mProgressCircle.setProgressStrokeColor(getColorSimple(R.color.colorCircleProgressSuccess), true, 200);
+            mProgressCircle.setProgressStrokeColor(getColorSimple(R.color.colorCircleProgressSuccess), true, 200);
         } else {
             mButtonContainer.setVisibility(View.VISIBLE);
-            mProgressCircle.setProgressStrokeColor(Color.parseColor("#FFAB91"), true, 200);
-            mProgressCircle.setProgressStrokeColor(Color.parseColor("#FFAB91"), true, 200);
+            mProgressCircle.setProgressStrokeColor(getColorSimple(R.color.colorCircleProgressError), true, 200);
+            mProgressCircle.setProgressStrokeColor(getColorSimple(R.color.colorCircleProgressError), true, 200);
 
             // show back/ok buttons
             mButtonBack.setVisibility(View.VISIBLE);

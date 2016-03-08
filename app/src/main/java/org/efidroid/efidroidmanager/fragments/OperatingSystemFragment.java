@@ -129,10 +129,10 @@ public class OperatingSystemFragment extends Fragment implements OperatingSystem
     @Override
     public void onOperatingSystemLongClicked(final OperatingSystem item) {
         new MaterialDialog.Builder(getContext())
-                .title("Delete")
-                .content("Do you want to delete '"+item.getName()+"'?")
-                .positiveText("Delete")
-                .negativeText("Cancel")
+                .title(R.string.action_delete)
+                .content(getString(R.string.os_delete_confirmation, item.getName()))
+                .positiveText(R.string.action_delete)
+                .negativeText(R.string.md_cancel_label)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -141,7 +141,7 @@ public class OperatingSystemFragment extends Fragment implements OperatingSystem
                                 getContext(),
                                 OSRemovalProgressServiceTask.class,
                                 extras,
-                                "Deleting system\n" + item.getName(),
+                                getString(R.string.deleting_system, item.getName()),
                                 R.anim.hold, R.anim.abc_slide_out_right_full,
                                 R.anim.hold, R.anim.abc_slide_out_right_full
                         );

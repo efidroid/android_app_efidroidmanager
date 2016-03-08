@@ -1,8 +1,6 @@
 package org.efidroid.efidroidmanager.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -53,6 +51,10 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private ArrayList<InstallStatusRecyclerViewAdapter.Item> mListData = new ArrayList<>();
     private InstallStatusRecyclerViewAdapter mListAdapter;
 
+    private int getColor(int id) {
+        return ResourcesCompat.getColor(getResources(), id, getContext().getTheme());
+    }
+
     private InstallStatusLoadCallback mInstallStatusLoadCallback = new InstallStatusLoadCallback() {
         @Override
         public void onStatusLoaded() {
@@ -61,19 +63,19 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         @Override
         public void onStatusLoadError() {
-            mProgressCircle.setFillColor(Color.parseColor("#FF5722"), false, 0);
-            mProgressCircle.setContentText("Error");
-            mProgressDescription.setText("Can't reload installation status");
+            mProgressCircle.setFillColor(getColor(R.color.colorCircleBgError), false, 0);
+            mProgressCircle.setContentText(R.string.error);
+            mProgressDescription.setText(R.string.cant_reload_install_status);
             mProgressCircle.setClickable(true);
         }
     };
 
     private void startReload() {
         mProgressCircle.setProgressHidden(true, true, 200);
-        mProgressCircle.setFillColor(Color.parseColor("#9E9E9E"), true, 200);
+        mProgressCircle.setFillColor(getColor(R.color.colorCircleBgLoading), true, 200);
         mProgressCircle.setClickable(false);
-        mProgressCircle.setContentText("Reloading");
-        mProgressDescription.setText("Reloading info");
+        mProgressCircle.setContentText(R.string.reloading);
+        mProgressDescription.setText(R.string.reloading_info);
         mListener.reloadInstallStatus(mInstallStatusLoadCallback);
     }
 
@@ -122,9 +124,9 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             Date date = new Date(entry.getTimeStamp() * 1000l);
             DateFormat format = DateFormat.getDateTimeInstance();
 
-            mListData.add(new InstallStatusRecyclerViewAdapter.Item("EFIDroid version", entry.getEFIDroidReleaseVersionString()));
-            mListData.add(new InstallStatusRecyclerViewAdapter.Item("Build time", format.format(date)));
-            mListData.add(new InstallStatusRecyclerViewAdapter.Item("EFI Specification", entry.getEfiSpecVersionMajor() + "." + entry.getEfiSpecVersionMinor()));
+            mListData.add(new InstallStatusRecyclerViewAdapter.Item(getString(R.string.efidroid_version), entry.getEFIDroidReleaseVersionString()));
+            mListData.add(new InstallStatusRecyclerViewAdapter.Item(getString(R.string.build_time), format.format(date)));
+            mListData.add(new InstallStatusRecyclerViewAdapter.Item(getString(R.string.efi_spec), entry.getEfiSpecVersionMajor() + "." + entry.getEfiSpecVersionMinor()));
         }
 
         mListAdapter.notifyDataSetChanged();
@@ -138,7 +140,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 mProgressCircle.setClickable(false);
                 mProgressCircle.setValue(0, false, 0);
                 mProgressCircle.setProgressHidden(false, true, 200);
-                mProgressCircle.setFillColor(Color.parseColor("#9E9E9E"), true, 200);
+                mProgressCircle.setFillColor(getColor(R.color.colorCircleBgLoading), true, 200);
 
                 Util.animateVisibility(mListener.getFAB(), View.VISIBLE, 200);
                 mListener.getFAB().setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_action_cancel, getActivity().getTheme()));
@@ -162,8 +164,8 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 mProgressCircle.setClickable(false);
                 mProgressCircle.setValue(0, false, 0);
                 mProgressCircle.setProgressHidden(false, true, 200);
-                mProgressCircle.setFillColor(Color.parseColor("#9E9E9E"), true, 200);
-                mProgressCircle.setContentText("Uninstall");
+                mProgressCircle.setFillColor(getColor(R.color.colorCircleBgLoading), true, 200);
+                mProgressCircle.setContentText(R.string.uninstall);
                 mProgressDescription.setText("");
 
                 Util.animateVisibility(mListener.getFAB(), View.VISIBLE, 200);
@@ -189,8 +191,8 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         if (!installStatus.isInstalled()) {
             // not installed
-            mProgressCircle.setFillColor(Color.parseColor("#FF5722"), animate, 200);
-            mProgressCircle.setContentText("Install");
+            mProgressCircle.setFillColor(getColor(R.color.colorCircleBgError), animate, 200);
+            mProgressCircle.setContentText(R.string.install);
             mProgressDescription.setText("");
             mListener.getFAB().setVisibility(View.GONE);
         }
@@ -200,8 +202,8 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             fab.setVisibility(View.GONE);
 
             // broken
-            mProgressCircle.setFillColor(Color.parseColor("#FF5722"), animate, 200);
-            mProgressCircle.setContentText("Repair");
+            mProgressCircle.setFillColor(getColor(R.color.colorCircleBgError), animate, 200);
+            mProgressCircle.setContentText(R.string.repair);
 
             ArrayList<InstallationEntry> installEntries = new ArrayList<>();
             installEntries.addAll(installStatus.getInstallationEntries());
@@ -224,7 +226,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
                     continue;
 
                 if(i!=0 && i==installEntries.size()-1)
-                    text += " and ";
+                    text += " "+getString(R.string.and)+" ";
                 else if(i!=0) {
                     text += ", ";
                 }
@@ -232,15 +234,15 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 text += entry.getFsTabEntry().getMountPoint().substring(1)+" ";
 
                 if(status==InstallationEntry.STATUS_ESP_ONLY)
-                    text += "has an ESP backup only";
+                    text += getString(R.string.status_esp_only);
 
                 else if(status==InstallationEntry.STATUS_ESP_MISSING)
-                    text += "has no ESP backup";
+                    text += getString(R.string.status_esp_missing);
 
                 else if(status==InstallationEntry.STATUS_WRONG_DEVICE)
-                    text += "is for another device";
+                    text += getString(R.string.status_wrong_device);
                 else if(status==InstallationEntry.STATUS_NOT_INSTALLED)
-                    text += "is not installed";
+                    text += getString(R.string.status_not_installed);
             }
 
             mProgressDescription.setText(text);
@@ -255,8 +257,8 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             fab.setVisibility(View.VISIBLE);
 
             // installed
-            mProgressCircle.setFillColor(Color.parseColor("#FFC107"), animate, 200);
-            mProgressCircle.setContentText("Update");
+            mProgressCircle.setFillColor(getColor(R.color.colorCircleBgWarning), animate, 200);
+            mProgressCircle.setContentText(R.string.update);
             mProgressDescription.setText(format.format(installStatus.getUpdateDate()));
         }
         else {
@@ -267,9 +269,9 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             fab.setVisibility(View.VISIBLE);
 
             // installed
-            mProgressCircle.setFillColor(Color.parseColor("#4CAF50"), animate, 200);
-            mProgressCircle.setContentText("Reinstall");
-            mProgressDescription.setText("Installed and updated");
+            mProgressCircle.setFillColor(getColor(R.color.colorCircleBgSuccess), animate, 200);
+            mProgressCircle.setContentText(R.string.reinstall);
+            mProgressDescription.setText(R.string.installed_and_updated);
         }
 
         loadListData();
@@ -298,13 +300,6 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
         View toolbarView = inflater.inflate(R.layout.toolbar_layout_install, toolbarFrameLayout, true);
         mProgressCircle = (ProgressCircle) toolbarView.findViewById(R.id.progressCircle);
         mProgressDescription = (TextView) toolbarView.findViewById(R.id.description);
-
-        //GradientDrawable bgShape = (GradientDrawable)mCircleButton.getIm();
-        //bgShape.setColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getActivity().getTheme()));
-        //bgShape.setColor(Color.parseColor("#4CAF50")); // green - installed + updated
-        //bgShape.setColor(Color.parseColor("#FFC107")); // orange - installed + update available
-        //bgShape.setColor(Color.parseColor("#FF5722")); // red - not installed
-        //mProgressCircle.setFillColor(Color.parseColor("#9E9E9E"), false, 0); // grey - loading
     }
 
     @Nullable
@@ -411,7 +406,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             startReload();
         } else {
             mProgressCircle.setProgressHidden(true, true, 1000);
-            mProgressCircle.setFillColor(Color.parseColor("#FF5722"), true, 1000);
+            mProgressCircle.setFillColor(getColor(R.color.colorCircleBgError), true, 1000);
         }
     }
 

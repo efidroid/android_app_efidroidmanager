@@ -1,5 +1,6 @@
 package org.efidroid.efidroidmanager.fragments.operatingsystemedit;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
     // types
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
+    private final Context mContext;
 
     public static class ReplacementItem {
         private String mName;
@@ -106,9 +108,10 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
         }
     }
 
-    public ReplacementItemRecyclerViewAdapter(OperatingSystem os, OnListFragmentInteractionListener listener) {
+    public ReplacementItemRecyclerViewAdapter(Context context, OperatingSystem os, OnListFragmentInteractionListener listener) {
         mOperatingSystem = os;
         mListener = listener;
+        mContext = context;
         rebuildItems();
     }
 
@@ -128,19 +131,19 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
         mValues.clear();
 
         if(!mOperatingSystem.isCreationMode()) {
-            mValues.add(new HeaderItem("Binaries"));
+            mValues.add(new HeaderItem(mContext.getString(R.string.binaries)));
 
             String value = mOperatingSystem.getReplacementKernel();
-            mValues.add(new KernelReplacementItem(mOperatingSystem, "kernel", value));
+            mValues.add(new KernelReplacementItem(mOperatingSystem, mContext.getString(R.string.kernel), value));
 
             value = mOperatingSystem.getReplacementRamdisk();
-            mValues.add(new RamdiskReplacementItem(mOperatingSystem, "ramdisk", value));
+            mValues.add(new RamdiskReplacementItem(mOperatingSystem, mContext.getString(R.string.ramdisk), value));
 
             value = mOperatingSystem.getReplacementDT();
-            mValues.add(new DTReplacementItem(mOperatingSystem, "dt", value));
+            mValues.add(new DTReplacementItem(mOperatingSystem, mContext.getString(R.string.dt), value));
         }
 
-        mValues.add(new HeaderItem("Commandline"));
+        mValues.add(new HeaderItem(mContext.getString(R.string.commandline)));
         mValues.addAll(mOperatingSystem.getCmdline());
     }
 
@@ -192,7 +195,7 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
             ReplacementItem item = (ReplacementItem)mValues.get(position);
             String value = item.getValue();
             if(value==null)
-                value = "(disabled)";
+                value = mContext.getString(R.string._disabled_);
 
             holder.mTitleView.setText(item.getName());
             holder.mSubtitleView.setText(value);

@@ -1,17 +1,14 @@
 package org.efidroid.efidroidmanager.tasks;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import com.stericson.roottools.RootTools;
 
+import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
-import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
 import org.efidroid.efidroidmanager.types.ProgressServiceTask;
-
-import java.util.List;
 
 public class OSRemovalProgressServiceTask extends ProgressServiceTask {
     // args
@@ -41,12 +38,12 @@ public class OSRemovalProgressServiceTask extends ProgressServiceTask {
         try {
             String romDir = os.getDirectory();
             if(!RootToolsEx.isDirectory(romDir)) {
-                throw new Exception("Operating System does not exist");
+                throw new Exception(getService().getString(R.string.os_does_not_exist));
             }
 
-            publishProgress(1, "removing system");
+            publishProgress(1, getService().getString(R.string.removing_system, os.getName()));
             if(!RootTools.deleteFileOrDirectory(romDir, false)) {
-                throw new Exception("Can't delete Operating system");
+                throw new Exception(getService().getString(R.string.cant_delete_os));
             }
 
             mSuccess = true;
@@ -58,7 +55,7 @@ public class OSRemovalProgressServiceTask extends ProgressServiceTask {
 
         // publish status
         if(mSuccess)
-            publishProgress(100, "Done");
+            publishProgress(100, getService().getString(R.string.md_done_label));
         publishFinish(mSuccess);
 
         mOperatingSystem = null;
@@ -66,15 +63,15 @@ public class OSRemovalProgressServiceTask extends ProgressServiceTask {
 
     @Override
     public String getNotificationProgressTitle() {
-        return  "Removing System '" + mOperatingSystem.getName() + "'";
+        return  getService().getString(R.string.removing_system, mOperatingSystem.getName());
     }
 
     @Override
     public String getNotificationResultTitle() {
         if (mSuccess) {
-            return "Removed System '" + mOperatingSystem.getName() + "'";
+            return getService().getString(R.string.removed_system, mOperatingSystem.getName());
         } else {
-            return "Error removing System '" + mOperatingSystem.getName() + "'";
+            return getService().getString(R.string.error_removing_system, mOperatingSystem.getName());
         }
     }
 }

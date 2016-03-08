@@ -303,7 +303,7 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
         String name = mOperatingSystem.getName();
         if(name==null || name.equals("")) {
             mListener.getTabLayout().getTabAt(0).select();
-            mEditTextName.setError("Name must not be empty");
+            mEditTextName.setError(getContext().getString(R.string.name_must_not_be_empty));
             return false;
         }
 

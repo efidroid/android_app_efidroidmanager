@@ -14,6 +14,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
         android:id="@+id/scheme_container">
 
         <TextView
@@ -21,7 +22,7 @@
             android:layout_height="match_parent"
             android:alpha="0.54"
             android:gravity="center_vertical"
-            android:text="Scheme"
+            android:text="@string/scheme"
             android:textAppearance="?attr/textAppearanceListItemSmall" />
 
         <android.support.v7.widget.AppCompatSpinner

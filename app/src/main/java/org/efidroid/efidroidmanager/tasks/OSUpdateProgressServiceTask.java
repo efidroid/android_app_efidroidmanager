@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.stericson.roottools.RootTools;
 
+import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
@@ -40,13 +41,13 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
         try {
             String romDir;
             if(os.isCreationMode()) {
-                progress = publishProgress(1, "Creating OS directory");
+                progress = publishProgress(1, getService().getString(R.string.creating_os_dir));
 
                 // create multiboot directory
                 String multibootDir = os.getLocation().path;
                 if (!RootToolsEx.isDirectory(multibootDir)) {
                     if (!RootToolsEx.mkdir(multibootDir, true)) {
-                        throw new Exception("Can't create multiboot directory");
+                        throw new Exception(getService().getString(R.string.cant_create_multiboot_dir));
                     }
                 }
 
@@ -57,13 +58,13 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                     _romDir += "-" + unixTime;
 
                     if (RootToolsEx.nodeExists(_romDir)) {
-                        throw new Exception("ROM directory does already exist");
+                        throw new Exception(getService().getString(R.string.rom_dir_does_already_exist));
                     }
                 }
 
                 // create ROM directory
                 if (!RootToolsEx.mkdir(_romDir, false)) {
-                    throw new Exception("Can't create ROM directory");
+                    throw new Exception(getService().getString(R.string.cant_create_rom_dir));
                 }
 
                 romDir = _romDir;
@@ -98,12 +99,12 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                     RootToolsEx.writeBitmapToPngFile(getService(), iconPath, iconBitmap);
                 }
                 catch (Exception e) {
-                    throw new Exception("Can't write icon: "+e.getLocalizedMessage());
+                    throw new Exception(getService().getString(R.string.cant_write_icon)+" "+e.getLocalizedMessage());
                 }
             }
             else if(RootToolsEx.nodeExists(iconPath)) {
                 if(!RootTools.deleteFileOrDirectory(iconPath, false)) {
-                    throw new Exception("Can't delete old icon");
+                    throw new Exception(getService().getString(R.string.cant_delete_old_icon));
                 }
             }
 
@@ -113,7 +114,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
                 for (int i=0; i<partitions.size(); i++) {
                     if (getService().shouldStop()) {
-                        throw new Exception("Aborted");
+                        throw new Exception(getService().getString(R.string.aborted));
                     }
 
                     OperatingSystem.Partition partition = partitions.get(i);
@@ -121,12 +122,12 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                     String filename_abs = romDir+"/"+filename;
 
                     // publich progress
-                    progress = publishProgress(100/partitions.size()*i, "setup partition '"+partition.getPartitionName()+"'");
+                    progress = publishProgress(100/partitions.size()*i, getService().getString(R.string.setup_partition, partition.getPartitionName()));
 
                     switch (partition.getType()) {
                         case OperatingSystem.Partition.TYPE_BIND:
                             if (!RootToolsEx.mkdir(filename_abs, false)) {
-                                throw new Exception("Can't create directory '"+filename+"'");
+                                throw new Exception(getService().getString(R.string.cant_create_dir, filename));
                             }
                             break;
 
@@ -134,9 +135,9 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                             try {
                                 RootToolsEx.createDynFileFsImage(getService(), filename_abs, partition.getSize());
                             } catch (InterruptedException e) {
-                                throw new Exception("Aborted");
+                                throw new Exception(getService().getString(R.string.aborted));
                             } catch (Exception e) {
-                                throw new Exception("Can't create DynfileFS2 image '"+filename+"': "+e.getLocalizedMessage());
+                                throw new Exception(getService().getString(R.string.cant_create_dynfilefs2_img)+e.getLocalizedMessage());
                             }
                             break;
 
@@ -144,9 +145,9 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                             try {
                                 RootToolsEx.createLoopImage(getService(), filename_abs, partition.getSize());
                             } catch (InterruptedException e) {
-                                throw new Exception("Aborted");
+                                throw new Exception(getService().getString(R.string.aborted));
                             } catch (Exception e) {
-                                throw new Exception("Can't create loop image '"+filename+"': "+e.getLocalizedMessage());
+                                throw new Exception(getService().getString(R.string.cant_create_loop_img)+e.getLocalizedMessage());
                             }
                             break;
                     }
@@ -162,7 +163,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
         // publish status
         if(mSuccess)
-            publishProgress(100, "Done");
+            publishProgress(100, getService().getString(R.string.md_done_label));
         publishFinish(mSuccess);
 
         mOperatingSystem = null;
@@ -170,15 +171,18 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
     @Override
     public String getNotificationProgressTitle() {
-        return (mOperatingSystem.isCreationMode() ? "Creating" : "Updating") + " System '" + mOperatingSystem.getName() + "'";
+        int textid = mOperatingSystem.isCreationMode()?R.string.creating_system:R.string.updating_system;
+        return getService().getString(textid, mOperatingSystem.getName());
     }
 
     @Override
     public String getNotificationResultTitle() {
         if (mSuccess) {
-            return (mOperatingSystem.isCreationMode() ? "Created" : "Updated") + " System '" + mOperatingSystem.getName() + "'";
+            int textid = mOperatingSystem.isCreationMode()?R.string.created_system:R.string.updated_system;
+            return getService().getString(textid, mOperatingSystem.getName());
         } else {
-            return "Error " + (mOperatingSystem.isCreationMode() ? "Creating" : "Updating") + " System '" + mOperatingSystem.getName() + "'";
+            int textid = mOperatingSystem.isCreationMode()?R.string.error_creating_system:R.string.error_updating_system;
+            return getService().getString(textid, mOperatingSystem.getName());
         }
     }
 }

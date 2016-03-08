@@ -11,4 +11,14 @@
 
     <color name="colorToolBarGrey">#455A64</color>
     <color name="colorToolBarGreyDark">#374850</color>
+
+    <color name="colorUpdateActivityBackground">#0288D1</color>
+
+    <color name="colorCircleBgError">#FF5722</color>
+    <color name="colorCircleBgSuccess">#4CAF50</color>
+    <color name="colorCircleBgWarning">#FFC107</color>
+    <color name="colorCircleBgLoading">#9E9E9E</color>
+
+    <color name="colorCircleProgressError">#FFAB91</color>
+    <color name="colorCircleProgressSuccess">#E6EE9C</color>
 </resources>

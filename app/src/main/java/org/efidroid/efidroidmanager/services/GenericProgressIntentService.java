@@ -81,7 +81,7 @@ public class GenericProgressIntentService extends IntentServiceEx {
         intent.putExtra(NotificationReceiverActivity.ARG_SERVICE_CLASS, getClass());
         intent.setAction(BUTTON_ACTION_STOP);
         pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
-        mBuilder.addAction(R.drawable.ic_action_delete, "Stop", pIntent);
+        mBuilder.addAction(R.drawable.ic_action_delete, getString(R.string.stop), pIntent);
 
         // create content intent
         intent = new Intent(this, MainActivity.class);
@@ -171,7 +171,7 @@ public class GenericProgressIntentService extends IntentServiceEx {
 
     @Override
     protected void earlyStop() {
-        publishProgress(0, "Aborted");
+        publishProgress(0, getString(R.string.aborted));
         publishFinish(false);
     }
 

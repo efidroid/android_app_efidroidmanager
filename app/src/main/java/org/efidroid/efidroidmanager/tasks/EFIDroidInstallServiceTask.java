@@ -6,6 +6,7 @@ import com.stericson.rootshell.RootShell;
 import com.stericson.roottools.RootTools;
 
 import org.efidroid.efidroidmanager.AppConstants;
+import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
@@ -59,11 +60,11 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         // copy data
         byte data[] = new byte[1024];
         int count;
-        publishProgress(mProgress, "Downloading");
+        publishProgress(mProgress, getService().getString(R.string.downloading));
         while ((count = input.read(data)) != -1) {
             if(shouldStop()) {
                 input.close();
-                throw new Exception("Aborted");
+                throw new Exception(getService().getString(R.string.aborted));
             }
 
             sb.append(new String(data, 0, count));
@@ -95,7 +96,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
             if(shouldStop()) {
                 output.close();
                 input.close();
-                throw new Exception("Aborted");
+                throw new Exception(getService().getString(R.string.aborted));
             }
 
             //total += count;
@@ -114,7 +115,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         // extract
         String downloadDir = getService().getCacheDir()+"/update";
         if(RootToolsEx.unzip(downloadFile, downloadDir)!=0)
-            throw new Exception("Can't extract update");
+            throw new Exception(getService().getString(R.string.cant_extract_update));
 
         return downloadDir;
     }
@@ -123,12 +124,12 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         // get esp parent directory
         String espParent = mDeviceInfo.getESPDir(false);
         if(espParent==null)
-            throw new Exception("Can't find ESP partition");
+            throw new Exception(getService().getString(R.string.cant_find_esp_partition));
 
         // create UEFIESP dir
         String espDir = espParent+"/UEFIESP";
         if(!RootToolsEx.mkdir(espDir, true)) {
-            throw new Exception("can't create UEFIESP directory");
+            throw new Exception(getService().getString(R.string.cant_create_uefiesp_dir));
         }
 
         // don't create backups on reinstall or update
@@ -139,7 +140,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
                     continue;
 
                 if (!RootToolsEx.isFile(updateDir + "/" + entry.getName() + ".img"))
-                    throw new Exception("Invalid update");
+                    throw new Exception(getService().getString(R.string.invalid_update));
 
                 // repair
                 if (mInstallationStatus.isBroken()) {
@@ -186,7 +187,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         mSuccess = false;
         try {
             // search for update
-            mProgress = publishProgress(1, "search for update");
+            mProgress = publishProgress(1, getService().getString(R.string.search_for_update));
             JSONArray updateList = getUpdateList();
             JSONObject latestUpdate = null;
             for(int i=0; i<updateList.length(); i++) {
@@ -197,13 +198,13 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
             }
 
             if(latestUpdate==null)
-                throw new Exception("No update available");
+                throw new Exception(getService().getString(R.string.no_update_available));
 
             // download update
-            mProgress = publishProgress(30, "downloading update");
+            mProgress = publishProgress(30, getService().getString(R.string.downloading_update));
             String updateDir = downloadUpdate(latestUpdate.getString("file"));
 
-            mProgress = publishProgress(50, "installing");
+            mProgress = publishProgress(50, getService().getString(R.string.installing));
             doInstall(updateDir);
 
             mSuccess = true;
@@ -215,21 +216,21 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
 
         // publish status
         if(mSuccess)
-            publishProgress(100, "Done");
+            publishProgress(100, getService().getString(R.string.md_done_label));
         publishFinish(mSuccess);
     }
 
     @Override
     public String getNotificationProgressTitle() {
-        return  "Installing EFIDroid";
+        return  getService().getString(R.string.installing_efidroid);
     }
 
     @Override
     public String getNotificationResultTitle() {
         if (mSuccess) {
-            return "Installing EFIDroid successful";
+            return getService().getString(R.string.installing_efidroid_successful);
         } else {
-            return "Error installing EFIDroid";
+            return getService().getString(R.string.error_installling_efidroid);
         }
     }
 }

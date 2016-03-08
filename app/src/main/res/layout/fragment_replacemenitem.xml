@@ -23,7 +23,6 @@
                 android:id="@+id/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Title"
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView
@@ -31,7 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:alpha="0.54"
-                android:text="Subtitle"
                 android:textAppearance="?attr/textAppearanceListItem"
                 android:textSize="14sp" />
         </LinearLayout>

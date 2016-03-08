@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0288D1"
+    android:background="@color/colorUpdateActivityBackground"
     android:orientation="vertical"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -44,7 +44,6 @@
             android:id="@+id/textHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:textAlignment="center"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/white" />
@@ -76,7 +75,7 @@
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                android:text="Cancel"
+                android:text="@string/md_cancel_label"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -86,7 +85,7 @@
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                android:text="Back"
+                android:text="@string/md_back_label"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -96,7 +95,7 @@
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                android:text="OK"
+                android:text="@string/ok"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>

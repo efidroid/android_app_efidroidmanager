@@ -5,26 +5,26 @@
         <item
             android:id="@+id/nav_operating_systems"
             android:icon="@drawable/ic_menu_memory"
-            android:title="Operating Systems"/>
+            android:title="@string/operating_systems"/>
         <item
             android:id="@+id/nav_recovery_tools"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Recovery Tools"
+            android:title="@string/recovery_tools"
             android:visible="false" />
         <item
             android:id="@+id/nav_uefi_apps"
             android:icon="@drawable/ic_menu_archive"
-            android:title="UEFI Apps"
+            android:title="@string/uefi_apps"
             android:visible="false" />
         <item
             android:id="@+id/nav_plugins"
             android:icon="@drawable/ic_menu_extension"
-            android:title="Plugins"
+            android:title="@string/plugins"
             android:visible="false" />
         <item
             android:id="@+id/nav_themes"
             android:icon="@drawable/ic_menu_color_lens"
-            android:title="Themes"
+            android:title="@string/themes"
             android:visible="false" />
     </group>
 
@@ -32,27 +32,27 @@
         <item
             android:id="@+id/nav_install"
             android:icon="@drawable/ic_menu_settings"
-            android:title="Install/Update" />
+            android:title="@string/install_update" />
     </group>
 
     <group android:id="@+id/nav_group_communicate">
         <item
             android:id="@+id/nav_share"
             android:icon="@drawable/ic_menu_share"
-            android:title="Share" />
+            android:title="@string/share" />
         <item
             android:id="@+id/nav_get_help"
             android:icon="@drawable/ic_menu_hospital"
-            android:title="Get help" />
+            android:title="@string/get_help" />
         <item
             android:id="@+id/nav_bug_report"
             android:icon="@drawable/ic_menu_bug_report"
-            android:title="Report bug" />
+            android:title="@string/report_bug" />
 
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_menu_info_outline"
-            android:title="About EFIDroid" />
+            android:title="@string/about_efidroid" />
     </group>
 
 
