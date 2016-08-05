@@ -474,6 +474,7 @@ public class MainActivity extends AppCompatActivity
         // reset appbar settings
         mCollapsingToolbarLayout.setTitleEnabled(false);
         mCollapsingToolbarLayout.setContentScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
+        mCollapsingToolbarLayout.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
         mCollapsingToolbarLayout.setStatusBarScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, getTheme()));
         mToolbarFrameLayout.removeAllViews();
 
