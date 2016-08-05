@@ -287,6 +287,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
         collapsingToolbarLayout.setContentScrimColor(colorToolBarGrey);
         collapsingToolbarLayout.setBackgroundColor(colorToolBarGrey);
         collapsingToolbarLayout.setStatusBarScrimColor(colorToolBarGreyDark);
+        collapsingToolbarLayout.setScrimVisibleHeightTrigger(-1);
 
         // appbar
         AppBarLayout appBarLayout = mListener.getAppBarLayout();

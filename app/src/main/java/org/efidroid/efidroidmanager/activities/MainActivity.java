@@ -476,6 +476,7 @@ public class MainActivity extends AppCompatActivity
         mCollapsingToolbarLayout.setContentScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
         mCollapsingToolbarLayout.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
         mCollapsingToolbarLayout.setStatusBarScrimColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, getTheme()));
+        mCollapsingToolbarLayout.setScrimVisibleHeightTrigger(Integer.MAX_VALUE);
         mToolbarFrameLayout.removeAllViews();
 
         if (id == R.id.nav_operating_systems) {
