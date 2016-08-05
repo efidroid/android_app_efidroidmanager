@@ -54,7 +54,7 @@
                 android:layout_below="@+id/textVersion"
                 android:layout_marginTop="20dp"
                 android:autoLink="all"
-                android:text="Copyright (C) 2016 The EFIDroid Project\n\nhttp://efidroid.github.io\n\n"
+                android:text="Copyright (C) 2016 The EFIDroid Project\n\nhttp://efidroid.org\n\n"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
