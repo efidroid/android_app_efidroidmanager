@@ -14,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
+import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 
@@ -217,11 +218,18 @@ public class OperatingSystem implements Parcelable {
         return false;
     }
 
+    private void configureIni4j() {
+        Config c = mIni.getConfig();
+        c.setEscapeKeyOnly(true);
+        mIni.setConfig(c);
+    }
+
     private void init(String filename) throws Exception {
         // create new ini
         if(filename.equals("")) {
             mFilename = filename;
             mIni = new Ini();
+            configureIni4j();
             return;
         }
 
@@ -233,6 +241,7 @@ public class OperatingSystem implements Parcelable {
         // parse ini
         mFilename = filename;
         mIni = new Ini(new StringReader(data));
+        configureIni4j();
 
         initCmdline();
     }
@@ -279,6 +288,7 @@ public class OperatingSystem implements Parcelable {
         String data = in.readString();
         try {
             mIni = new Ini(new StringReader(data));
+            configureIni4j();
         } catch (IOException e) {
             throw new RuntimeException("Can't read ini from buffer");
         }
