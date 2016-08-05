@@ -79,7 +79,6 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
             // write icon
             Bitmap iconBitmap = os.getIconBitmap(getService());
             String iconPath = romDir + "/icon.png";
-            // 960 x 540
             if(iconBitmap!=null) {
                 try {
                     double width = iconBitmap.getWidth();
@@ -121,7 +120,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                     String filename = partition.toIniPath();
                     String filename_abs = romDir+"/"+filename;
 
-                    // publich progress
+                    // publish progress
                     progress = publishProgress(100/partitions.size()*i, getService().getString(R.string.setup_partition, partition.getPartitionName()));
 
                     switch (partition.getType()) {
