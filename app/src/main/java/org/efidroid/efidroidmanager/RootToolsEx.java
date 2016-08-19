@@ -513,42 +513,6 @@ public final class RootToolsEx {
         ReturnCodeException.check(rc);
     }
 
-    public static void createDynFileFsImage(IntentServiceEx service, String filename, long size) throws Exception {
-        String DYNFILE_MAGIC = "DynfileFS2";
-        long NUM_INDEXED_BLOCKS = 16384;
-        long sizeof_magic = 24;
-        long sizeof_header = sizeof_magic + 8; // magic, size64
-        long sizeof_zero = 8;
-
-        long seek_offset = sizeof_header + NUM_INDEXED_BLOCKS*sizeof_zero*2;
-        long file_size = seek_offset + sizeof_zero;
-
-        // create empty file
-        Command command = new Command(0, false, 0, "busybox dd if=/dev/zero of=\""+filename+"\" bs="+file_size+" count=1");
-        int rc = runServiceCommand(service, command);
-        ReturnCodeException.check(rc);
-
-        StringBuilder sb = new StringBuilder();
-
-        // magic
-        long num_zero_bytes = sizeof_magic - DYNFILE_MAGIC.length();
-        sb.append(DYNFILE_MAGIC);
-        for(long i=0; i<num_zero_bytes; i++)
-            sb.append("\\x00");
-
-        // size
-        byte[] sizeArr = Util.longToBytes(size);
-        for(byte b : sizeArr)
-            sb.append("\\x"+Util.byteToHexStr(b));
-
-        // write header
-        command = new Command(0, false, "busybox echo -n -e \""+sb.toString()+"\" | busybox dd of=\""+filename+"\"");
-        Shell shell = RootTools.getShell(true);
-        shell.add(command);
-        commandWait(shell, command);
-        ReturnCodeException.check(command.getExitCode());
-    }
-
     public static class RootFile extends File {
         private boolean mIsDir;
 

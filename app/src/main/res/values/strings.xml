@@ -120,7 +120,6 @@
     <string name="cant_delete_old_icon">Can\'t delete old icon</string>
     <string name="setup_partition" formatted="false">setup partition \'%s\'</string>
     <string name="cant_create_dir" formatted="false">Can\'t create directory \'%s\'</string>
-    <string name="cant_create_dynfilefs2_img" formatted="false">Can\'t create DynfileFS2 image \'%s\': </string>
     <string name="cant_create_loop_img" formatted="false">Can\'t create loop image \'%s\': </string>
     <string name="created_system" formatted="false">created system %s</string>
     <string name="updated_system" formatted="false">updated system %s</string>

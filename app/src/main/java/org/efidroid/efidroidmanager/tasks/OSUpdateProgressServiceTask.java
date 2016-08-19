@@ -130,16 +130,6 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                             }
                             break;
 
-                        case OperatingSystem.Partition.TYPE_DYNFILEFS:
-                            try {
-                                RootToolsEx.createDynFileFsImage(getService(), filename_abs, partition.getSize());
-                            } catch (InterruptedException e) {
-                                throw new Exception(getService().getString(R.string.aborted));
-                            } catch (Exception e) {
-                                throw new Exception(getService().getString(R.string.cant_create_dynfilefs2_img)+e.getLocalizedMessage());
-                            }
-                            break;
-
                         case OperatingSystem.Partition.TYPE_LOOP:
                             try {
                                 RootToolsEx.createLoopImage(getService(), filename_abs, partition.getSize());

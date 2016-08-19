@@ -68,7 +68,6 @@ public class OperatingSystem implements Parcelable {
 
         public static final int TYPE_BIND = 0;
         public static final int TYPE_LOOP = 1;
-        public static final int TYPE_DYNFILEFS= 2;
 
         private Partition(String name, String value) {
             mPartitionName = name;
@@ -78,10 +77,6 @@ public class OperatingSystem implements Parcelable {
             switch(ext) {
                 case "img":
                     mType = TYPE_LOOP;
-                    break;
-
-                case "dyn":
-                    mType = TYPE_DYNFILEFS;
                     break;
 
                 default:
@@ -159,10 +154,6 @@ public class OperatingSystem implements Parcelable {
             switch(mType) {
                 case TYPE_LOOP:
                     sb.append(".img");
-                    break;
-
-                case TYPE_DYNFILEFS:
-                    sb.append(".dyn");
                     break;
             }
 

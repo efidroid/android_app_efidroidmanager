@@ -58,9 +58,6 @@ public class PartitionItemRecyclerViewAdapter extends RecyclerView.Adapter<Parti
             case OperatingSystem.Partition.TYPE_LOOP:
                 letter = "L";
                 break;
-            case OperatingSystem.Partition.TYPE_DYNFILEFS:
-                letter = "D";
-                break;
         }
         holder.mIconLetter.setText(letter);
 
