@@ -9,9 +9,8 @@
     <string name="ostype_android">Android</string>
     <string name="ostype_ubuntu">Ubuntu</string>
 
-    <string name="scheme_android_dynsystem_bindother">DynSystem + BindOther</string>
+    <string name="scheme_android_loopsystem_bindother">LoopSystem + BindOther</string>
     <string name="scheme_android_bindall">BindAll</string>
-    <string name="scheme_android_dynsystem_loopother">DynSystem + LoopOther</string>
     <string name="scheme_android_loopall">LoopAll</string>
     <string name="title_activity_about">About</string>
     <string name="ok">OK</string>

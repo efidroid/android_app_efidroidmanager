@@ -33,10 +33,9 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
     private OSEditFragmentInteractionListener mListener = null;
 
     // scheme id's
-    private static final int SCHEMEID_ANDROID_DYNSYS_BINDOTHER = 0;
+    private static final int SCHEMEID_ANDROID_LOOPSYS_BINDOTHER = 0;
     private static final int SCHEMEID_ANDROID_BINDALL = 1;
-    private static final int SCHEMEID_ANDROID_DYNSYS_LOOPOTHER = 2;
-    private static final int SCHEMEID_ANDROID_LOOPALL = 3;
+    private static final int SCHEMEID_ANDROID_LOOPALL = 2;
 
     // schemes
     private final HashMap<Integer, PartitionScheme> SCHEMES = new HashMap<>();
@@ -130,7 +129,7 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
                     + " must be OSEditFragmentInteractionListener");
         }
 
-        SCHEMES.put(SCHEMEID_ANDROID_DYNSYS_BINDOTHER, new PartitionScheme(getContext(), R.string.scheme_android_dynsystem_bindother, new PartitionScheme.Callback() {
+        SCHEMES.put(SCHEMEID_ANDROID_LOOPSYS_BINDOTHER, new PartitionScheme(getContext(), R.string.scheme_android_loopsystem_bindother, new PartitionScheme.Callback() {
             @Override
             public void onSetDefaults() {
                 ArrayList<OperatingSystem.Partition> list = new ArrayList<>();
@@ -144,7 +143,7 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
 
                     int type;
                     if(name.equals("system"))
-                        type = OperatingSystem.Partition.TYPE_DYNFILEFS;
+                        type = OperatingSystem.Partition.TYPE_LOOP;
                     else if(is_bind)
                         type = OperatingSystem.Partition.TYPE_BIND;
                     else
@@ -182,33 +181,6 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
                     long size = -1;
                     OperatingSystemEditActivity.MultibootPartitionInfo info = Util.getPartitionInfoByName(mListener.getMultibootPartitionInfo(), name);
                     if(info!=null && type!=OperatingSystem.Partition.TYPE_BIND)
-                        size = info.size;
-
-                    list.add(new OperatingSystem.Partition(name, name, type, size));
-                }
-                mOperatingSystem.setPartitions(list);
-            }
-        }));
-
-        SCHEMES.put(SCHEMEID_ANDROID_DYNSYS_LOOPOTHER, new PartitionScheme(getContext(), R.string.scheme_android_dynsystem_loopother, new PartitionScheme.Callback() {
-            @Override
-            public void onSetDefaults() {
-                ArrayList<OperatingSystem.Partition> list = new ArrayList<>();
-                FSTab fsTab = mListener.getDeviceInfo().getFSTab();
-                for(FSTabEntry entry : fsTab.getFSTabEntries()) {
-                    if(!entry.isMultiboot())
-                        continue;
-
-                    String name = entry.getMountPoint().substring(1);
-                    int type;
-                    if(name.equals("system"))
-                        type = OperatingSystem.Partition.TYPE_DYNFILEFS;
-                    else
-                        type = OperatingSystem.Partition.TYPE_LOOP;
-
-                    long size = -1;
-                    OperatingSystemEditActivity.MultibootPartitionInfo info = Util.getPartitionInfoByName(mListener.getMultibootPartitionInfo(), name);
-                    if(info!=null)
                         size = info.size;
 
                     list.add(new OperatingSystem.Partition(name, name, type, size));
@@ -271,10 +243,9 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
             boolean bindSupported = OperatingSystem.isBindAllowed(mOperatingSystem.getLocation().mountEntry.getFsType());
 
             if (bindSupported)
-                mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_DYNSYS_BINDOTHER));
+                mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_LOOPSYS_BINDOTHER));
             if (bindSupported)
                 mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_BINDALL));
-            mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_DYNSYS_LOOPOTHER));
             mSpinnerSchemes.add(SCHEMES.get(SCHEMEID_ANDROID_LOOPALL));
         }
         mSpinnerPartitionScheme.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, mSpinnerSchemes));
