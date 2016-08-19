@@ -242,6 +242,9 @@ public class Shell {
             Thread.currentThread().interrupt();
             throw new TimeoutException();
         }
+
+        // extend PATH
+        this.add(new Command(0, false, "export PATH=\""+RootShell.shellPathExtension+":$PATH\""));
     }
 
 

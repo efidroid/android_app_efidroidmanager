@@ -44,6 +44,7 @@ public class RootShell {
     // --------------------
 
     public static boolean debugMode = false;
+    public static String shellPathExtension = "";
 
     public static final String version = "RootShell v1.3";
 
