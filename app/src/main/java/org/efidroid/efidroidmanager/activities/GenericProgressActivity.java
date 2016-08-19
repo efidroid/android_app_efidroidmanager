@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.efidroid.efidroidmanager.R;
+import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
 import org.efidroid.efidroidmanager.types.ProgressReceiver;
 import org.efidroid.efidroidmanager.view.ProgressCircle;
@@ -107,6 +108,8 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        RootToolsEx.init(this);
+
         // reset variables
         mFinishOnResume = false;
 

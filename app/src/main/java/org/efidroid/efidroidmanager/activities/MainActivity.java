@@ -27,7 +27,6 @@ import android.widget.ProgressBar;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.melnykov.fab.FloatingActionButton;
-import com.stericson.roottools.RootTools;
 
 import org.efidroid.efidroidmanager.DataHelper;
 import org.efidroid.efidroidmanager.R;
@@ -51,7 +50,6 @@ public class MainActivity extends AppCompatActivity
         DataHelper.DeviceInfoLoadCallback, InstallFragment.OnInstallFragmentInteractionListener {
 
     // status
-    private boolean hasBusybox = false;
     private boolean hasRoot = false;
     private boolean mTouchDisabled = false;
     private int mActiveMenuItemId = 0;
@@ -64,7 +62,6 @@ public class MainActivity extends AppCompatActivity
     // args
     private static final String ARG_DEVICE_INFO = "deviceinfo";
     private static final String ARG_ACTIVEMENU_ID = "activemenu_id";
-    private static final String ARG_HAS_BUSYBOX = "has_busybox";
     private static final String ARG_HAS_ROOT = "has_root";
 
     // UI
@@ -220,6 +217,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        RootToolsEx.init(this);
         setContentView(R.layout.activity_main);
 
         // get views
@@ -272,7 +270,6 @@ public class MainActivity extends AppCompatActivity
         else {
             mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
             mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
-            hasBusybox = savedInstanceState.getBoolean(ARG_HAS_BUSYBOX);
             hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
 
             // operating systems
@@ -299,28 +296,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void onLoadUiData() {
-        if (!hasBusybox && !RootTools.isBusyboxAvailable()) {
-            new MaterialDialog.Builder(this)
-                    .title(R.string.error)
-                    .content(R.string.you_need_busybox)
-                    .positiveText(R.string.install)
-                    .neutralText(R.string.try_again)
-                    .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-                @Override
-                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                    RootTools.offerBusyBox(MainActivity.this);
-                }
-            })
-                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            onLoadUiData();
-                        }
-                    }).show();
-            return;
-        }
-        hasBusybox = true;
-
         if (!hasRoot && !RootToolsEx.isAccessGiven(0, 0)) {
             new MaterialDialog.Builder(this)
                     .title(R.string.error)
@@ -354,11 +329,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        // we got paused by offering the busybox, so resume loading now
-        if(!hasBusybox) {
-            onLoadUiData();
-        }
-
         // operating systems got deleted, reload them
         if(mActiveMenuItemId==R.id.nav_operating_systems && mOperatingSystems==null)
             reloadOperatingSystems();
@@ -381,7 +351,6 @@ public class MainActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(ARG_DEVICE_INFO, mDeviceInfo);
         outState.putInt(ARG_ACTIVEMENU_ID, mActiveMenuItemId);
-        outState.putBoolean(ARG_HAS_BUSYBOX, hasBusybox);
         outState.putBoolean(ARG_HAS_ROOT, hasRoot);
 
         // operating systems

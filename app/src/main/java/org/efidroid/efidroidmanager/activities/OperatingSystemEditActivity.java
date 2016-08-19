@@ -218,6 +218,8 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        RootToolsEx.init(this);
+
         if (savedInstanceState != null) {
             mOperatingSystem = savedInstanceState.getParcelable(ARG_OPERATING_SYSTEM);
             mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);

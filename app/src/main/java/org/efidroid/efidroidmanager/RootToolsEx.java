@@ -2,18 +2,26 @@ package org.efidroid.efidroidmanager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.util.Base64;
-import android.util.Log;
 
 import com.stericson.rootshell.RootShell;
-import com.stericson.rootshell.exceptions.RootDeniedException;
 import com.stericson.rootshell.execution.Command;
 import com.stericson.rootshell.execution.Shell;
 import com.stericson.roottools.RootTools;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.efidroid.efidroidmanager.models.MountInfo;
+import org.efidroid.efidroidmanager.services.IntentServiceEx;
+import org.efidroid.efidroidmanager.types.MountEntry;
+import org.efidroid.efidroidmanager.types.Pointer;
+import org.efidroid.efidroidmanager.types.ReturnCodeException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,14 +31,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.io.FilenameUtils;
-import org.efidroid.efidroidmanager.models.MountInfo;
-import org.efidroid.efidroidmanager.services.IntentServiceEx;
-import org.efidroid.efidroidmanager.types.MountEntry;
-import org.efidroid.efidroidmanager.types.Pointer;
-import org.efidroid.efidroidmanager.types.ReturnCodeException;
-
 public final class RootToolsEx {
+    private static String BUSYBOX = null;
+
     public interface MountInfoLoadedCallback {
         void onError(Exception e);
         void onSuccess(List<MountEntry> mountEntry);
@@ -639,5 +642,19 @@ public final class RootToolsEx {
         shell.add(command);
         commandWait(shell, command);
         ReturnCodeException.check(command.getExitCode());
+    }
+
+    public static void init(Context context) {
+        try {
+            InputStream is = context.getAssets().open(Build.CPU_ABI+"/busybox");
+            File out = new File(context.getFilesDir(), "/busybox");
+            if(!out.exists())
+                FileUtils.copyInputStreamToFile(is, out);
+            out.setExecutable(true, false);
+            BUSYBOX = out.getAbsolutePath();
+            RootShell.shellPathExtension = context.getFilesDir().getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
