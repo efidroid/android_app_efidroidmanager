@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+def gitRevision() {
+    def cmd = "git rev-parse --short HEAD"
+    return cmd.execute().text.trim()
+}
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
@@ -9,7 +14,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
-        versionName "1.0"
+        versionName "1.0-g${gitRevision()}"
 
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
         buildConfigField "String", "USERNAME", "\""+System.getProperty("user.name")+"\""
