@@ -71,12 +71,14 @@ public class OperatingSystem implements Parcelable {
 
         private Partition(String name, String value) {
             mPartitionName = name;
-            mFileName = FilenameUtils.removeExtension(value);
+            mFileName = value;
 
+            String nameNoExt = FilenameUtils.removeExtension(mFileName);
             String ext = FilenameUtils.getExtension(value);
             switch(ext) {
                 case "img":
                     mType = TYPE_LOOP;
+                    mFileName = nameNoExt;
                     break;
 
                 default:
