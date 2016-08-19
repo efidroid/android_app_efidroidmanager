@@ -57,8 +57,6 @@ public class OSRemovalProgressServiceTask extends ProgressServiceTask {
         if(mSuccess)
             publishProgress(100, getService().getString(R.string.md_done_label));
         publishFinish(mSuccess);
-
-        mOperatingSystem = null;
     }
 
     @Override
