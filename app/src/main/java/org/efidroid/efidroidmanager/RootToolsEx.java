@@ -651,6 +651,7 @@ public final class RootToolsEx {
             if(!out.exists())
                 FileUtils.copyInputStreamToFile(is, out);
             out.setExecutable(true, false);
+            out.setReadable(true, false);
             BUSYBOX = out.getAbsolutePath();
             RootShell.shellPathExtension = context.getFilesDir().getAbsolutePath();
         } catch (IOException e) {
