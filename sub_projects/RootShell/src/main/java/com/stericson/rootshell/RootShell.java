@@ -278,7 +278,7 @@ public class RootShell {
      * @return <code>List<String></code> A List of Strings representing the environment variable $PATH
      */
     public static List<String> getPath() {
-        return Arrays.asList(System.getenv("PATH").split(":"));
+        return Arrays.asList((shellPathExtension+":"+System.getenv("PATH")).split(":"));
     }
 
     /**
