@@ -52,7 +52,7 @@
         </LinearLayout>
 
         <!-- PATH -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="?android:attr/selectableItemBackground"
@@ -85,7 +85,7 @@
         </LinearLayout>
 
         <!-- OSTYPE -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="?android:attr/selectableItemBackground"
@@ -120,7 +120,7 @@
         <include layout="@layout/divider" />
 
         <!-- NAME -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="?android:attr/selectableItemBackground"
@@ -151,7 +151,7 @@
         <include layout="@layout/divider" />
 
         <!-- DESCRIPTION -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="?android:attr/selectableItemBackground"
