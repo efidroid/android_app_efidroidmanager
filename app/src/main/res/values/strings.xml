@@ -34,8 +34,8 @@
     <string name="action_done">Done</string>
     <string name="action_refresh">Refresh</string>
 
-    <string name="app_version">App Version %s</string>
-    <string name="compiled_by" formatted="false">Compiled by %s@%s on %s</string>
+    <string name="app_version">App Version %1$s</string>
+    <string name="compiled_by">Compiled by %1$s@%2$s on %3$s</string>
 
     <string name="reloading_info">Reloading info</string>
     <string name="reloading">Reloading</string>
@@ -59,9 +59,9 @@
     <string name="installed_and_updated">Installed and updated</string>
     <string name="save">Save</string>
     <string name="edit_partition">Edit partition</string>
-    <string name="creating_system">Creating system %s</string>
-    <string name="updating_system">Updating system %s</string>
-    <string name="deleting_system">Deleting system %s</string>
+    <string name="creating_system">Creating system %1$s</string>
+    <string name="updating_system">Updating system %1$s</string>
+    <string name="deleting_system">Deleting system %1$s</string>
     <string name="create_operating_system">Create Operating System</string>
     <string name="loading_device_info">Loading device info</string>
     <string name="please_wait">Please wait</string>
@@ -76,8 +76,8 @@
     <string name="cant_load_device_info_check_connection">Can\'t load device info. Please check your connection.\n\n</string>
     <string name="try_again">Try again</string>
     <string name="you_need_root">You need Root access to use this app.</string>
-    <string name="share_text">I\'m running EFIDroid on my %s!\nMore info: http://efidroid.org</string>
-    <string name="os_delete_confirmation">Do you want to delete \'%s\'?</string>
+    <string name="share_text">I\'m running EFIDroid on my %1$s!\nMore info: http://efidroid.org</string>
+    <string name="os_delete_confirmation">Do you want to delete \'%1$s\'?</string>
     <string name="name_must_not_be_empty">Name must not be empty</string>
     <string name="new_cmdline_override">New cmdline override</string>
     <string name="edit_cmdline_override">Edit cmdline override</string>
@@ -107,9 +107,9 @@
     <string name="uninstalling_efidroid_successful">Uninstalling EFIDroid successful</string>
     <string name="error_uninstalliing_efidroid">Error uninstalling EFIDroid</string>
     <string name="os_does_not_exist">Operating System does not exist</string>
-    <string name="removing_system" formatted="false">Removing system %s</string>
-    <string name="removed_system" formatted="false">Removed system %s</string>
-    <string name="error_removing_system" formatted="false">Error removing system %s</string>
+    <string name="removing_system">Removing system %1$s</string>
+    <string name="removed_system">Removed system %1$s</string>
+    <string name="error_removing_system">Error removing system %1$s</string>
     <string name="cant_delete_os">Can\'t delete Operating system</string>
     <string name="creating_os_dir">Creating OS directory</string>
     <string name="cant_create_multiboot_dir">Can\'t create multiboot directory</string>
@@ -117,11 +117,11 @@
     <string name="cant_create_rom_dir">Can\'t create ROM directory</string>
     <string name="cant_write_icon">Can\'t create ROM directory</string>
     <string name="cant_delete_old_icon">Can\'t delete old icon</string>
-    <string name="setup_partition" formatted="false">setup partition \'%s\'</string>
-    <string name="cant_create_dir" formatted="false">Can\'t create directory \'%s\'</string>
-    <string name="cant_create_loop_img" formatted="false">Can\'t create loop image \'%s\': </string>
-    <string name="created_system" formatted="false">created system %s</string>
-    <string name="updated_system" formatted="false">updated system %s</string>
-    <string name="error_creating_system" formatted="false">Error creating system %s</string>
-    <string name="error_updating_system" formatted="false">Error updating system %s</string>
+    <string name="setup_partition">setup partition \'%1$s\'</string>
+    <string name="cant_create_dir">Can\'t create directory \'%1$s\'</string>
+    <string name="cant_create_loop_img">Can\'t create loop image \'%1$s\': </string>
+    <string name="created_system">created system %s</string>
+    <string name="updated_system">updated system %s</string>
+    <string name="error_creating_system">Error creating system %1$s</string>
+    <string name="error_updating_system">Error updating system %1$s</string>
 </resources>
