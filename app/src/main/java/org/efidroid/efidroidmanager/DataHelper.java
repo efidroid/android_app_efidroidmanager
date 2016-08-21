@@ -149,7 +149,7 @@ public class DataHelper {
                                     // store time of last update
                                     Date date = new Date();
                                     SharedPreferences sp = context.getSharedPreferences(AppConstants.SHAREDPREFS_GLOBAL, Context.MODE_PRIVATE);
-                                    sp.edit().putLong(AppConstants.SHAREDPREFS_GLOBAL_LAST_DEVICEINFO_UPDATE, date.getTime()).commit();
+                                    sp.edit().putLong(AppConstants.SHAREDPREFS_GLOBAL_LAST_DEVICEINFO_UPDATE, date.getTime()).apply();
 
                                     // done
                                     if(callback!=null)

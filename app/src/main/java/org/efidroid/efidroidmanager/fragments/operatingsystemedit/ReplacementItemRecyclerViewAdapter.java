@@ -1,6 +1,7 @@
 package org.efidroid.efidroidmanager.fragments.operatingsystemedit;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -175,6 +176,8 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
             case TYPE_HEADER:
                 view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.fragment_replacemenitem_header, parent, false);
+                TextView textView = (TextView) view.findViewById(R.id.text);
+                textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
                 break;
         }
         return new ViewHolder(view);
@@ -182,31 +185,32 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        final int pos = holder.getAdapterPosition();
+        holder.mItem = mValues.get(pos);
 
         if (holder.mItem instanceof OperatingSystem.CmdlineItem) {
-            OperatingSystem.CmdlineItem item = (OperatingSystem.CmdlineItem)mValues.get(position);
+            OperatingSystem.CmdlineItem item = (OperatingSystem.CmdlineItem)mValues.get(pos);
             holder.mTitleView.setText(item.name);
             holder.mSubtitleView.setText(item.value);
-            holder.mPosition = position;
+            holder.mPosition = pos;
         }
 
         else if (holder.mItem instanceof ReplacementItem) {
-            ReplacementItem item = (ReplacementItem)mValues.get(position);
+            ReplacementItem item = (ReplacementItem)mValues.get(pos);
             String value = item.getValue();
             if(value==null)
                 value = mContext.getString(R.string._disabled_);
 
             holder.mTitleView.setText(item.getName());
             holder.mSubtitleView.setText(value);
-            holder.mPosition = position;
+            holder.mPosition = pos;
         }
 
         else if (holder.mItem instanceof HeaderItem) {
-            HeaderItem item = (HeaderItem)mValues.get(position);
+            HeaderItem item = (HeaderItem)mValues.get(pos);
             holder.mTitleView.setText(item.title);
             holder.mType = TYPE_HEADER;
-            holder.mPosition = position;
+            holder.mPosition = pos;
         }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +245,7 @@ public class ReplacementItemRecyclerViewAdapter extends RecyclerView.Adapter<Rep
         });
 
         // activation status
-        holder.mView.setActivated(mSelectedItems.contains(position));
+        holder.mView.setActivated(mSelectedItems.contains(pos));
     }
 
     @Override

@@ -27,12 +27,12 @@
 
     <TextView
         android:id="@+id/description"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/progressCircle"
         android:layout_marginTop="8dp"
         android:textSize="20sp"
-        android:textColor="@android:color/white"
-        android:textAlignment="center"/>
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>

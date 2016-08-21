@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceListItem"
-            android:fontFamily="sans-serif-medium"
             android:textSize="14sp"
             android:alpha="0.87"
             android:textColor="@color/colorPrimary"/>
