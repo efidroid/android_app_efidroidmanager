@@ -150,8 +150,14 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                         if (isCancelled()) return null;
 
                         try {
-                            // get mountpoint
+                            // get device node id's
                             int[] majmin = RootToolsEx.getDeviceNode(blkDevice);
+
+                            // ignore loop device mounts
+                            if(majmin[0]==7)
+                                continue;
+
+                            // get mountpoint
                             MountEntry mountEntry = mountInfo.getByMajorMinor(majmin[0], majmin[1]);
                             if (mountEntry == null)
                                 continue;
