@@ -202,7 +202,12 @@ public final class RootToolsEx {
     public static List<String> getBlockDevices() throws Exception {
         final ArrayList<String> devices = new ArrayList<>();
 
-        final Command command = new Command(0, false, "busybox blkid")
+        String deviceWildcard = "/dev/block/*";
+        if(isDirectory("/multiboot")) {
+            deviceWildcard = "/multiboot/dev/block/*";
+        }
+
+        final Command command = new Command(0, false, "busybox blkid -c /dev/null "+deviceWildcard)
         {
             @Override
             public void commandOutput(int id, String line) {
