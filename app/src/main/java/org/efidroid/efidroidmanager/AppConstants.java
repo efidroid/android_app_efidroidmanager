@@ -8,7 +8,7 @@ public final class AppConstants {
     private static final String URL_OTA = "https://raw.githubusercontent.com/efidroid/ota/master";
     public static final String URL_DEVICES = URL_OTA+"/devices.json";
 
-    public static final String DEVICE_NAME = Build.MANUFACTURER+"/"+Build.DEVICE;
+    public static final String DEVICE_NAME = Build.MANUFACTURER.toLowerCase()+"/"+Build.DEVICE.toLowerCase();
     public static final String PATH_INTERNAL_DEVICES = "devices.json";
     public static final String PATH_INTERNAL_FSTAB = "fstab.multiboot";
 
