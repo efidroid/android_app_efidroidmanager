@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
 import org.efidroid.efidroidmanager.types.ArgbEvaluator;
+import org.efidroid.efidroidmanager.types.SystemPropertiesProxy;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -202,5 +203,10 @@ public class Util {
         anim.setIntValues(values);
         anim.setEvaluator(ArgbEvaluator.getInstance());
         return anim;
+    }
+
+    public static boolean isDeviceEncryptionEnabled(Context context) {
+        final String status = SystemPropertiesProxy.get(context, "ro.crypto.state", "unsupported");
+        return "encrypted".equalsIgnoreCase(status);
     }
 }

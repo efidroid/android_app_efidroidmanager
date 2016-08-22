@@ -186,6 +186,10 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         mProgress = 0;
         mSuccess = false;
         try {
+            if(Util.isDeviceEncryptionEnabled(getService().getBaseContext())) {
+                throw new Exception(getService().getString(R.string.device_is_encrypted));
+            }
+
             // search for update
             mProgress = publishProgress(1, getService().getString(R.string.search_for_update));
             JSONArray updateList = getUpdateList();
