@@ -49,22 +49,22 @@
 
             <TextView
                 android:id="@+id/textView3"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/textVersion"
                 android:layout_marginTop="20dp"
                 android:autoLink="all"
                 android:text="Copyright (C) 2016 The EFIDroid Project\n\nhttp://efidroid.org\n\n"
-                android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/textBuildInfo"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/textView3"
                 android:text="Build info"
-                android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
     </ScrollView>
