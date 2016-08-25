@@ -49,7 +49,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         StringBuilder sb = new StringBuilder();
 
         // connect
-        URL url = new URL(AppConstants.getUpdatesUrl(mDeviceInfo));
+        URL url = new URL(AppConstants.getUrlUpdates(getService().getBaseContext(), mDeviceInfo));
         URLConnection connection = url.openConnection();
         connection.connect();
         int fileLength = connection.getContentLength();

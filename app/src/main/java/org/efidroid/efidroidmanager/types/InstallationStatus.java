@@ -1,5 +1,6 @@
 package org.efidroid.efidroidmanager.types;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -25,11 +26,11 @@ public class InstallationStatus implements Parcelable {
     public InstallationStatus() {
     }
 
-    private JSONArray getUpdateList(DeviceInfo deviceInfo) throws Exception {
+    private JSONArray getUpdateList(Context context, DeviceInfo deviceInfo) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         // connect
-        URL url = new URL(AppConstants.getUpdatesUrl(deviceInfo));
+        URL url = new URL(AppConstants.getUrlUpdates(context, deviceInfo));
         URLConnection connection = url.openConnection();
         connection.connect();
 
@@ -47,7 +48,7 @@ public class InstallationStatus implements Parcelable {
         return new JSONArray(sb.toString());
     }
 
-    public void doLoad(DeviceInfo deviceInfo) {
+    public void doLoad(Context context, DeviceInfo deviceInfo) {
 
         // load installation info
         FSTab fsTab = deviceInfo.getFSTab();
@@ -63,7 +64,7 @@ public class InstallationStatus implements Parcelable {
         // get update list
         try {
             if(isInstalled() && !isBroken()) {
-                JSONArray updateList = getUpdateList(deviceInfo);
+                JSONArray updateList = getUpdateList(context, deviceInfo);
                 JSONObject latestUpdate = null;
                 for (int i = 0; i < updateList.length(); i++) {
                     JSONObject o = updateList.getJSONObject(i);
