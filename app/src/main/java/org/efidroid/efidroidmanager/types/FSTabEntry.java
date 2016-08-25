@@ -66,6 +66,12 @@ public class FSTabEntry implements Parcelable {
     }
 
     public String getBlkDevice() {
+        try {
+            if(RootToolsEx.isDirectory("/multiboot"))
+                return "/multiboot"+RootToolsEx.realpath(mBlkDevice);
+        } catch (Exception e) {
+        }
+
         return mBlkDevice;
     }
 

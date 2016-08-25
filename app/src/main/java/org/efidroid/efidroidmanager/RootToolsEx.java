@@ -375,6 +375,25 @@ public final class RootToolsEx {
         return size.value;
     }
 
+    public static String realpath(String path) throws Exception {
+        final StringBuffer sb = new StringBuffer();
+
+        final Command command = new Command(0, false, "busybox realpath \""+path+"\"")
+        {
+            @Override
+            public void commandOutput(int id, String line) {
+                super.commandOutput(id, line);
+                sb.append(line);
+            }
+        };
+
+        Shell shell = RootTools.getShell(true);
+        shell.add(command);
+        commandWait(shell, command);
+
+        return command.getExitCode()==0?sb.toString():null;
+    }
+
     public static String readFile(String path) throws Exception {
         final StringWriter stringWriter = new StringWriter();
 
