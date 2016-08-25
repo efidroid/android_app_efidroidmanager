@@ -114,10 +114,10 @@ public class InstallationEntry implements Parcelable {
             long manifest_offset = readU32(meta, pPos);
 
             // read device_name
-            mDeviceName = new String(RootToolsEx.readBinaryFileEx(fsTabEntry.getBlkDevice(), pMetaOffset.value + pPos.value, device_name_size - 1));
+            mDeviceName = new String(RootToolsEx.readBinaryFileEx(fsTabEntry.getBlkDevice(), pMetaOffset.value + device_name_offset, device_name_size - 1));
 
             // read manifest
-            mManifest = new String(RootToolsEx.readBinaryFileEx(fsTabEntry.getBlkDevice(), pMetaOffset.value + pPos.value + device_name_size, manifest_size));
+            mManifest = new String(RootToolsEx.readBinaryFileEx(fsTabEntry.getBlkDevice(), pMetaOffset.value + manifest_offset, manifest_size));
 
             if(!mDeviceName.equals(deviceInfo.getDeviceName()))
                 mStatus = STATUS_WRONG_DEVICE;
