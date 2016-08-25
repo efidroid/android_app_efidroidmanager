@@ -425,7 +425,7 @@ public final class RootToolsEx {
     public static byte[] readBinaryFileEx(String path, long offset, long size) throws Exception {
         final StringBuffer sb = new StringBuffer();
 
-        final Command command = new Command(0, false, "busybox dd if=\""+path+"\" bs=1 count="+size+" skip="+offset+" status=none | busybox base64")
+        final Command command = new Command(0, false, "busybox dd if=\""+path+"\" bs=1 count="+size+" skip="+offset+" status=none 2>/dev/null | busybox base64")
         {
             @Override
             public void commandOutput(int id, String line) {
