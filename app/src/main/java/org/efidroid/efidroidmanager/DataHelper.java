@@ -87,7 +87,7 @@ public class DataHelper {
         switch (deviceInfo.mLoadingState) {
             case STATE_LOAD_DEVICEINFO:
                 // try to load from server
-                stringRequest = new StringRequest(Request.Method.GET, AppConstants.URL_DEVICES,
+                stringRequest = new StringRequest(Request.Method.GET, AppConstants.getUrlDeviceList(context),
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String json) {
@@ -133,7 +133,7 @@ public class DataHelper {
 
             case STATE_LOAD_FSTAB:
                 // try to load from server
-                stringRequest = new StringRequest(Request.Method.GET, AppConstants.getDeviceRepoUrl(deviceInfo)+"/fstab.multiboot",
+                stringRequest = new StringRequest(Request.Method.GET, AppConstants.getUrlDeviceFsTab(context, deviceInfo),
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {

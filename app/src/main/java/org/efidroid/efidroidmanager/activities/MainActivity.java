@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             protected Exception doInBackground(Void... params) {
                 try {
-                    installStatus.doLoad(mDeviceInfo);
+                    installStatus.doLoad(MainActivity.this, mDeviceInfo);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return e;
