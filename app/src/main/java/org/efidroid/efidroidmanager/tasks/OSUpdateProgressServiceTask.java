@@ -136,7 +136,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                             } catch (InterruptedException e) {
                                 throw new Exception(getService().getString(R.string.aborted));
                             } catch (Exception e) {
-                                throw new Exception(getService().getString(R.string.cant_create_loop_img)+e.getLocalizedMessage());
+                                throw new Exception(getService().getString(R.string.cant_create_loop_img, partition.getPartitionName())+e.getLocalizedMessage());
                             }
                             break;
                     }
