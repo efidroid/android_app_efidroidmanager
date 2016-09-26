@@ -524,7 +524,7 @@ public final class RootToolsEx {
     }
 
     public static void createLoopImage(IntentServiceEx service, String filename, long size) throws Exception {
-        final Command command = new Command(0, false, 0, "busybox dd if=/dev/zero of=\""+filename+"\" bs=512 count="+(Util.ROUNDUP(size,512)/512)+"");
+        final Command command = new Command(0, false, 0, "busybox truncate -s "+size+" \""+filename+"\"");
         int rc = runServiceCommand(service, command);
         ReturnCodeException.check(rc);
     }
