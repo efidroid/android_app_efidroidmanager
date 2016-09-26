@@ -7,7 +7,7 @@ def gitRevision() {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "org.efidroid.efidroidmanager"
@@ -37,10 +37,10 @@ dependencies {
     compile('com.github.afollestad.material-dialogs:commons:0.8.5.6@aar') {
         transitive = true
     }
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
-    compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'org.ini4j:ini4j:0.5.4'
     compile 'commons-io:commons-io:2.5'
