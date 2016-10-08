@@ -12,12 +12,11 @@ public class MountEntry implements Parcelable {
     private final String mMountPoint;
     private final String mMountOptions;
     private final String mOptionalFields;
-    private final String mSeparator;
     private final String mFsType;
     private final String mMountSource;
     private final String mSuperOptions;
 
-    public MountEntry(int mountID, int parentID, int major, int minor, String root, String mountPoint, String mountOptions, String optionalFields, String separator, String fsType, String mountSource, String superOptions) {
+    public MountEntry(int mountID, int parentID, int major, int minor, String root, String mountPoint, String mountOptions, String optionalFields, String fsType, String mountSource, String superOptions) {
         mMountID = mountID;
         mParentID = parentID;
         mMajor = major;
@@ -26,7 +25,6 @@ public class MountEntry implements Parcelable {
         mMountPoint = mountPoint;
         mMountOptions = mountOptions;
         mOptionalFields = optionalFields;
-        mSeparator = separator;
         mFsType = fsType;
         mMountSource = mountSource;
         mSuperOptions = superOptions;
@@ -41,7 +39,6 @@ public class MountEntry implements Parcelable {
         mMountPoint = in.readString();
         mMountOptions = in.readString();
         mOptionalFields = in.readString();
-        mSeparator = in.readString();
         mFsType = in.readString();
         mMountSource = in.readString();
         mSuperOptions = in.readString();
@@ -74,7 +71,6 @@ public class MountEntry implements Parcelable {
         dest.writeString(mMountPoint);
         dest.writeString(mMountOptions);
         dest.writeString(mOptionalFields);
-        dest.writeString(mSeparator);
         dest.writeString(mFsType);
         dest.writeString(mMountSource);
         dest.writeString(mSuperOptions);
@@ -110,10 +106,6 @@ public class MountEntry implements Parcelable {
 
     public String getOptionalFields() {
         return mOptionalFields;
-    }
-
-    public String getSeparator() {
-        return mSeparator;
     }
 
     public String getFsType() {

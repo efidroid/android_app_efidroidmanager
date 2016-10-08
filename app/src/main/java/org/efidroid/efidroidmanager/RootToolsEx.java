@@ -182,11 +182,10 @@ public final class RootToolsEx {
                         fields[3], // root
                         fields[4], // mountPoint
                         fields[5], // mountOptions
-                        fields[6], // optionalFields
-                        fields[7], // separator
-                        fields[8], // fsType
-                        fields[9], // mountSource
-                        fields[10] // superOptions
+                        "", // optionalFields
+                        fields[fields.length-3], // fsType
+                        fields[fields.length-2], // mountSource
+                        fields[fields.length-1] // superOptions
                 ));
             }
         };
