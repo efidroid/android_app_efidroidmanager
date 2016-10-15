@@ -354,6 +354,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                     );
 
                     extras.putParcelable(OSUpdateProgressServiceTask.ARG_OPERATING_SYSTEM, mOperatingSystem);
+                    extras.putParcelable(OSUpdateProgressServiceTask.ARG_DEVICE_INFO, mDeviceInfo);
                     startActivityForResult(intent, 0);
                     overridePendingTransition(R.anim.abc_slide_in_right_full, R.anim.abc_slide_out_left_full);
                 }

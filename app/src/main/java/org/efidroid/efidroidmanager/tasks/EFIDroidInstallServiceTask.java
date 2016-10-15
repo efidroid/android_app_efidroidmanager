@@ -165,7 +165,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
 
                 }
 
-                RootToolsEx.createPartitionBackup(getService(), entry.getBlkDevice(), espDir + "/partition_" + entry.getName() + ".img");
+                RootToolsEx.createPartitionBackup(getService(), entry.getBlkDevice(), espDir + "/partition_" + entry.getName() + ".img", -1);
             }
         }
 
