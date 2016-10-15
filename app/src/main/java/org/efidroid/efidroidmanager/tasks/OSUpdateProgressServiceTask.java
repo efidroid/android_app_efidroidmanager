@@ -49,11 +49,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
                 // create multiboot directory
                 String multibootDir = os.getLocation().path;
-                if (!RootToolsEx.isDirectory(multibootDir)) {
-                    if (!RootToolsEx.mkdir(multibootDir, true)) {
-                        throw new Exception(getService().getString(R.string.cant_create_multiboot_dir));
-                    }
-                }
+                RootToolsEx.mkdir(multibootDir, true);
 
                 // get available rom directory
                 String _romDir = multibootDir + "/" + Util.name2path(os.getName());
@@ -67,9 +63,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                 }
 
                 // create ROM directory
-                if (!RootToolsEx.mkdir(_romDir, false)) {
-                    throw new Exception(getService().getString(R.string.cant_create_rom_dir));
-                }
+                RootToolsEx.mkdir(_romDir, false);
 
                 romDir = _romDir;
             }
@@ -129,9 +123,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
                     switch (partition.getType()) {
                         case OperatingSystem.Partition.TYPE_BIND:
-                            if (!RootToolsEx.mkdir(filename_abs, false)) {
-                                throw new Exception(getService().getString(R.string.cant_create_dir, filename));
-                            }
+                            RootToolsEx.mkdir(filename_abs, false);
                             break;
 
                         case OperatingSystem.Partition.TYPE_LOOP:
