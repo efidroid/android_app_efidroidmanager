@@ -8,8 +8,10 @@ import com.stericson.roottools.RootTools;
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
+import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
+import org.efidroid.efidroidmanager.types.FSTabEntry;
 import org.efidroid.efidroidmanager.types.ProgressServiceTask;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 public class OSUpdateProgressServiceTask extends ProgressServiceTask {
     // args
     public static final String ARG_OPERATING_SYSTEM = "operatingsystem";
+    public static final String ARG_DEVICE_INFO = "device_info";
 
     private OperatingSystem mOperatingSystem = null;
     private boolean mSuccess = false;
@@ -28,7 +31,8 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
     public void onProcess(Bundle extras) {
         OperatingSystem os = extras.getParcelable(ARG_OPERATING_SYSTEM);
-        if(os==null) {
+        DeviceInfo deviceInfo = extras.getParcelable(ARG_DEVICE_INFO);
+        if(os==null || deviceInfo==null) {
             mSuccess = false;
             publishFinish(mSuccess);
             return;
@@ -132,7 +136,17 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
                         case OperatingSystem.Partition.TYPE_LOOP:
                             try {
-                                RootToolsEx.createLoopImage(getService(), filename_abs, partition.getSize());
+                                long size = partition.getSize();
+
+                                if (partition.getPartitionName().equals("firmware")) {
+                                    FSTabEntry fsTabEntry = deviceInfo.getFSTab().getEntryByName(partition.getPartitionName());
+                                    if(fsTabEntry==null)
+                                        throw new Exception("Can't find "+partition.getPartitionName()+"in fstab.multiboot");
+
+                                    RootToolsEx.createPartitionBackup(getService(), fsTabEntry.getBlkDevice(), filename_abs, size);
+                                }
+                                else
+                                    RootToolsEx.createLoopImage(getService(), filename_abs, size);
                             } catch (InterruptedException e) {
                                 throw new Exception(getService().getString(R.string.aborted));
                             } catch (Exception e) {

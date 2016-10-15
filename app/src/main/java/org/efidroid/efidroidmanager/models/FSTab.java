@@ -48,6 +48,14 @@ public class FSTab implements Parcelable {
         return mFSTabEntries;
     }
 
+    public FSTabEntry getEntryByName(String name) {
+        for (FSTabEntry entry : getFSTabEntries()) {
+            if(entry.getName().equals(name))
+                return entry;
+        }
+        return null;
+    }
+
     @Override
     public int describeContents() {
         return 0;

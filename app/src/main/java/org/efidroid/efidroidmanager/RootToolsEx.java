@@ -528,8 +528,9 @@ public final class RootToolsEx {
         ReturnCodeException.check(rc);
     }
 
-    public static void createPartitionBackup(IntentServiceEx service, String device, String filename) throws Exception {
-        long size = getDeviceSize(device);
+    public static void createPartitionBackup(IntentServiceEx service, String device, String filename, long size) throws Exception {
+        if(size==-1)
+            size = getDeviceSize(device);
 
         final Command command = new Command(0, false, 0, "busybox dd if=\""+device+"\" of=\""+filename+"\" bs=512 count="+(Util.ROUNDUP(size,512)/512)+"");
         int rc = runServiceCommand(service, command);
