@@ -161,6 +161,8 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                             MountEntry mountEntry = mountInfo.getByMajorMinor(majmin[0], majmin[1]);
                             if (mountEntry == null)
                                 continue;
+                            if(mountEntry.getMountOptionsList().contains("ro"))
+                                continue;
                             String mountPoint = mountEntry.getMountPoint();
                             String multibootDir;
 
