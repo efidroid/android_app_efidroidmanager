@@ -3,6 +3,10 @@ package org.efidroid.efidroidmanager.types;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MountEntry implements Parcelable {
     private final int mMountID;
     private final int mParentID;
@@ -118,5 +122,9 @@ public class MountEntry implements Parcelable {
 
     public String getSuperOptions() {
         return mSuperOptions;
+    }
+
+    public List<String> getMountOptionsList() {
+        return new ArrayList<>( Arrays.asList( getMountOptions().split(",") ) );
     }
 }
