@@ -114,8 +114,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
 
         // extract
         String downloadDir = getService().getCacheDir()+"/update";
-        if(RootToolsEx.unzip(downloadFile, downloadDir)!=0)
-            throw new Exception(getService().getString(R.string.cant_extract_update));
+        RootToolsEx.unzip(downloadFile, downloadDir);
 
         return downloadDir;
     }
@@ -128,9 +127,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
 
         // create UEFIESP dir
         String espDir = espParent+"/UEFIESP";
-        if(!RootToolsEx.mkdir(espDir, true)) {
-            throw new Exception(getService().getString(R.string.cant_create_uefiesp_dir));
-        }
+        RootToolsEx.mkdir(espDir, true);
 
         // don't create backups on reinstall or update
         if(!mInstallationStatus.isInstalled() || mInstallationStatus.isBroken()) {

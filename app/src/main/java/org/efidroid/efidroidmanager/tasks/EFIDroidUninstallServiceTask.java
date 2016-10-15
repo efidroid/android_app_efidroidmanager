@@ -50,9 +50,7 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
 
         // create UEFIESP dir
         String espDir = espParent+"/UEFIESP";
-        if(!RootToolsEx.mkdir(espDir, true)) {
-            throw new Exception(getService().getString(R.string.cant_create_uefiesp_dir));
-        }
+        RootToolsEx.mkdir(espDir, true);
 
         // restore backups
         for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
