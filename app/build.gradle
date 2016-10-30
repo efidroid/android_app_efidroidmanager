@@ -20,6 +20,10 @@ android {
         buildConfigField "String", "USERNAME", "\""+System.getProperty("user.name")+"\""
         buildConfigField "String", "HOSTNAME", "\""+InetAddress.getLocalHost().getHostName()+"\""
     }
+    aaptOptions{
+        // Disable automatic image compression since the included images are already compressed
+        cruncherEnabled false
+    }
     buildTypes {
         release {
             minifyEnabled false
