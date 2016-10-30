@@ -188,10 +188,8 @@ public class OperatingSystem implements Parcelable {
 
     static {
         ALL_OS_TYPES.add(OSTYPE_ANDROID);
-        ALL_OS_TYPES.add(OSTYPE_UBUNTU);
 
         ALL_OS_TYPES_NAMES.add(R.string.ostype_android);
-        ALL_OS_TYPES_NAMES.add(R.string.ostype_ubuntu);
 
         // the order is important
         MULTIBOOT_PATHS.add("/media/0/multiboot");
