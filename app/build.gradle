@@ -5,6 +5,13 @@ def gitRevision() {
     return cmd.execute().text.trim()
 }
 
+def gitDirty() {
+    def cmd = "git diff-index --name-only HEAD"
+    if(cmd.execute().text.trim().length()>0)
+        return "-dirty";
+    return "";
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
@@ -14,7 +21,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 3
-        versionName "1.0-g${gitRevision()}"
+        versionName "1.0-g${gitRevision()}${gitDirty()}"
 
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
         buildConfigField "String", "USERNAME", "\""+System.getProperty("user.name")+"\""
