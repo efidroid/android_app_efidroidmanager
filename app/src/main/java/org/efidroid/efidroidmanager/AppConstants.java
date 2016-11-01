@@ -13,6 +13,7 @@ public final class AppConstants {
     public static final String DEVICE_NAME = Build.MANUFACTURER.toLowerCase()+"/"+Build.DEVICE.toLowerCase();
     public static final String SHAREDPREFS_GLOBAL = "org.efidroid.efidroidmanager";
     public static final String SHAREDPREFS_GLOBAL_LAST_DEVICEINFO_UPDATE = "last_deviceinfo_update";
+    public static final String SHAREDPREFS_GLOBAL_LAST_APP_VERSION = "last_app_version";
 
     public static final String PATH_INTERNAL_DEVICES = "devices.json";
     public static final String PATH_INTERNAL_FSTAB = "fstab.multiboot";
