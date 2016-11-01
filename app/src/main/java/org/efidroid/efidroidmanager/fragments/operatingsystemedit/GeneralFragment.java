@@ -113,7 +113,7 @@ public class GeneralFragment extends Fragment implements OSEditFragmentInteracti
             locationTextView.setVisibility(View.GONE);
 
             final ArrayList<OperatingSystemEditActivity.MultibootDir> multibootDirectories = mListener.getMultibootDirectories();
-            locationSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, multibootDirectories));
+            locationSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.efidroid_simple_spinner_dropdown_item, multibootDirectories));
             locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
