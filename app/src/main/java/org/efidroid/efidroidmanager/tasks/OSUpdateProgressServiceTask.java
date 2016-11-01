@@ -42,8 +42,8 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
         mSuccess = false;
 
         int progress = 0;
+        String romDir = null;
         try {
-            String romDir;
             if(os.isCreationMode()) {
                 progress = publishProgress(1, getService().getString(R.string.creating_os_dir));
 
@@ -153,6 +153,19 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
         }
         catch (Exception e) {
             mSuccess = false;
+
+            if(os.isCreationMode()) {
+                publishProgress(progress, "Undoing changes");
+
+                // delete rom directory
+                try {
+                    if (romDir != null) {
+                        RootTools.deleteFileOrDirectory(romDir, false);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
             publishProgress(progress, e.getLocalizedMessage());
         }
 
