@@ -1,6 +1,7 @@
 package org.efidroid.efidroidmanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Base64;
@@ -684,14 +685,19 @@ public final class RootToolsEx {
     }
 
     public static void init(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(AppConstants.SHAREDPREFS_GLOBAL, Context.MODE_PRIVATE);
+        int lastVersionCode = sp.getInt(AppConstants.SHAREDPREFS_GLOBAL_LAST_APP_VERSION, 0);
+
         try {
             InputStream is = context.getAssets().open(Build.CPU_ABI+"/busybox");
             File out = new File(context.getFilesDir(), "/busybox");
-            if(!out.exists())
+            if(!out.exists() || lastVersionCode!=BuildConfig.VERSION_CODE)
                 FileUtils.copyInputStreamToFile(is, out);
             out.setExecutable(true, false);
             out.setReadable(true, false);
             RootShell.shellPathExtension = context.getFilesDir().getAbsolutePath();
+
+            sp.edit().putInt(AppConstants.SHAREDPREFS_GLOBAL_LAST_APP_VERSION, BuildConfig.VERSION_CODE).apply();
         } catch (IOException e) {
             e.printStackTrace();
         }
