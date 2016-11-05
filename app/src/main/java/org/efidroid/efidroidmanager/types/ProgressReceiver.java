@@ -42,7 +42,7 @@ public class ProgressReceiver {
     private OnStatusChangeListener mListener;
 
     public void reset() {
-        if(mIsRunning)
+        if (mIsRunning)
             throw new RuntimeException("service is still running");
 
         mProgress = 0;
@@ -53,15 +53,16 @@ public class ProgressReceiver {
 
     public interface OnStatusChangeListener {
         void onStatusUpdate(int progress, String text);
+
         void onCompleted(boolean success);
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch(intent.getAction()) {
+            switch (intent.getAction()) {
                 case ACTION_OPUPDATE_PROGRESS:
-                    if(!mFinished) {
+                    if (!mFinished) {
                         mProgress = intent.getIntExtra(ARG_OPUPDATE_PROGRESS, -1);
                         mProgressText = intent.getStringExtra(ARG_OPUPDATE_TEXT);
 
@@ -93,9 +94,9 @@ public class ProgressReceiver {
         mServiceBundle = serviceBundle;
         mServiceHandler = serviceHandler;
 
-        if(mServiceClass==null)
+        if (mServiceClass == null)
             mServiceClass = GenericProgressIntentService.class;
-        if(mServiceBundle==null)
+        if (mServiceBundle == null)
             mServiceBundle = new Bundle();
 
         // register broadcast receiver
@@ -111,32 +112,32 @@ public class ProgressReceiver {
 
     public void notifyPause() {
         // show notification
-        if(!mFinished)
+        if (!mFinished)
             GenericProgressIntentService.showNotification(mContext, mServiceClass, true);
     }
 
     public void notifyResume() {
         // hide notification
-        if(!mFinished)
+        if (!mFinished)
             GenericProgressIntentService.showNotification(mContext, mServiceClass, false);
     }
 
     public void setServiceClass(Class<?> serviceClass) {
-        if(mIsRunning)
+        if (mIsRunning)
             throw new RuntimeException("service is still running");
 
         mServiceClass = serviceClass;
     }
 
     public void setServiceHandler(Class<?> serviceHandler) {
-        if(mIsRunning)
+        if (mIsRunning)
             throw new RuntimeException("service is still running");
 
         mServiceHandler = serviceHandler;
     }
 
     public void setServiceBundle(Bundle bundle) {
-        if(mIsRunning)
+        if (mIsRunning)
             throw new RuntimeException("service is still running");
 
         mServiceBundle = bundle;
@@ -166,12 +167,12 @@ public class ProgressReceiver {
         mServiceHandler = (Class<?>) savedInstanceState.getSerializable(ARG_SERVICE_HANDLER);
 
         mListener.onStatusUpdate(mProgress, mProgressText);
-        if(mFinished)
+        if (mFinished)
             mListener.onCompleted(mSuccess);
     }
 
     public void startService() {
-        if(mIsRunning)
+        if (mIsRunning)
             throw new RuntimeException("service is still running");
 
         // start service

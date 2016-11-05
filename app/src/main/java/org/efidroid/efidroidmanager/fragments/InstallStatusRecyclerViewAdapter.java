@@ -54,11 +54,10 @@ public class InstallStatusRecyclerViewAdapter extends RecyclerView.Adapter<Insta
         holder.mItem = item;
         holder.mTitleView.setText(item.title);
 
-        if(item.subtitle!=null && item.subtitle.length()>0) {
+        if (item.subtitle != null && item.subtitle.length() > 0) {
             holder.mSubtitleView.setText(item.subtitle);
             holder.mSubtitleView.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             holder.mSubtitleView.setVisibility(View.GONE);
         }
     }

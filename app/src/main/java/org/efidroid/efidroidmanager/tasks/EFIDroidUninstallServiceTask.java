@@ -45,11 +45,11 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
     private void doUninstall() throws Exception {
         // get esp parent directory
         String espParent = mDeviceInfo.getESPDir(false);
-        if(espParent==null)
+        if (espParent == null)
             throw new Exception(getService().getString(R.string.cant_find_esp_partition));
 
         // create UEFIESP dir
-        String espDir = espParent+"/UEFIESP";
+        String espDir = espParent + "/UEFIESP";
         RootToolsEx.mkdir(espDir, true);
 
         // restore backups
@@ -61,7 +61,7 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
         }
 
         // remove backups
-        for(FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
+        for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
             if (!entry.isUEFI())
                 continue;
 
@@ -87,14 +87,14 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
         }
 
         // publish status
-        if(mSuccess)
+        if (mSuccess)
             publishProgress(100, "Done");
         publishFinish(mSuccess);
     }
 
     @Override
     public String getNotificationProgressTitle() {
-        return  getService().getString(R.string.uninstalling_efidroid);
+        return getService().getString(R.string.uninstalling_efidroid);
     }
 
     @Override

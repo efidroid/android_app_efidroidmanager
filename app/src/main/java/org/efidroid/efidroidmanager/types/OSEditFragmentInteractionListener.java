@@ -97,8 +97,11 @@ public interface OSEditFragmentInteractionListener {
 
     // data methods
     DeviceInfo getDeviceInfo();
+
     OperatingSystem getOperatingSystem();
+
     ArrayList<MultibootDir> getMultibootDirectories();
+
     ArrayList<MultibootPartitionInfo> getMultibootPartitionInfo();
 
     // callbacks
@@ -106,10 +109,13 @@ public interface OSEditFragmentInteractionListener {
 
     // listeners
     void addOnCommitListener(CommitListener listener);
+
     void removeOnCommitListener(CommitListener listener);
 
     // UI
     CustomViewPager getViewPager();
+
     TabLayout getTabLayout();
+
     void setFabVisible(final boolean visible);
 }

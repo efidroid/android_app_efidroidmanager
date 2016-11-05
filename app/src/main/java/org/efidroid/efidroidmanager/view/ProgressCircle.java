@@ -222,7 +222,7 @@ public class ProgressCircle extends ViewGroup {
      * Do all of the recalculations needed when the data array changes.
      */
     private void onDataChanged() {
-        mCurrentSweepAngle = (int)(mCurrentValue * (mSweepAngle/Math.abs(mMaxValue-mMinValue)));
+        mCurrentSweepAngle = (int) (mCurrentValue * (mSweepAngle / Math.abs(mMaxValue - mMinValue)));
 
         invalidate();
     }
@@ -260,7 +260,7 @@ public class ProgressCircle extends ViewGroup {
         mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setColor(mContentTextColor);
-        if(mContentTextSize>0)
+        if (mContentTextSize > 0)
             mTextPaint.setTextSize(mContentTextSize);
 
         // Add a child view to draw the pie. Putting this in a child view
@@ -303,8 +303,7 @@ public class ProgressCircle extends ViewGroup {
             });
             anim.setDuration(duration);
             anim.start();
-        }
-        else {
+        } else {
             mCurrentValue = value;
             onDataChanged();
         }
@@ -324,8 +323,7 @@ public class ProgressCircle extends ViewGroup {
             });
             anim.setDuration(duration);
             anim.start();
-        }
-        else {
+        } else {
             mProgressStrokeColor = color;
             mProgressStrokePaint.setColor(mProgressStrokeColor);
             invalidate();
@@ -346,8 +344,7 @@ public class ProgressCircle extends ViewGroup {
             });
             anim.setDuration(duration);
             anim.start();
-        }
-        else {
+        } else {
             mFillColor = color;
             mBackgroundPaint.setColor(mFillColor);
             invalidate();
@@ -377,8 +374,7 @@ public class ProgressCircle extends ViewGroup {
             });
             anim.setDuration(duration);
             anim.start();
-        }
-        else {
+        } else {
             mContentTextColor = color;
             mTextPaint.setColor(mContentTextColor);
             invalidate();
@@ -387,7 +383,7 @@ public class ProgressCircle extends ViewGroup {
 
 
     public void setProgressHidden(final boolean hidden, boolean animate, long duration) {
-        if(mHideProgress==hidden)
+        if (mHideProgress == hidden)
             return;
 
         if (animate) {
@@ -429,8 +425,7 @@ public class ProgressCircle extends ViewGroup {
 
             mHideProgress = false;
             anim.start();
-        }
-        else {
+        } else {
             mHideProgress = hidden;
             invalidate();
         }
@@ -474,14 +469,14 @@ public class ProgressCircle extends ViewGroup {
                         false, mProgressStrokePaint);
             }
 
-            if(mContentText!=null)
-                canvas.drawText(mContentText, mBounds.centerX(), mBounds.centerY() + mContentTextSize/3.0f, mTextPaint);
+            if (mContentText != null)
+                canvas.drawText(mContentText, mBounds.centerX(), mBounds.centerY() + mContentTextSize / 3.0f, mTextPaint);
         }
 
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             mMaxStrokeWidth = Math.max(mBaseStrokeWidth, mProgressStrokeWidth);
-            mBounds = new RectF(mMaxStrokeWidth/2f, mMaxStrokeWidth/2f, w-mMaxStrokeWidth/2f, h-mMaxStrokeWidth/2f);
+            mBounds = new RectF(mMaxStrokeWidth / 2f, mMaxStrokeWidth / 2f, w - mMaxStrokeWidth / 2f, h - mMaxStrokeWidth / 2f);
         }
 
         RectF mBounds;

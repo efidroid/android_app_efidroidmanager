@@ -32,7 +32,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
     public void onProcess(Bundle extras) {
         OperatingSystem os = extras.getParcelable(ARG_OPERATING_SYSTEM);
         DeviceInfo deviceInfo = extras.getParcelable(ARG_DEVICE_INFO);
-        if(os==null || deviceInfo==null) {
+        if (os == null || deviceInfo == null) {
             mSuccess = false;
             publishFinish(mSuccess);
             return;
@@ -44,7 +44,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
         int progress = 0;
         String romDir = null;
         try {
-            if(os.isCreationMode()) {
+            if (os.isCreationMode()) {
                 progress = publishProgress(1, getService().getString(R.string.creating_os_dir));
 
                 // create multiboot directory
@@ -66,18 +66,17 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                 RootToolsEx.mkdir(_romDir, false);
 
                 romDir = _romDir;
-            }
-            else {
+            } else {
                 romDir = os.getDirectory();
             }
 
             // write multiboot.ini
-            os.saveToFile(getService().getApplicationContext(), romDir+"/multiboot.ini");
+            os.saveToFile(getService().getApplicationContext(), romDir + "/multiboot.ini");
 
             // write icon
             Bitmap iconBitmap = os.getIconBitmap(getService());
             String iconPath = romDir + "/icon.png";
-            if(iconBitmap!=null) {
+            if (iconBitmap != null) {
                 try {
                     double width = iconBitmap.getWidth();
                     double height = iconBitmap.getHeight();
@@ -92,34 +91,32 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                         height = 192f;
                     }
 
-                    iconBitmap = Bitmap.createScaledBitmap(iconBitmap, (int)width, (int)height, false);
+                    iconBitmap = Bitmap.createScaledBitmap(iconBitmap, (int) width, (int) height, false);
                     RootToolsEx.writeBitmapToPngFile(getService(), iconPath, iconBitmap);
+                } catch (Exception e) {
+                    throw new Exception(getService().getString(R.string.cant_write_icon) + " " + e.getLocalizedMessage());
                 }
-                catch (Exception e) {
-                    throw new Exception(getService().getString(R.string.cant_write_icon)+" "+e.getLocalizedMessage());
-                }
-            }
-            else if(RootToolsEx.nodeExists(iconPath)) {
-                if(!RootTools.deleteFileOrDirectory(iconPath, false)) {
+            } else if (RootToolsEx.nodeExists(iconPath)) {
+                if (!RootTools.deleteFileOrDirectory(iconPath, false)) {
                     throw new Exception(getService().getString(R.string.cant_delete_old_icon));
                 }
             }
 
             // create partitions
-            if(os.isCreationMode()) {
+            if (os.isCreationMode()) {
                 List<OperatingSystem.Partition> partitions = os.getPartitions();
 
-                for (int i=0; i<partitions.size(); i++) {
+                for (int i = 0; i < partitions.size(); i++) {
                     if (getService().shouldStop()) {
                         throw new Exception(getService().getString(R.string.aborted));
                     }
 
                     OperatingSystem.Partition partition = partitions.get(i);
                     String filename = partition.toIniPath();
-                    String filename_abs = romDir+"/"+filename;
+                    String filename_abs = romDir + "/" + filename;
 
                     // publish progress
-                    progress = publishProgress(100/partitions.size()*i, getService().getString(R.string.setup_partition, partition.getPartitionName()));
+                    progress = publishProgress(100 / partitions.size() * i, getService().getString(R.string.setup_partition, partition.getPartitionName()));
 
                     switch (partition.getType()) {
                         case OperatingSystem.Partition.TYPE_BIND:
@@ -132,17 +129,16 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
 
                                 if (partition.getPartitionName().equals("firmware")) {
                                     FSTabEntry fsTabEntry = deviceInfo.getFSTab().getEntryByName(partition.getPartitionName());
-                                    if(fsTabEntry==null)
-                                        throw new Exception("Can't find "+partition.getPartitionName()+"in fstab.multiboot");
+                                    if (fsTabEntry == null)
+                                        throw new Exception("Can't find " + partition.getPartitionName() + "in fstab.multiboot");
 
                                     RootToolsEx.createPartitionBackup(getService(), fsTabEntry.getBlkDevice(), filename_abs, size);
-                                }
-                                else
+                                } else
                                     RootToolsEx.createLoopImage(getService(), filename_abs, size);
                             } catch (InterruptedException e) {
                                 throw new Exception(getService().getString(R.string.aborted));
                             } catch (Exception e) {
-                                throw new Exception(getService().getString(R.string.cant_create_loop_img, partition.getPartitionName())+e.getLocalizedMessage());
+                                throw new Exception(getService().getString(R.string.cant_create_loop_img, partition.getPartitionName()) + e.getLocalizedMessage());
                             }
                             break;
                     }
@@ -150,11 +146,10 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
             }
 
             mSuccess = true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             mSuccess = false;
 
-            if(os.isCreationMode()) {
+            if (os.isCreationMode()) {
                 publishProgress(progress, "Undoing changes");
 
                 // delete rom directory
@@ -170,24 +165,24 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
         }
 
         // publish status
-        if(mSuccess)
+        if (mSuccess)
             publishProgress(100, getService().getString(R.string.md_done_label));
         publishFinish(mSuccess);
     }
 
     @Override
     public String getNotificationProgressTitle() {
-        int textid = mOperatingSystem.isCreationMode()?R.string.creating_system:R.string.updating_system;
+        int textid = mOperatingSystem.isCreationMode() ? R.string.creating_system : R.string.updating_system;
         return getService().getString(textid, mOperatingSystem.getName());
     }
 
     @Override
     public String getNotificationResultTitle() {
         if (mSuccess) {
-            int textid = mOperatingSystem.isCreationMode()?R.string.created_system:R.string.updated_system;
+            int textid = mOperatingSystem.isCreationMode() ? R.string.created_system : R.string.updated_system;
             return getService().getString(textid, mOperatingSystem.getName());
         } else {
-            int textid = mOperatingSystem.isCreationMode()?R.string.error_creating_system:R.string.error_updating_system;
+            int textid = mOperatingSystem.isCreationMode() ? R.string.error_creating_system : R.string.error_updating_system;
             return getService().getString(textid, mOperatingSystem.getName());
         }
     }

@@ -48,7 +48,7 @@ public class GenericProgressIntentService extends IntentServiceEx {
             e.printStackTrace();
         }
 
-        if(mShowNotifications) {
+        if (mShowNotifications) {
             // remove progress notification
             cancelNotification();
 
@@ -144,21 +144,21 @@ public class GenericProgressIntentService extends IntentServiceEx {
 
     @Override
     protected void onHandleMessage(Intent intent) {
-        if(mHandler==null) {
+        if (mHandler == null) {
             super.onHandleMessage(intent);
             return;
         }
 
         switch (intent.getAction()) {
             case MESSAGE_ACTION_NOTIFICATION_SHOW:
-                if(!mShowNotifications) {
+                if (!mShowNotifications) {
                     showProgressNotification();
                     mShowNotifications = true;
                 }
                 break;
 
             case MESSAGE_ACTION_NOTIFICATION_HIDE:
-                if(mShowNotifications) {
+                if (mShowNotifications) {
                     cancelNotification();
                     mShowNotifications = false;
                 }
@@ -176,7 +176,7 @@ public class GenericProgressIntentService extends IntentServiceEx {
     }
 
     public static void handleNotificationIntent(Activity activity, Class<?> clazz) {
-        switch(activity.getIntent().getAction()) {
+        switch (activity.getIntent().getAction()) {
             case BUTTON_ACTION_STOP:
                 stopCurrentTask(activity, clazz);
                 break;
@@ -185,7 +185,7 @@ public class GenericProgressIntentService extends IntentServiceEx {
 
     public static void showNotification(Context context, Class<?> clazz, boolean show) {
         Intent intent = new Intent();
-        intent.setAction(show?MESSAGE_ACTION_NOTIFICATION_SHOW:MESSAGE_ACTION_NOTIFICATION_HIDE);
+        intent.setAction(show ? MESSAGE_ACTION_NOTIFICATION_SHOW : MESSAGE_ACTION_NOTIFICATION_HIDE);
         sendMessage(context, clazz, intent);
     }
 }

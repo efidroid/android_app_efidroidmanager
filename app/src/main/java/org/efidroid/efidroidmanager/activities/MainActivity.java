@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity
     // operating systems
     private ArrayList<OperatingSystem> mOperatingSystems;
     private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
+
     private AsyncTask<Void, Void, Exception> makeOperatingSystemsTask() {
         final ArrayList<OperatingSystem> list = new ArrayList<>();
 
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity
                             String mountPoint = mountEntry.getMountPoint();
 
                             // find multiboot directories
-                            for(String multibootPath : OperatingSystem.MULTIBOOT_PATHS) {
+                            for (String multibootPath : OperatingSystem.MULTIBOOT_PATHS) {
                                 String multibootDir = mountPoint + multibootPath;
 
                                 if (!RootToolsEx.isDirectory(multibootDir))
@@ -118,11 +119,11 @@ public class MainActivity extends AppCompatActivity
 
                                     try {
                                         list.add(new OperatingSystem(path));
-                                    } catch (Exception ignored){}
+                                    } catch (Exception ignored) {
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             continue;
                         }
                     }
@@ -160,6 +161,7 @@ public class MainActivity extends AppCompatActivity
     // installation
     private InstallationStatus mInstallStatus = null;
     private static final String ARG_INSTALL_STATUS = "install_status";
+
     private AsyncTask<Void, Void, Exception> makeInstallationStatusTask(final InstallFragment.InstallStatusLoadCallback callback) {
         final InstallationStatus installStatus = new InstallationStatus();
 
@@ -190,15 +192,13 @@ public class MainActivity extends AppCompatActivity
 
                 mInstallStatus = installStatus;
 
-                if(callback==null) {
+                if (callback == null) {
                     // show fragment
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.flContent, new InstallFragment()).commit();
 
                     mTouchDisabled = false;
-                }
-
-                else {
+                } else {
                     callback.onStatusLoaded();
                 }
             }
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity
             protected void onCancelled() {
                 super.onCancelled();
 
-                if(callback!=null) {
+                if (callback != null) {
                     callback.onStatusLoadError();
                 }
             }
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity
 
         // get views
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mFragmentProgress = (ProgressBar)findViewById(R.id.progressBar);
+        mFragmentProgress = (ProgressBar) findViewById(R.id.progressBar);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity
         // SRL
         mSwipeRefreshLayout.setEnabled(false);
 
-        if(savedInstanceState!=null) {
+        if (savedInstanceState != null) {
             mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
             mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
             hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // load data the first time
-        if (mDeviceInfo==null) {
+        if (mDeviceInfo == null) {
             // show progress dialog
             mProgressDialog = new MaterialDialog.Builder(this)
                     .title(R.string.loading_device_info)
@@ -277,9 +277,7 @@ public class MainActivity extends AppCompatActivity
 
             // load device info
             DataHelper.loadDeviceInfo(this, this);
-        }
-
-        else {
+        } else {
             onLoadUiData();
         }
     }
@@ -287,7 +285,7 @@ public class MainActivity extends AppCompatActivity
     public void onDeviceInfoLoadError(Exception e) {
         new MaterialDialog.Builder(this)
                 .title(R.string.error)
-                .content(getString(R.string.cant_load_device_info_check_connection)+e.getLocalizedMessage())
+                .content(getString(R.string.cant_load_device_info_check_connection) + e.getLocalizedMessage())
                 .positiveText(R.string.try_again)
                 .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
@@ -304,16 +302,16 @@ public class MainActivity extends AppCompatActivity
                     .content(R.string.you_need_root)
                     .positiveText(R.string.try_again)
                     .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            onLoadUiData();
-                        }
-                    }).show();
+                @Override
+                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    onLoadUiData();
+                }
+            }).show();
             return;
         }
 
         // set default tab
-        if(mActiveMenuItemId==0)
+        if (mActiveMenuItemId == 0)
             mActiveMenuItemId = R.id.nav_operating_systems;
 
         // restore old tab
@@ -332,7 +330,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         // operating systems got deleted, reload them
-        if(mActiveMenuItemId==R.id.nav_operating_systems && mOperatingSystems==null)
+        if (mActiveMenuItemId == R.id.nav_operating_systems && mOperatingSystems == null)
             reloadOperatingSystems();
     }
 
@@ -341,7 +339,7 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
 
         // cancel current task and disable loading animations
-        if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled()) {
+        if (mFragmentLoadingTask != null && !mFragmentLoadingTask.isCancelled()) {
             mFragmentLoadingTask.cancel(true);
             mSwipeRefreshLayout.setRefreshing(false);
             mFragmentProgress.setVisibility(View.GONE);
@@ -418,7 +416,7 @@ public class MainActivity extends AppCompatActivity
 
             return true;
         } else if (id == R.id.nav_about) {
-            Intent i= new Intent(this, AboutActivity.class);
+            Intent i = new Intent(this, AboutActivity.class);
             startActivity(i);
 
             // close drawer
@@ -428,7 +426,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // cancel any running loading task
-        if(mFragmentLoadingTask!=null && !mFragmentLoadingTask.isCancelled())
+        if (mFragmentLoadingTask != null && !mFragmentLoadingTask.isCancelled())
             mFragmentLoadingTask.cancel(true);
 
         // hide progressbar
@@ -452,14 +450,13 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_operating_systems) {
             // start loading
-            if(mOperatingSystems==null) {
+            if (mOperatingSystems == null) {
                 // show progressbar
                 mFragmentProgress.setVisibility(View.VISIBLE);
 
                 // run task
                 mFragmentLoadingTask = makeOperatingSystemsTask().execute();
-            }
-            else {
+            } else {
                 fragment = new OperatingSystemFragment();
             }
 
@@ -479,14 +476,13 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_themes) {
         } else if (id == R.id.nav_install) {
             // start loading
-            if(mInstallStatus==null) {
+            if (mInstallStatus == null) {
                 // show progressbar
                 mFragmentProgress.setVisibility(View.VISIBLE);
 
                 // run task
                 mFragmentLoadingTask = makeInstallationStatusTask(null).execute();
-            }
-            else {
+            } else {
                 fragment = new InstallFragment();
             }
         }
@@ -494,7 +490,7 @@ public class MainActivity extends AppCompatActivity
         mActiveMenuItemId = item.getItemId();
 
         // use empty fragment
-        if(fragment == null) {
+        if (fragment == null) {
             fragment = new EmptyFragment();
         }
 
@@ -559,7 +555,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void reloadOperatingSystems() {
         mOperatingSystems = null;
-        if(mActiveMenuItemId>0)
+        if (mActiveMenuItemId > 0)
             onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
     }
 
@@ -572,11 +568,10 @@ public class MainActivity extends AppCompatActivity
     public void reloadInstallStatus(InstallFragment.InstallStatusLoadCallback callback) {
         mInstallStatus = null;
 
-        if(callback==null) {
+        if (callback == null) {
             if (mActiveMenuItemId > 0)
                 onNavigationItemSelected(mNavigationView.getMenu().findItem(mActiveMenuItemId));
-        }
-        else {
+        } else {
             // run task
             mFragmentLoadingTask = makeInstallationStatusTask(callback).execute();
         }

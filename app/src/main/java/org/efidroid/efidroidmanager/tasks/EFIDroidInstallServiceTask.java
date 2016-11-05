@@ -62,7 +62,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         int count;
         publishProgress(mProgress, getService().getString(R.string.downloading));
         while ((count = input.read(data)) != -1) {
-            if(shouldStop()) {
+            if (shouldStop()) {
                 input.close();
                 throw new Exception(getService().getString(R.string.aborted));
             }
@@ -84,7 +84,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
 
         // open streams
         InputStream input = new BufferedInputStream(connection.getInputStream());
-        String downloadFile = getService().getCacheDir().getAbsolutePath()+"/update.zip";
+        String downloadFile = getService().getCacheDir().getAbsolutePath() + "/update.zip";
         OutputStream output = new FileOutputStream(downloadFile);
 
         // copy data
@@ -93,7 +93,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         int count;
         //publishProgress(mProgress, "Downloading");
         while ((count = input.read(data)) != -1) {
-            if(shouldStop()) {
+            if (shouldStop()) {
                 output.close();
                 input.close();
                 throw new Exception(getService().getString(R.string.aborted));
@@ -113,7 +113,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         input.close();
 
         // extract
-        String downloadDir = getService().getCacheDir()+"/update";
+        String downloadDir = getService().getCacheDir() + "/update";
         RootToolsEx.unzip(downloadFile, downloadDir);
 
         return downloadDir;
@@ -122,15 +122,15 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
     private void doInstall(String updateDir) throws Exception {
         // get esp parent directory
         String espParent = mDeviceInfo.getESPDir(false);
-        if(espParent==null)
+        if (espParent == null)
             throw new Exception(getService().getString(R.string.cant_find_esp_partition));
 
         // create UEFIESP dir
-        String espDir = espParent+"/UEFIESP";
+        String espDir = espParent + "/UEFIESP";
         RootToolsEx.mkdir(espDir, true);
 
         // don't create backups on reinstall or update
-        if(!mInstallationStatus.isInstalled() || mInstallationStatus.isBroken()) {
+        if (!mInstallationStatus.isInstalled() || mInstallationStatus.isBroken()) {
             // create backups
             for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
                 if (!entry.isUEFI())
@@ -167,11 +167,11 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         }
 
         // install
-        for(FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
+        for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
             if (!entry.isUEFI())
                 continue;
 
-            String file = updateDir + "/" + entry.getName()+".img";
+            String file = updateDir + "/" + entry.getName() + ".img";
             RootToolsEx.dd(file, entry.getBlkDevice());
         }
     }
@@ -183,7 +183,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         mProgress = 0;
         mSuccess = false;
         try {
-            if(Util.isDeviceEncryptionEnabled(getService().getBaseContext())) {
+            if (Util.isDeviceEncryptionEnabled(getService().getBaseContext())) {
                 throw new Exception(getService().getString(R.string.device_is_encrypted));
             }
 
@@ -191,14 +191,14 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
             mProgress = publishProgress(1, getService().getString(R.string.search_for_update));
             JSONArray updateList = getUpdateList();
             JSONObject latestUpdate = null;
-            for(int i=0; i<updateList.length(); i++) {
+            for (int i = 0; i < updateList.length(); i++) {
                 JSONObject o = updateList.getJSONObject(i);
 
-                if(latestUpdate==null ||o.getLong("timestamp")>latestUpdate.getLong("timestamp"))
+                if (latestUpdate == null || o.getLong("timestamp") > latestUpdate.getLong("timestamp"))
                     latestUpdate = o;
             }
 
-            if(latestUpdate==null)
+            if (latestUpdate == null)
                 throw new Exception(getService().getString(R.string.no_update_available));
 
             // download update
@@ -216,14 +216,14 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         }
 
         // publish status
-        if(mSuccess)
+        if (mSuccess)
             publishProgress(100, getService().getString(R.string.md_done_label));
         publishFinish(mSuccess);
     }
 
     @Override
     public String getNotificationProgressTitle() {
-        return  getService().getString(R.string.installing_efidroid);
+        return getService().getString(R.string.installing_efidroid);
     }
 
     @Override

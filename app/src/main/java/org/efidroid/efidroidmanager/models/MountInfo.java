@@ -12,8 +12,8 @@ public class MountInfo {
     }
 
     public MountEntry getByMajorMinor(int major, int minor) {
-        for(MountEntry mountEntry : mMountEntries) {
-            if(mountEntry.getMajor()==major && mountEntry.getMinor()==minor && mountEntry.getRoot().equals("/")) {
+        for (MountEntry mountEntry : mMountEntries) {
+            if (mountEntry.getMajor() == major && mountEntry.getMinor() == minor && mountEntry.getRoot().equals("/")) {
                 return mountEntry;
             }
         }

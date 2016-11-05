@@ -21,8 +21,8 @@ public class FSTabEntry implements Parcelable {
         // use backup node if it exists
         String new_blkDevice = blkDevice;
         try {
-            String backup = "/multiboot/dev/replacement_backup_"+getName();
-            if(RootToolsEx.nodeExists(backup)) {
+            String backup = "/multiboot/dev/replacement_backup_" + getName();
+            if (RootToolsEx.nodeExists(backup)) {
                 new_blkDevice = backup;
             }
         } catch (Exception e) {
@@ -67,8 +67,8 @@ public class FSTabEntry implements Parcelable {
 
     public String getBlkDevice() {
         try {
-            if(RootToolsEx.isDirectory("/multiboot"))
-                return "/multiboot"+RootToolsEx.realpath(mBlkDevice);
+            if (RootToolsEx.isDirectory("/multiboot"))
+                return "/multiboot" + RootToolsEx.realpath(mBlkDevice);
         } catch (Exception e) {
         }
 
@@ -97,8 +97,8 @@ public class FSTabEntry implements Parcelable {
 
     public boolean isMultiboot() {
         String[] parts = mFfMgrFlags.split(",");
-        for(String part : parts) {
-            if(part.equals("multiboot"))
+        for (String part : parts) {
+            if (part.equals("multiboot"))
                 return true;
         }
 
@@ -107,8 +107,8 @@ public class FSTabEntry implements Parcelable {
 
     public boolean isUEFI() {
         String[] parts = mFfMgrFlags.split(",");
-        for(String part : parts) {
-            if(part.equals("uefi"))
+        for (String part : parts) {
+            if (part.equals("uefi"))
                 return true;
         }
 
@@ -117,8 +117,8 @@ public class FSTabEntry implements Parcelable {
 
     public String getESP() {
         String[] parts = mFfMgrFlags.split(",");
-        for(String part : parts) {
-            if(!part.startsWith("esp"))
+        for (String part : parts) {
+            if (!part.startsWith("esp"))
                 continue;
 
             return part.substring(4);

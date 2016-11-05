@@ -62,7 +62,7 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
             MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
             for (File fi : contents) {
                 if (fi.isDirectory()) {
-                    if(!mHideDirectories)
+                    if (!mHideDirectories)
                         results.add(fi);
                 } else {
                     if (fileIsMimeType(fi, mimeType, mimeTypeMap)) {
@@ -141,7 +141,7 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
         mProtectRoot = getBuilder().mProtectRoot;
         mInitialPath = getBuilder().mInitialPath;
 
-        if(mProtectRoot)
+        if (mProtectRoot)
             canGoUp = false;
 
         return new MaterialDialog.Builder(getActivity())
@@ -167,7 +167,7 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
                 parentFolder = parentFolder.getParentFile();
             canGoUp = parentFolder.getParent() != null;
 
-            if(mProtectRoot && parentFolder.getAbsolutePath().equals(new File(mInitialPath).getAbsolutePath()))
+            if (mProtectRoot && parentFolder.getAbsolutePath().equals(new File(mInitialPath).getAbsolutePath()))
                 canGoUp = false;
         } else {
             parentFolder = parentContents[canGoUp ? i - 1 : i];
@@ -192,7 +192,7 @@ public class RootFileChooserDialog extends DialogFragment implements MaterialDia
         super.onAttach(activity);
 
         Fragment fragment = getTargetFragment();
-        if(fragment==null || !(fragment instanceof FileCallback)) {
+        if (fragment == null || !(fragment instanceof FileCallback)) {
             throw new RuntimeException("target fragment invalid");
         }
 

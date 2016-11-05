@@ -125,6 +125,6 @@ public class MountEntry implements Parcelable {
     }
 
     public List<String> getMountOptionsList() {
-        return new ArrayList<>( Arrays.asList( getMountOptions().split(",") ) );
+        return new ArrayList<>(Arrays.asList(getMountOptions().split(",")));
     }
 }

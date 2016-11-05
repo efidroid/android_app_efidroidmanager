@@ -30,6 +30,8 @@ public abstract class ProgressServiceTask {
     }
 
     abstract public void onProcess(Bundle extras);
+
     abstract public String getNotificationProgressTitle();
+
     abstract public String getNotificationResultTitle();
 }

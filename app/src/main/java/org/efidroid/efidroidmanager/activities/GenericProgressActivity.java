@@ -81,7 +81,7 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         mButtonCancel.setVisibility(View.GONE);
 
         // indicate status
-        if(mProgressReceiver.wasSuccessful()) {
+        if (mProgressReceiver.wasSuccessful()) {
             mButtonContainer.setVisibility(View.GONE);
             mProgressCircle.setProgressStrokeColor(getColorSimple(R.color.colorCircleProgressSuccess), true, 200);
             mProgressCircle.setProgressStrokeColor(getColorSimple(R.color.colorCircleProgressSuccess), true, 200);
@@ -114,7 +114,7 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         mFinishOnResume = false;
 
         Bundle extras;
-        if(savedInstanceState==null)
+        if (savedInstanceState == null)
             extras = getIntent().getExtras();
         else
             extras = savedInstanceState;
@@ -129,9 +129,9 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         mAnimErrorEnter = extras.getInt(ARG_ANIM_ERROR_ENTER, 0);
         mAnimErrorExit = extras.getInt(ARG_ANIM_ERROR_EXIT, 0);
 
-        if(mServiceClass==null)
+        if (mServiceClass == null)
             mServiceClass = GenericProgressIntentService.class;
-        if(mServiceBundle==null)
+        if (mServiceBundle == null)
             mServiceBundle = new Bundle();
 
         super.onCreate(savedInstanceState);
@@ -141,10 +141,10 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         mTextTitle = (TextView) findViewById(R.id.textTitle);
         mTextHint = (TextView) findViewById(R.id.textHint);
         mProgressCircle = (ProgressCircle) findViewById(R.id.progressCircle);
-        mButtonCancel = (Button)findViewById(R.id.button_cancel);
-        mButtonBack= (Button)findViewById(R.id.button_back);
-        mButtonOk = (Button)findViewById(R.id.button_ok);
-        mButtonContainer = (ViewGroup)findViewById(R.id.button_container);
+        mButtonCancel = (Button) findViewById(R.id.button_cancel);
+        mButtonBack = (Button) findViewById(R.id.button_back);
+        mButtonOk = (Button) findViewById(R.id.button_ok);
+        mButtonContainer = (ViewGroup) findViewById(R.id.button_container);
 
         // set statusbar color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -207,7 +207,7 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         // finish
         super.finish();
 
-        if(mResultCode==RESULT_CODE_OK) {
+        if (mResultCode == RESULT_CODE_OK) {
             overridePendingTransition(mAnimSuccessEnter, mAnimSuccessExit);
         } else {
             overridePendingTransition(mAnimErrorEnter, mAnimErrorExit);
@@ -244,7 +244,7 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
         mProgressReceiver.notifyResume();
 
         // finish
-        if(mFinishOnResume) {
+        if (mFinishOnResume) {
             mFinishOnResume = false;
             finishDelayed(1000);
         }
@@ -258,7 +258,7 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
     @Override
     public void onStatusUpdate(int progress, String text) {
         mProgressCircle.setValue(progress, true, 100);
-        mProgressCircle.setContentText(progress+"%");
+        mProgressCircle.setContentText(progress + "%");
         mTextHint.setText(text);
     }
 
@@ -266,7 +266,7 @@ public class GenericProgressActivity extends AppCompatActivity implements Progre
     public void onCompleted(boolean success) {
         finishProgressbar();
 
-        if(success) {
+        if (success) {
             mResultCode = RESULT_CODE_OK;
 
             // finish now

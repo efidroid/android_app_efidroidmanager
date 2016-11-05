@@ -32,9 +32,9 @@ public class CommandEx extends Command {
     }
 
     public void checkReturnCode() throws Exception {
-        if(getExitCode()!=0) {
+        if (getExitCode() != 0) {
             String s = getErrorBuffer();
-            if(s.trim().length()==0)
+            if (s.trim().length() == 0)
                 throw new ReturnCodeException(getExitCode());
             else
                 throw new Exception(s);

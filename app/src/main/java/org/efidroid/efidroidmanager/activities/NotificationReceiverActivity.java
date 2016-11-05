@@ -15,7 +15,7 @@ public class NotificationReceiverActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        switch(getIntent().getIntExtra(ARG_NOTIFICATION_ID, -1)) {
+        switch (getIntent().getIntExtra(ARG_NOTIFICATION_ID, -1)) {
             case NOTIFICATION_ID_OP_UPDATE_SERVICE:
                 GenericProgressIntentService.handleNotificationIntent(this, (Class<?>) getIntent().getSerializableExtra(ARG_SERVICE_CLASS));
         }

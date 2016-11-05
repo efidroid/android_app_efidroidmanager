@@ -195,8 +195,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             mProgressCircle.setContentText(R.string.install);
             mProgressDescription.setText("");
             mListener.getFAB().setVisibility(View.GONE);
-        }
-        else if(installStatus.isBroken()) {
+        } else if (installStatus.isBroken()) {
             // hide FAB
             FloatingActionButton fab = mListener.getFAB();
             fab.setVisibility(View.GONE);
@@ -214,40 +213,39 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 InstallationEntry entry = iterator.next();
 
                 int status = entry.getStatus();
-                if(status==InstallationEntry.STATUS_OK)
+                if (status == InstallationEntry.STATUS_OK)
                     iterator.remove();
             }
 
             String text = "";
-            for(int i=0; i<installEntries.size(); i++) {
+            for (int i = 0; i < installEntries.size(); i++) {
                 InstallationEntry entry = installEntries.get(i);
                 int status = entry.getStatus();
-                if(status==InstallationEntry.STATUS_OK)
+                if (status == InstallationEntry.STATUS_OK)
                     continue;
 
-                if(i!=0 && i==installEntries.size()-1)
-                    text += " "+getString(R.string.and)+" ";
-                else if(i!=0) {
+                if (i != 0 && i == installEntries.size() - 1)
+                    text += " " + getString(R.string.and) + " ";
+                else if (i != 0) {
                     text += ", ";
                 }
 
-                text += entry.getFsTabEntry().getMountPoint().substring(1)+" ";
+                text += entry.getFsTabEntry().getMountPoint().substring(1) + " ";
 
-                if(status==InstallationEntry.STATUS_ESP_ONLY)
+                if (status == InstallationEntry.STATUS_ESP_ONLY)
                     text += getString(R.string.status_esp_only);
 
-                else if(status==InstallationEntry.STATUS_ESP_MISSING)
+                else if (status == InstallationEntry.STATUS_ESP_MISSING)
                     text += getString(R.string.status_esp_missing);
 
-                else if(status==InstallationEntry.STATUS_WRONG_DEVICE)
+                else if (status == InstallationEntry.STATUS_WRONG_DEVICE)
                     text += getString(R.string.status_wrong_device);
-                else if(status==InstallationEntry.STATUS_NOT_INSTALLED)
+                else if (status == InstallationEntry.STATUS_NOT_INSTALLED)
                     text += getString(R.string.status_not_installed);
             }
 
             mProgressDescription.setText(text);
-        }
-        else if(installStatus.isUpdateAvailable()) {
+        } else if (installStatus.isUpdateAvailable()) {
             DateFormat format = DateFormat.getDateTimeInstance();
 
             // show FAB
@@ -260,8 +258,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
             mProgressCircle.setFillColor(getColor(R.color.colorCircleBgWarning), animate, 200);
             mProgressCircle.setContentText(R.string.update);
             mProgressDescription.setText(format.format(installStatus.getUpdateDate()));
-        }
-        else {
+        } else {
             // show FAB
             FloatingActionButton fab = mListener.getFAB();
             fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_action_delete, getActivity().getTheme()));
@@ -306,7 +303,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_install, container, false);
+        View view = inflater.inflate(R.layout.fragment_install, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -393,7 +390,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
     @Override
     public void onStatusUpdate(int progress, String text) {
         mProgressCircle.setValue(progress, true, 100);
-        mProgressCircle.setContentText(progress+"%");
+        mProgressCircle.setContentText(progress + "%");
         mProgressDescription.setText(text);
     }
 
@@ -413,19 +410,27 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     public interface InstallStatusLoadCallback {
         void onStatusLoaded();
+
         void onStatusLoadError();
     }
 
     public interface OnInstallFragmentInteractionListener {
         DeviceInfo getDeviceInfo();
+
         InstallationStatus getInstallStatus();
+
         void reloadInstallStatus(InstallStatusLoadCallback callback);
 
         FloatingActionButton getFAB();
+
         Toolbar getToolbar();
+
         CollapsingToolbarLayout getCollapsingToolbarLayout();
+
         AppBarLayout getAppBarLayout();
+
         FrameLayout getToolbarFrameLayout();
+
         DrawerLayout getDrawerLayout();
     }
 }

@@ -24,14 +24,14 @@ public class AboutActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
-        if(getSupportActionBar()!=null)
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        TextView textVersion = (TextView)findViewById(R.id.textVersion);
+        TextView textVersion = (TextView) findViewById(R.id.textVersion);
         textVersion.setText(getString(R.string.app_version, BuildConfig.VERSION_NAME));
 
         DateFormat format = DateFormat.getDateTimeInstance();
-        TextView textBuildinfo = (TextView)findViewById(R.id.textBuildInfo);
+        TextView textBuildinfo = (TextView) findViewById(R.id.textBuildInfo);
         textBuildinfo.setText(getString(R.string.compiled_by, BuildConfig.USERNAME, BuildConfig.HOSTNAME, format.format(BuildConfig.TIMESTAMP)));
     }
 

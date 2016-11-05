@@ -30,16 +30,16 @@ public class InstallationEntry implements Parcelable {
     public static final int STATUS_ESP_ONLY = 4;
 
     private byte[] readBytes(byte[] data, Pointer<Integer> pPos, int size) {
-        byte[] ret = Arrays.copyOfRange(data, pPos.value, pPos.value+size);
+        byte[] ret = Arrays.copyOfRange(data, pPos.value, pPos.value + size);
         pPos.value += size;
         return ret;
     }
 
     private long uint32FromByteArray(byte[] bytes) {
         return (long) (((bytes[0] & 0xFF)) |
-                                ((bytes[1] & 0xFF) <<  8) |
-                                ((bytes[2] & 0xFF) << 16) |
-                                ((bytes[3] & 0xFF) << 24));
+                ((bytes[1] & 0xFF) << 8) |
+                ((bytes[2] & 0xFF) << 16) |
+                ((bytes[3] & 0xFF) << 24));
     }
 
     private long readU32(byte[] data, Pointer<Integer> pPos) {
@@ -53,7 +53,7 @@ public class InstallationEntry implements Parcelable {
 
         // magic
         String magic = new String(readBytes(header, pPos, 8));
-        if(!magic.equals("ANDROID!"))
+        if (!magic.equals("ANDROID!"))
             throw new UnsupportedOperationException("Invalid magic");
 
         long kernel_size = readU32(header, pPos);
@@ -70,15 +70,15 @@ public class InstallationEntry implements Parcelable {
         long dt_size = readU32(header, pPos);
 
         // calculate offsets
-        long off_kernel  = page_size;
-        long off_ramdisk = off_kernel  + Util.ROUNDUP(kernel_size,  page_size);
-        long off_second  = off_ramdisk + Util.ROUNDUP(ramdisk_size, page_size);
-        long off_tags    = off_second  + Util.ROUNDUP(second_size,  page_size);
-        long off_meta    = off_tags    + dt_size;
+        long off_kernel = page_size;
+        long off_ramdisk = off_kernel + Util.ROUNDUP(kernel_size, page_size);
+        long off_second = off_ramdisk + Util.ROUNDUP(ramdisk_size, page_size);
+        long off_tags = off_second + Util.ROUNDUP(second_size, page_size);
+        long off_meta = off_tags + dt_size;
 
         // read meta
         byte[] meta = RootToolsEx.readBinaryFileEx(mFSTabEntry.getBlkDevice(), off_meta, 36);
-        pMetaOffset.value = (int)off_meta;
+        pMetaOffset.value = (int) off_meta;
         return meta;
     }
 
@@ -89,7 +89,7 @@ public class InstallationEntry implements Parcelable {
         try {
             mFSTabEntry = fsTabEntry;
 
-            if(espDir!=null && RootToolsEx.isFile(espDir+"/partition_"+mFSTabEntry.getName()+".img"))
+            if (espDir != null && RootToolsEx.isFile(espDir + "/partition_" + mFSTabEntry.getName() + ".img"))
                 has_espfile = true;
 
             // read meta data
@@ -119,15 +119,14 @@ public class InstallationEntry implements Parcelable {
             // read manifest
             mManifest = new String(RootToolsEx.readBinaryFileEx(fsTabEntry.getBlkDevice(), pMetaOffset.value + manifest_offset, manifest_size));
 
-            if(!mDeviceName.equals(deviceInfo.getDeviceName()))
+            if (!mDeviceName.equals(deviceInfo.getDeviceName()))
                 mStatus = STATUS_WRONG_DEVICE;
-            else if(!has_espfile)
+            else if (!has_espfile)
                 mStatus = STATUS_ESP_MISSING;
             else
                 mStatus = STATUS_OK;
-        }
-        catch (Exception e) {
-            if(has_espfile)
+        } catch (Exception e) {
+            if (has_espfile)
                 mStatus = STATUS_ESP_ONLY;
             else
                 mStatus = STATUS_NOT_INSTALLED;
@@ -173,29 +172,30 @@ public class InstallationEntry implements Parcelable {
     }
 
     public long getEfiSpecVersionMajor() {
-        return ((mEfiSpecVersion&0xffff0000) >> 16);
+        return ((mEfiSpecVersion & 0xffff0000) >> 16);
     }
 
     public long getEfiSpecVersionMinor() {
-        return (mEfiSpecVersion&0x0000ffff);
+        return (mEfiSpecVersion & 0x0000ffff);
     }
 
     public long getEFIDroidReleaseVersion() {
         return mEFIDroidReleaseVersion;
     }
+
     public String getEFIDroidReleaseVersionString() {
         String str = "";
-        long ver_0 = ((mEFIDroidReleaseVersion&0xff000000)>>24);
-        long ver_1 = ((mEFIDroidReleaseVersion&0x00ff0000)>>16);
-        long ver_2 = ((mEFIDroidReleaseVersion&0x0000ff00)>>8);
-        long ver_3 = ((mEFIDroidReleaseVersion&0x000000ff));
+        long ver_0 = ((mEFIDroidReleaseVersion & 0xff000000) >> 24);
+        long ver_1 = ((mEFIDroidReleaseVersion & 0x00ff0000) >> 16);
+        long ver_2 = ((mEFIDroidReleaseVersion & 0x0000ff00) >> 8);
+        long ver_3 = ((mEFIDroidReleaseVersion & 0x000000ff));
 
-        if(ver_3>0)
-            str = "."+ver_3 + str;
-        if(ver_2>0 || str.length()>0)
-            str = "."+ver_2 + str;
+        if (ver_3 > 0)
+            str = "." + ver_3 + str;
+        if (ver_2 > 0 || str.length() > 0)
+            str = "." + ver_2 + str;
 
-        str = "."+ver_1 + str;
+        str = "." + ver_1 + str;
         str = ver_0 + str;
 
         return str;

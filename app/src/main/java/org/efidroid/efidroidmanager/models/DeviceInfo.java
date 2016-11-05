@@ -76,7 +76,7 @@ public class DeviceInfo implements Parcelable {
     }
 
     public String getESPDir(boolean requireUEFIESPDir) {
-        for(FSTabEntry entry : mFSTab.getFSTabEntries()) {
+        for (FSTabEntry entry : mFSTab.getFSTabEntries()) {
             String espFlag = entry.getESP();
             if (espFlag == null)
                 continue;
@@ -92,20 +92,20 @@ public class DeviceInfo implements Parcelable {
                 String mountPoint = mountEntry.getMountPoint();
 
                 // absolute path
-                if(espFlag.startsWith("/"))
-                    return mountPoint+espFlag;
+                if (espFlag.startsWith("/"))
+                    return mountPoint + espFlag;
 
-                if(espFlag.equals("datamedia")) {
+                if (espFlag.equals("datamedia")) {
                     String path;
 
-                    if(requireUEFIESPDir)
+                    if (requireUEFIESPDir)
                         path = mountPoint + "/media/0/UEFIESP";
                     else
                         path = mountPoint + "/media/0";
                     if (RootToolsEx.isDirectory(path))
                         return path;
 
-                    if(requireUEFIESPDir)
+                    if (requireUEFIESPDir)
                         path = mountPoint + "/media/UEFIESP";
                     else
                         path = mountPoint + "/media";

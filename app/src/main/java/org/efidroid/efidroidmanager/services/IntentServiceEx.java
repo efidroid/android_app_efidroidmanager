@@ -133,7 +133,7 @@ public abstract class IntentServiceEx extends Service {
 
     @Override
     public void onStart(Intent intent, int startId) {
-        if(intent.getAction()!=null) {
+        if (intent.getAction() != null) {
             if (intent.getAction().equals(ACTION_CLEAR_QUEUE)) {
                 clearQueue();
                 return;
@@ -211,10 +211,9 @@ public abstract class IntentServiceEx extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            if(!shouldStop()) {
+            if (!shouldStop()) {
                 onHandleIntent((Intent) msg.obj);
-            }
-            else {
+            } else {
                 earlyStop();
             }
 
@@ -236,6 +235,6 @@ public abstract class IntentServiceEx extends Service {
         mServiceLooper.dump(new StringBuilderPrinter(sb), "");
 
         String[] lines = sb.toString().split("\n");
-        return lines.length-2;
+        return lines.length - 2;
     }
 }

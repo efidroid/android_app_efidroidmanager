@@ -30,11 +30,11 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                for(int i=0; i<mValues.size(); i++) {
+                for (int i = 0; i < mValues.size(); i++) {
                     OperatingSystem os = mValues.get(i);
 
                     try {
-                        if(!os.hasLoadedIcon()) {
+                        if (!os.hasLoadedIcon()) {
                             os.getIconBitmap(context);
                             publishProgress(i);
                         }
@@ -48,7 +48,7 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
 
             @Override
             protected void onProgressUpdate(Integer... values) {
-                for(int pos : values) {
+                for (int pos : values) {
                     notifyItemChanged(pos);
                 }
             }
@@ -78,7 +78,7 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         holder.mTitleView.setText(os.getName());
 
         Bitmap iconBitmap = null;
-        if(os.hasLoadedIcon()) {
+        if (os.hasLoadedIcon()) {
             try {
                 iconBitmap = os.getIconBitmap(holder.mView.getContext());
                 if (iconBitmap != null)
@@ -98,11 +98,10 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
         }
 
         String desc = os.getDescription();
-        if(desc!=null && desc.length()>0) {
+        if (desc != null && desc.length() > 0) {
             holder.mSubtitleView.setText(desc);
             holder.mSubtitleView.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             holder.mSubtitleView.setVisibility(View.GONE);
         }
 
@@ -154,6 +153,7 @@ public class OperatingSystemRecyclerViewAdapter extends RecyclerView.Adapter<Ope
 
     public interface OnInteractionListener {
         void onOperatingSystemClicked(OperatingSystem item);
+
         void onOperatingSystemLongClicked(OperatingSystem item);
     }
 }

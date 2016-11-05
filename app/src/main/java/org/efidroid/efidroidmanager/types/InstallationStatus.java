@@ -52,7 +52,7 @@ public class InstallationStatus implements Parcelable {
 
         // load installation info
         FSTab fsTab = deviceInfo.getFSTab();
-        for(FSTabEntry entry : fsTab.getFSTabEntries()) {
+        for (FSTabEntry entry : fsTab.getFSTabEntries()) {
             if (!entry.isUEFI())
                 continue;
 
@@ -63,7 +63,7 @@ public class InstallationStatus implements Parcelable {
 
         // get update list
         try {
-            if(isInstalled() && !isBroken()) {
+            if (isInstalled() && !isBroken()) {
                 JSONArray updateList = getUpdateList(context, deviceInfo);
                 JSONObject latestUpdate = null;
                 for (int i = 0; i < updateList.length(); i++) {
@@ -73,7 +73,7 @@ public class InstallationStatus implements Parcelable {
                         latestUpdate = o;
                 }
 
-                if(latestUpdate!=null && latestUpdate.getLong("timestamp")>getWorkingEntry().getTimeStamp())
+                if (latestUpdate != null && latestUpdate.getLong("timestamp") > getWorkingEntry().getTimeStamp())
                     mUpdate = latestUpdate;
             }
         } catch (Exception e) {
@@ -86,9 +86,9 @@ public class InstallationStatus implements Parcelable {
     }
 
     public InstallationEntry getWorkingEntry() {
-        for(InstallationEntry entry : mInstallationEntries) {
+        for (InstallationEntry entry : mInstallationEntries) {
             int status = entry.getStatus();
-            if(status==InstallationEntry.STATUS_OK)
+            if (status == InstallationEntry.STATUS_OK)
                 return entry;
         }
 
@@ -96,8 +96,8 @@ public class InstallationStatus implements Parcelable {
     }
 
     public InstallationEntry getEntryByName(String name) {
-        for(InstallationEntry entry : mInstallationEntries) {
-            if(entry.getFsTabEntry().getName().equals(name))
+        for (InstallationEntry entry : mInstallationEntries) {
+            if (entry.getFsTabEntry().getName().equals(name))
                 return entry;
         }
 
@@ -106,8 +106,8 @@ public class InstallationStatus implements Parcelable {
 
     private int getInstalledCount() {
         int installedCount = 0;
-        for(InstallationEntry entry : mInstallationEntries) {
-            if(entry.getStatus()==InstallationEntry.STATUS_OK)
+        for (InstallationEntry entry : mInstallationEntries) {
+            if (entry.getStatus() == InstallationEntry.STATUS_OK)
                 installedCount++;
         }
         return installedCount;
@@ -115,29 +115,29 @@ public class InstallationStatus implements Parcelable {
 
     private int getEspOnlyCount() {
         int count = 0;
-        for(InstallationEntry entry : mInstallationEntries) {
+        for (InstallationEntry entry : mInstallationEntries) {
             int status = entry.getStatus();
-            if(status==InstallationEntry.STATUS_ESP_ONLY)
+            if (status == InstallationEntry.STATUS_ESP_ONLY)
                 count++;
         }
         return count;
     }
 
     public boolean isInstalled() {
-        return getInstalledCount()>0 || getEspOnlyCount()>0;
+        return getInstalledCount() > 0 || getEspOnlyCount() > 0;
     }
 
     public boolean isBroken() {
-        return getInstalledCount()!=mInstallationEntries.size();
+        return getInstalledCount() != mInstallationEntries.size();
     }
 
     public boolean isUpdateAvailable() {
-        return mUpdate!=null;
+        return mUpdate != null;
     }
 
     public Date getUpdateDate() {
         try {
-            return new Date(mUpdate.getLong("timestamp")*1000l);
+            return new Date(mUpdate.getLong("timestamp") * 1000l);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -147,8 +147,8 @@ public class InstallationStatus implements Parcelable {
     protected InstallationStatus(Parcel in) {
         in.readList(mInstallationEntries, InstallationEntry.class.getClassLoader());
         try {
-            String jsonString = (String)in.readValue(String.class.getClassLoader());
-            if(jsonString!=null)
+            String jsonString = (String) in.readValue(String.class.getClassLoader());
+            if (jsonString != null)
                 mUpdate = new JSONObject(jsonString);
         } catch (JSONException e) {
             e.printStackTrace();

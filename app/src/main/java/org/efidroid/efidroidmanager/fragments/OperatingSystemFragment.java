@@ -94,7 +94,7 @@ public class OperatingSystemFragment extends Fragment implements OperatingSystem
         });
 
         CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-        layoutParams.gravity = Gravity.END|Gravity.BOTTOM;
+        layoutParams.gravity = Gravity.END | Gravity.BOTTOM;
         layoutParams.setMargins(layoutParams.leftMargin, 0, layoutParams.rightMargin, layoutParams.bottomMargin);
         fab.setLayoutParams(layoutParams);
 
@@ -155,10 +155,10 @@ public class OperatingSystemFragment extends Fragment implements OperatingSystem
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_EDIT_OS:
             case REQUEST_CREATE_OS:
-                if(resultCode==OperatingSystemEditActivity.RESULT_UPDATED)
+                if (resultCode == OperatingSystemEditActivity.RESULT_UPDATED)
                     mListener.reloadOperatingSystems();
                 break;
 
@@ -173,10 +173,13 @@ public class OperatingSystemFragment extends Fragment implements OperatingSystem
 
     public interface OnOperatingSystemFragmentInteractionListener {
         DeviceInfo getDeviceInfo();
+
         FloatingActionButton getFAB();
+
         AppBarLayout getAppBarLayout();
 
         List<OperatingSystem> getOperatingSystems();
+
         void reloadOperatingSystems();
     }
 }

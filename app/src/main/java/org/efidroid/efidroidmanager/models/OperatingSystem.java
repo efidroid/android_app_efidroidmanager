@@ -52,7 +52,7 @@ public class OperatingSystem implements Parcelable {
 
     // os types
     public static final String OSTYPE_ANDROID = "android";
-    public static final String OSTYPE_UBUNTU  = "ubuntu";
+    public static final String OSTYPE_UBUNTU = "ubuntu";
 
     // os type lists
     public static final ArrayList<String> ALL_OS_TYPES = new ArrayList<>();
@@ -75,7 +75,7 @@ public class OperatingSystem implements Parcelable {
 
             String nameNoExt = FilenameUtils.removeExtension(mFileName);
             String ext = FilenameUtils.getExtension(value);
-            switch(ext) {
+            switch (ext) {
                 case "img":
                     mType = TYPE_LOOP;
                     mFileName = nameNoExt;
@@ -153,7 +153,7 @@ public class OperatingSystem implements Parcelable {
             StringBuilder sb = new StringBuilder();
             sb.append(mFileName);
 
-            switch(mType) {
+            switch (mType) {
                 case TYPE_LOOP:
                     sb.append(".img");
                     break;
@@ -198,7 +198,7 @@ public class OperatingSystem implements Parcelable {
     }
 
     public static boolean isBindAllowed(String fsType) {
-        switch(fsType) {
+        switch (fsType) {
             case "ext2":
             case "ext3":
             case "ext4":
@@ -217,7 +217,7 @@ public class OperatingSystem implements Parcelable {
 
     private void init(String filename) throws Exception {
         // create new ini
-        if(filename.equals("")) {
+        if (filename.equals("")) {
             mFilename = filename;
             mIni = new Ini();
             configureIni4j();
@@ -240,17 +240,17 @@ public class OperatingSystem implements Parcelable {
     private void initCmdline() {
         // parse cmdline
         String cmdlineStr = mIni.get("replacements", "cmdline");
-        if(cmdlineStr!=null) {
+        if (cmdlineStr != null) {
             String[] parts = cmdlineStr.split(" ");
-            for(String part : parts) {
-                if(part.equals(""))
+            for (String part : parts) {
+                if (part.equals(""))
                     continue;
 
                 String[] kv = part.split("=");
                 String name = kv[0];
                 String value = null;
 
-                if(kv.length>1)
+                if (kv.length > 1)
                     value = kv[1];
 
                 mCmdline.add(new CmdlineItem(name, value));
@@ -333,11 +333,11 @@ public class OperatingSystem implements Parcelable {
         // write cmdline back to ini
         StringWriter cmdlineWriter = new StringWriter();
         for (CmdlineItem item : mCmdline) {
-            cmdlineWriter.write(" "+item.name+"="+item.value);
+            cmdlineWriter.write(" " + item.name + "=" + item.value);
         }
 
         String cmdline = cmdlineWriter.getBuffer().toString();
-        if(cmdline.equals(""))
+        if (cmdline.equals(""))
             mIni.remove("replacements", "cmdline");
         else
             mIni.put("replacements", "cmdline", cmdline);
@@ -355,7 +355,7 @@ public class OperatingSystem implements Parcelable {
         try {
             mIni.store(writer);
         } catch (IOException e) {
-           throw new RuntimeException("Can't store ini to buffer");
+            throw new RuntimeException("Can't store ini to buffer");
         }
         dest.writeString(writer.getBuffer().toString());
 
@@ -370,7 +370,7 @@ public class OperatingSystem implements Parcelable {
         // creation mode
         dest.writeByte((byte) (mCreationMode ? 1 : 0));
 
-        if(mCreationMode) {
+        if (mCreationMode) {
             // location
             dest.writeByte((byte) (mLocation != null ? 1 : 0));
             if (mLocation != null)
@@ -405,14 +405,14 @@ public class OperatingSystem implements Parcelable {
     }
 
     public void notifyChange() {
-        for(OperatingSystemChangeListener listener : mListeners) {
+        for (OperatingSystemChangeListener listener : mListeners) {
             listener.onOperatingSystemChanged();
         }
     }
 
     public static List<String> getLocalizedOSTypeList(Context context) {
         ArrayList<String> list = new ArrayList<>();
-        for(Integer id : ALL_OS_TYPES_NAMES) {
+        for (Integer id : ALL_OS_TYPES_NAMES) {
             list.add(context.getResources().getString(id));
         }
 
@@ -422,6 +422,7 @@ public class OperatingSystem implements Parcelable {
     public String getFilename() {
         return mFilename;
     }
+
     public void setFilename(String filename) {
         mFilename = filename;
     }
@@ -440,7 +441,7 @@ public class OperatingSystem implements Parcelable {
 
     public String getLocalizedOperatingSystemType(Context context) {
         String osType = getOperatingSystemType();
-        if(osType==null)
+        if (osType == null)
             return null;
 
         return context.getResources().getString(ALL_OS_TYPES_NAMES.get(ALL_OS_TYPES.indexOf(osType)));
@@ -464,20 +465,21 @@ public class OperatingSystem implements Parcelable {
 
     public List<Partition> getPartitions() {
         ArrayList<Partition> partitions = new ArrayList<>();
-        if(mCreationMode) {
+        if (mCreationMode) {
             partitions.addAll(mPartitions);
             return partitions;
         }
 
         Profile.Section list = mIni.get("partitions");
-        if(list!=null) {
+        if (list != null) {
             for (Map.Entry<String, String> entry : new TreeMap<String, String>(list).entrySet()) {
                 Partition partition = new Partition(entry.getKey(), entry.getValue());
 
                 try {
-                    if(partition.getType()!=Partition.TYPE_BIND)
-                        partition.setSize(RootToolsEx.getFileSize(getDirectory()+"/"+partition.toIniPath()));
-                } catch (Exception e){}
+                    if (partition.getType() != Partition.TYPE_BIND)
+                        partition.setSize(RootToolsEx.getFileSize(getDirectory() + "/" + partition.toIniPath()));
+                } catch (Exception e) {
+                }
 
                 partitions.add(partition);
             }
@@ -488,7 +490,7 @@ public class OperatingSystem implements Parcelable {
 
     public void setPartitions(List<Partition> partitions) {
         Profile.Section list = mIni.get("partitions");
-        if(list!=null) {
+        if (list != null) {
             mIni.remove(list);
         }
 
@@ -496,7 +498,7 @@ public class OperatingSystem implements Parcelable {
             mIni.put("partitions", p.getPartitionName(), p.toIniPath());
         }
 
-        if(mCreationMode) {
+        if (mCreationMode) {
             mPartitions.clear();
             mPartitions.addAll(partitions);
         }
@@ -519,21 +521,21 @@ public class OperatingSystem implements Parcelable {
     }
 
     public void setReplacementKernel(String s) {
-        if(s==null)
+        if (s == null)
             mIni.remove("replacements", "kernel");
         else
             mIni.put("replacements", "kernel", s);
     }
 
     public void setReplacementRamdisk(String s) {
-        if(s==null)
+        if (s == null)
             mIni.remove("replacements", "ramdisk");
         else
             mIni.put("replacements", "ramdisk", s);
     }
 
     public void setReplacementDT(String s) {
-        if(s==null)
+        if (s == null)
             mIni.remove("replacements", "dt");
         else
             mIni.put("replacements", "dt", s);
@@ -555,21 +557,20 @@ public class OperatingSystem implements Parcelable {
     public Bitmap getIconBitmap(Context context) throws Exception {
         Bitmap bitmap = null;
 
-        if(mIconBitmapCache!=null)
+        if (mIconBitmapCache != null)
             return mIconBitmapCache;
 
-        if(isCreationMode() || mIconUri!=null) {
+        if (isCreationMode() || mIconUri != null) {
             if (mIconUri == null)
                 return null;
 
             bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), mIconUri);
-        }
-        else {
-            if(mDeleteIcon)
+        } else {
+            if (mDeleteIcon)
                 return null;
 
             // get icon
-            String iconPath = getDirectory()+"/icon.png";
+            String iconPath = getDirectory() + "/icon.png";
             if (RootToolsEx.isFile(iconPath)) {
                 byte[] bytes = RootToolsEx.readBinaryFile(iconPath);
                 bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
@@ -581,14 +582,13 @@ public class OperatingSystem implements Parcelable {
     }
 
     public boolean hasLoadedIcon() {
-        if(mIconBitmapCache!=null)
+        if (mIconBitmapCache != null)
             return true;
 
-        if(isCreationMode() || mIconUri!=null) {
+        if (isCreationMode() || mIconUri != null) {
             return false;
-        }
-        else {
-            if(mDeleteIcon)
+        } else {
+            if (mDeleteIcon)
                 return true;
 
             return false;

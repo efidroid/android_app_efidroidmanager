@@ -154,14 +154,14 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                             int[] majmin = RootToolsEx.getDeviceNode(blkDevice);
 
                             // ignore loop device mounts
-                            if(majmin[0]==7)
+                            if (majmin[0] == 7)
                                 continue;
 
                             // get mountpoint
                             MountEntry mountEntry = mountInfo.getByMajorMinor(majmin[0], majmin[1]);
                             if (mountEntry == null)
                                 continue;
-                            if(mountEntry.getMountOptionsList().contains("ro"))
+                            if (mountEntry.getMountOptionsList().contains("ro"))
                                 continue;
                             String mountPoint = mountEntry.getMountPoint();
                             String multibootDir;
@@ -204,17 +204,17 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
                                 }
                             }).show();
                 } else if (isCancelled()) {
-                        new MaterialDialog.Builder(OperatingSystemEditActivity.this)
-                                .title(R.string.error)
-                                .content(R.string.cancelled_loading_system_info)
-                                .positiveText(R.string.ok)
-                                .cancelable(false)
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        finish();
-                                    }
-                                }).show();
+                    new MaterialDialog.Builder(OperatingSystemEditActivity.this)
+                            .title(R.string.error)
+                            .content(R.string.cancelled_loading_system_info)
+                            .positiveText(R.string.ok)
+                            .cancelable(false)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    finish();
+                                }
+                            }).show();
                 } else {
                     mMultibootDirectories = list;
                     mMultibootPartitionInfo = partitionSizes;
@@ -261,7 +261,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
         setContentView(R.layout.activity_operating_system_edit);
 
         // title
-        if(mOperatingSystem.isCreationMode())
+        if (mOperatingSystem.isCreationMode())
             setTitle(R.string.create_operating_system);
         else
             setTitle(mOperatingSystem.getName());
@@ -269,7 +269,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
         // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar()!=null)
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // pager adapter for tabs
@@ -338,13 +338,13 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
         switch (item.getItemId()) {
             case R.id.action_done:
                 boolean error = false;
-                for(CommitListener l : mCommitListeners) {
-                    if(!l.onCommit())
+                for (CommitListener l : mCommitListeners) {
+                    if (!l.onCommit())
                         error = true;
                 }
 
-                if(!error) {
-                    int textid = mOperatingSystem.isCreationMode()?R.string.creating_system:R.string.updating_system;
+                if (!error) {
+                    int textid = mOperatingSystem.isCreationMode() ? R.string.creating_system : R.string.updating_system;
                     Bundle extras = new Bundle();
                     Intent intent = GenericProgressActivity.makeIntent(
                             this,
@@ -374,7 +374,7 @@ public class OperatingSystemEditActivity extends AppCompatActivity implements OS
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         setResult(RESULT_UPDATED);
-        if(requestCode==0 && resultCode==GenericProgressActivity.RESULT_CODE_OK) {
+        if (requestCode == 0 && resultCode == GenericProgressActivity.RESULT_CODE_OK) {
             finish();
         }
     }

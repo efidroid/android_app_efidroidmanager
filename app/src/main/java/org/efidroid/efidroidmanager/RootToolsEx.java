@@ -38,6 +38,7 @@ import java.util.concurrent.TimeoutException;
 public final class RootToolsEx {
     public interface MountInfoLoadedCallback {
         void onError(Exception e);
+
         void onSuccess(List<MountEntry> mountEntry);
     }
 
@@ -81,7 +82,7 @@ public final class RootToolsEx {
 
     public static void commandWaitService(Shell shell, Command cmd, int pid, IntentServiceEx service) throws Exception {
         while (!cmd.isFinished()) {
-            if(service.shouldStop()) {
+            if (service.shouldStop()) {
                 shell.close();
                 ReturnCodeException.check(kill(pid));
                 throw new InterruptedException("command got killed");
@@ -168,8 +169,7 @@ public final class RootToolsEx {
     public static MountInfo getMountInfo() throws Exception {
         final ArrayList<MountEntry> mountinfos = new ArrayList<>();
 
-        final CommandEx command = new CommandEx(0, false, "busybox cat /proc/1/mountinfo")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox cat /proc/1/mountinfo") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -185,9 +185,9 @@ public final class RootToolsEx {
                         fields[4], // mountPoint
                         fields[5], // mountOptions
                         "", // optionalFields
-                        fields[fields.length-3], // fsType
-                        fields[fields.length-2], // mountSource
-                        fields[fields.length-1] // superOptions
+                        fields[fields.length - 3], // fsType
+                        fields[fields.length - 2], // mountSource
+                        fields[fields.length - 1] // superOptions
                 ));
             }
         };
@@ -204,13 +204,12 @@ public final class RootToolsEx {
         final ArrayList<String> devices = new ArrayList<>();
 
         String deviceWildcard = "/multiboot/dev/block/* /dev/block/*";
-        final CommandEx command = new CommandEx(0, false, "busybox blkid -c /dev/null "+deviceWildcard)
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox blkid -c /dev/null " + deviceWildcard) {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
                 String blkDevice = line.split(":")[0];
-                if(blkDevice.startsWith("/multiboot") || devices.indexOf("/multiboot"+blkDevice)<0)
+                if (blkDevice.startsWith("/multiboot") || devices.indexOf("/multiboot" + blkDevice) < 0)
                     devices.add(blkDevice);
             }
         };
@@ -227,8 +226,7 @@ public final class RootToolsEx {
         final Pointer<Integer> major = new Pointer<>(0);
         final Pointer<Integer> minor = new Pointer<>(0);
 
-        final CommandEx command = new CommandEx(0, false, "busybox stat -Lt \""+path+"\"")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox stat -Lt \"" + path + "\"") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -250,8 +248,7 @@ public final class RootToolsEx {
     public static List<String> getMultibootSystems(String path) throws Exception {
         final ArrayList<String> directories = new ArrayList<>();
 
-        final CommandEx command = new CommandEx(0, false, "busybox find \""+path+"\" -mindepth 1 -maxdepth 1")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox find \"" + path + "\" -mindepth 1 -maxdepth 1") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -270,8 +267,7 @@ public final class RootToolsEx {
     public static boolean isDirectory(String path) throws Exception {
         final Pointer<Boolean> exists = new Pointer<>(false);
 
-        final Command command = new Command(0, false, "busybox find \""+path+"\" -mindepth 0 -maxdepth 0 -type d")
-        {
+        final Command command = new Command(0, false, "busybox find \"" + path + "\" -mindepth 0 -maxdepth 0 -type d") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -283,14 +279,13 @@ public final class RootToolsEx {
         shell.add(command);
         commandWait(shell, command);
 
-        return command.getExitCode()==0 && exists.value;
+        return command.getExitCode() == 0 && exists.value;
     }
 
     public static boolean isFile(String path) throws Exception {
         final Pointer<Boolean> exists = new Pointer<>(false);
 
-        Command command = new Command(0, false, "busybox find \""+path+"\" -mindepth 0 -maxdepth 0 -type f")
-        {
+        Command command = new Command(0, false, "busybox find \"" + path + "\" -mindepth 0 -maxdepth 0 -type f") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -302,14 +297,13 @@ public final class RootToolsEx {
         shell.add(command);
         commandWait(shell, command);
 
-        return command.getExitCode()==0 && exists.value;
+        return command.getExitCode() == 0 && exists.value;
     }
 
     public static boolean nodeExists(String path) throws Exception {
         final Pointer<Boolean> exists = new Pointer<>(false);
 
-        Command command = new Command(0, false, "busybox find \""+path+"\" -mindepth 0 -maxdepth 0")
-        {
+        Command command = new Command(0, false, "busybox find \"" + path + "\" -mindepth 0 -maxdepth 0") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -321,11 +315,11 @@ public final class RootToolsEx {
         shell.add(command);
         commandWait(shell, command);
 
-        return command.getExitCode()==0 && exists.value;
+        return command.getExitCode() == 0 && exists.value;
     }
 
     public static void mkdir(String path, boolean parents) throws Exception {
-        final CommandEx command = new CommandEx(0, false, "busybox mkdir "+(parents?"-p":"")+ " \""+path+"\"");
+        final CommandEx command = new CommandEx(0, false, "busybox mkdir " + (parents ? "-p" : "") + " \"" + path + "\"");
 
         Shell shell = RootTools.getShell(true);
         shell.add(command);
@@ -336,8 +330,7 @@ public final class RootToolsEx {
     public static long getDeviceSize(String path) throws Exception {
         final Pointer<Long> size = new Pointer<>(new Long(-1));
 
-        final CommandEx command = new CommandEx(0, false, "busybox blockdev --getsize64 \""+path+"\"")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox blockdev --getsize64 \"" + path + "\"") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -356,8 +349,7 @@ public final class RootToolsEx {
     public static long getFileSize(String path) throws Exception {
         final Pointer<Long> size = new Pointer<>(new Long(-1));
 
-        final CommandEx command = new CommandEx(0, false, "busybox stat -L -c %s \""+path+"\"")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox stat -L -c %s \"" + path + "\"") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -376,8 +368,7 @@ public final class RootToolsEx {
     public static String realpath(String path) throws Exception {
         final StringBuffer sb = new StringBuffer();
 
-        final Command command = new Command(0, false, "busybox realpath \""+path+"\"")
-        {
+        final Command command = new Command(0, false, "busybox realpath \"" + path + "\"") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -389,14 +380,13 @@ public final class RootToolsEx {
         shell.add(command);
         commandWait(shell, command);
 
-        return command.getExitCode()==0?sb.toString():null;
+        return command.getExitCode() == 0 ? sb.toString() : null;
     }
 
     public static String readFile(String path) throws Exception {
         final StringWriter stringWriter = new StringWriter();
 
-        final CommandEx command = new CommandEx(0, false, "busybox cat \""+path+"\"")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox cat \"" + path + "\"") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -416,8 +406,7 @@ public final class RootToolsEx {
     public static byte[] readBinaryFile(String path) throws Exception {
         final StringBuffer sb = new StringBuffer();
 
-        final CommandEx command = new CommandEx(0, false, "busybox cat \""+path+"\" | busybox base64")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox cat \"" + path + "\" | busybox base64") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -436,8 +425,7 @@ public final class RootToolsEx {
     public static byte[] readBinaryFileEx(String path, long offset, long size) throws Exception {
         final StringBuffer sb = new StringBuffer();
 
-        final CommandEx command = new CommandEx(0, false, "busybox dd if=\""+path+"\" bs=1 count="+size+" skip="+offset+" status=none 2>/dev/null | busybox base64")
-        {
+        final CommandEx command = new CommandEx(0, false, "busybox dd if=\"" + path + "\" bs=1 count=" + size + " skip=" + offset + " status=none 2>/dev/null | busybox base64") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -454,7 +442,7 @@ public final class RootToolsEx {
     }
 
     public static void copyFileNoRoot(String source, String destination) throws Exception {
-        final CommandEx command = new CommandEx(0, false, "su -c 'busybox cat \""+source+"\"' > \""+destination+"\"");
+        final CommandEx command = new CommandEx(0, false, "su -c 'busybox cat \"" + source + "\"' > \"" + destination + "\"");
 
         Shell shell = RootTools.getShell(false);
         shell.add(command);
@@ -464,7 +452,7 @@ public final class RootToolsEx {
 
     public static File copyFileToTemp(Context context, String path) throws Exception {
         String cacheDir = context.getCacheDir().getAbsolutePath();
-        File cacheFile = new File(cacheDir+"/"+ UUID.randomUUID().toString() + ".tmp");
+        File cacheFile = new File(cacheDir + "/" + UUID.randomUUID().toString() + ".tmp");
 
         copyFileNoRoot(path, cacheFile.getAbsolutePath());
 
@@ -472,7 +460,7 @@ public final class RootToolsEx {
     }
 
     public static void chmod(String file, String perm) throws Exception {
-        final CommandEx command = new CommandEx(0, false, "busybox chmod \""+perm+"\" \""+file+"\"");
+        final CommandEx command = new CommandEx(0, false, "busybox chmod \"" + perm + "\" \"" + file + "\"");
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
@@ -480,7 +468,7 @@ public final class RootToolsEx {
     }
 
     public static int kill(int pid) throws Exception {
-        final Command command = new Command(0, false, "busybox kill -SIGKILL "+pid);
+        final Command command = new Command(0, false, "busybox kill -SIGKILL " + pid);
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
@@ -492,8 +480,7 @@ public final class RootToolsEx {
         final Pointer<Integer> pid = new Pointer<>(0);
         final File tmpfile = File.createTempFile("servicecmd", null);
 
-        final Command pidcommand = new Command(0, false, 0, sCommand+" &>> "+tmpfile.getAbsolutePath()+" &\n echo $!")
-        {
+        final Command pidcommand = new Command(0, false, 0, sCommand + " &>> " + tmpfile.getAbsolutePath() + " &\n echo $!") {
             @Override
             public void commandOutput(int id, String line) {
                 super.commandOutput(id, line);
@@ -508,7 +495,7 @@ public final class RootToolsEx {
         ReturnCodeException.check(pidcommand.getExitCode());
 
         // wait for async command to finish
-        final Command waitcommand = new Command(0, false, 0, "wait "+pid.value);
+        final Command waitcommand = new Command(0, false, 0, "wait " + pid.value);
         shell = RootTools.getShell(true);
         shell.add(waitcommand);
         commandWaitService(shell, waitcommand, pid.value, service);
@@ -518,16 +505,16 @@ public final class RootToolsEx {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(tmpfile));
-            for(String line; (line = br.readLine()) != null; ) {
+            for (String line; (line = br.readLine()) != null; ) {
                 outputBuffer.append(line);
             }
-        }
-        catch (Exception e){}
-        finally {
-            if(br!=null) {
+        } catch (Exception e) {
+        } finally {
+            if (br != null) {
                 try {
                     br.close();
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
             }
         }
 
@@ -536,7 +523,7 @@ public final class RootToolsEx {
 
         // check return code
         int rc = waitcommand.getExitCode();
-        if (rc!=0) {
+        if (rc != 0) {
             String s = outputBuffer.toString();
             if (s.trim().length() == 0)
                 throw new ReturnCodeException(rc);
@@ -546,14 +533,14 @@ public final class RootToolsEx {
     }
 
     public static void createLoopImage(IntentServiceEx service, String filename, long size) throws Exception {
-        runServiceCommand(service, "busybox truncate -s "+size+" \""+filename+"\"");
+        runServiceCommand(service, "busybox truncate -s " + size + " \"" + filename + "\"");
     }
 
     public static void createPartitionBackup(IntentServiceEx service, String device, String filename, long size) throws Exception {
-        if(size==-1)
+        if (size == -1)
             size = getDeviceSize(device);
 
-        runServiceCommand(service, "busybox dd if=\""+device+"\" of=\""+filename+"\" bs=512 count="+(Util.ROUNDUP(size,512)/512)+"");
+        runServiceCommand(service, "busybox dd if=\"" + device + "\" of=\"" + filename + "\" bs=512 count=" + (Util.ROUNDUP(size, 512) / 512) + "");
     }
 
     public static class RootFile extends File {
@@ -592,24 +579,23 @@ public final class RootToolsEx {
         public File[] listFiles() {
             final String path = getAbsolutePath();
             final ArrayList<RootFile> list = new ArrayList<>();
-            final String prefix = path.charAt(path.length()-1)=='/'?path:path+"/";
+            final String prefix = path.charAt(path.length() - 1) == '/' ? path : path + "/";
             final Pointer<Boolean> first = new Pointer<>(true);
 
-            final Command command = new Command(0, false, "busybox ls -lL \""+path+"\"")
-            {
+            final Command command = new Command(0, false, "busybox ls -lL \"" + path + "\"") {
                 @Override
                 public void commandOutput(int id, String line) {
                     super.commandOutput(id, line);
                     String[] parts = line.split(" ");
 
-                    if(first.value) {
+                    if (first.value) {
                         first.value = false;
                         return;
                     }
 
-                    boolean is_dir = parts[0].charAt(0)=='d';
-                    String name = parts[parts.length-1];
-                    list.add(new RootFile(prefix+name, is_dir));
+                    boolean is_dir = parts[0].charAt(0) == 'd';
+                    String name = parts[parts.length - 1];
+                    list.add(new RootFile(prefix + name, is_dir));
                 }
             };
 
@@ -617,7 +603,7 @@ public final class RootToolsEx {
                 Shell shell = RootTools.getShell(true);
                 shell.add(command);
                 commandWait(shell, command);
-                if(command.getExitCode()!=0)
+                if (command.getExitCode() != 0)
                     list.clear();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -628,7 +614,7 @@ public final class RootToolsEx {
     }
 
     public static void copyFile(String source, String destination) throws Exception {
-        final CommandEx command = new CommandEx(0, false, "busybox cat \""+source+"\" > \""+destination+"\"");
+        final CommandEx command = new CommandEx(0, false, "busybox cat \"" + source + "\" > \"" + destination + "\"");
 
         Shell shell = RootTools.getShell(true);
         shell.add(command);
@@ -638,7 +624,7 @@ public final class RootToolsEx {
 
     public static void writeDataToFile(Context context, String filename, String data) throws Exception {
         String cacheDir = context.getCacheDir().getAbsolutePath();
-        File cacheFile = new File(cacheDir+"/"+ FilenameUtils.getName(filename));
+        File cacheFile = new File(cacheDir + "/" + FilenameUtils.getName(filename));
 
         // write data to cache file
         FileOutputStream os = new FileOutputStream(cacheFile);
@@ -654,7 +640,7 @@ public final class RootToolsEx {
 
     public static void writeBitmapToPngFile(Context context, String filename, Bitmap bitmap) throws Exception {
         String cacheDir = context.getCacheDir().getAbsolutePath();
-        File cacheFile = new File(cacheDir+"/"+ FilenameUtils.getName(filename));
+        File cacheFile = new File(cacheDir + "/" + FilenameUtils.getName(filename));
 
         // write data to cache file
         Util.savePng(cacheFile, bitmap);
@@ -669,7 +655,7 @@ public final class RootToolsEx {
     public static void unzip(String zip, String destination) throws Exception {
         mkdir(destination, true);
 
-        final CommandEx command = new CommandEx(0, false, "busybox unzip -oq \""+zip+"\" -d \""+destination+"\"");
+        final CommandEx command = new CommandEx(0, false, "busybox unzip -oq \"" + zip + "\" -d \"" + destination + "\"");
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
@@ -677,7 +663,7 @@ public final class RootToolsEx {
     }
 
     public static void dd(String source, String destination) throws Exception {
-        final CommandEx command = new CommandEx(0, false, "busybox dd if=\""+source+"\" of=\""+destination+"\"");
+        final CommandEx command = new CommandEx(0, false, "busybox dd if=\"" + source + "\" of=\"" + destination + "\"");
         Shell shell = RootTools.getShell(true);
         shell.add(command);
         commandWait(shell, command);
@@ -689,9 +675,9 @@ public final class RootToolsEx {
         int lastVersionCode = sp.getInt(AppConstants.SHAREDPREFS_GLOBAL_LAST_APP_VERSION, 0);
 
         try {
-            InputStream is = context.getAssets().open(Build.CPU_ABI+"/busybox");
+            InputStream is = context.getAssets().open(Build.CPU_ABI + "/busybox");
             File out = new File(context.getFilesDir(), "/busybox");
-            if(!out.exists() || lastVersionCode!=BuildConfig.VERSION_CODE)
+            if (!out.exists() || lastVersionCode != BuildConfig.VERSION_CODE)
                 FileUtils.copyInputStreamToFile(is, out);
             out.setExecutable(true, false);
             out.setReadable(true, false);
