@@ -253,8 +253,20 @@ public class MainActivity extends AppCompatActivity
         // SRL
         mSwipeRefreshLayout.setEnabled(false);
 
+        if(savedInstanceState!=null) {
+            mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
+            mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
+            hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
+
+            // operating systems
+            mOperatingSystems = savedInstanceState.getParcelableArrayList(ARG_OPERATING_SYSTEMS);
+
+            // install status
+            mInstallStatus = savedInstanceState.getParcelable(ARG_INSTALL_STATUS);
+        }
+
         // load data the first time
-        if (savedInstanceState == null) {
+        if (mDeviceInfo==null) {
             // show progress dialog
             mProgressDialog = new MaterialDialog.Builder(this)
                     .title(R.string.loading_device_info)
@@ -268,16 +280,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         else {
-            mDeviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO);
-            mActiveMenuItemId = savedInstanceState.getInt(ARG_ACTIVEMENU_ID);
-            hasRoot = savedInstanceState.getBoolean(ARG_HAS_ROOT);
-
-            // operating systems
-            mOperatingSystems = savedInstanceState.getParcelableArrayList(ARG_OPERATING_SYSTEMS);
-
-            // install status
-            mInstallStatus = savedInstanceState.getParcelable(ARG_INSTALL_STATUS);
-
             onLoadUiData();
         }
     }
