@@ -94,11 +94,15 @@ public class Util {
         return textSize;
     }
 
+    public static float dp2px(Context context, float dp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+    }
+
     public static void setToolBarHeight(final AppBarLayout appBarLayout, int heightDP, final boolean expand) {
         int animTime = appBarLayout.getContext().getResources().getInteger(android.R.integer.config_mediumAnimTime);
 
         // calculate new height
-        int heightPX = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightDP, appBarLayout.getContext().getResources().getDisplayMetrics());
+        int heightPX = (int) Util.dp2px(appBarLayout.getContext(), heightDP);
         final int totalHeightPX = Util.getStatusBarHeight(appBarLayout.getContext()) + Util.getToolBarHeight(appBarLayout.getContext()) + heightPX;
         int startHeightPx = appBarLayout.getMeasuredHeight();
         if(startHeightPx==0) {
