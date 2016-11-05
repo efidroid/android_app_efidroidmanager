@@ -8,8 +8,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
-import com.stericson.roottools.RootTools;
-
 import org.apache.commons.io.FilenameUtils;
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
@@ -19,7 +17,6 @@ import org.ini4j.Ini;
 import org.ini4j.Profile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -472,7 +469,7 @@ public class OperatingSystem implements Parcelable {
 
         Profile.Section list = mIni.get("partitions");
         if (list != null) {
-            for (Map.Entry<String, String> entry : new TreeMap<String, String>(list).entrySet()) {
+            for (Map.Entry<String, String> entry : new TreeMap<>(list).entrySet()) {
                 Partition partition = new Partition(entry.getKey(), entry.getValue());
 
                 try {
@@ -588,10 +585,8 @@ public class OperatingSystem implements Parcelable {
         if (isCreationMode() || mIconUri != null) {
             return false;
         } else {
-            if (mDeleteIcon)
-                return true;
+            return mDeleteIcon;
 
-            return false;
         }
     }
 

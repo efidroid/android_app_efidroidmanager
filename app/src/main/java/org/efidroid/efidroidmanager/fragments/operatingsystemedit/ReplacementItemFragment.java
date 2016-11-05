@@ -59,7 +59,6 @@ public class ReplacementItemFragment extends Fragment implements FABListener, Re
     public ReplacementItemFragment() {
     }
 
-    @SuppressWarnings("unused")
     public static ReplacementItemFragment newInstance() {
         return new ReplacementItemFragment();
     }

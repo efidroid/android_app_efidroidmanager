@@ -501,7 +501,7 @@ public final class RootToolsEx {
         commandWaitService(shell, waitcommand, pid.value, service);
 
         // read output
-        StringBuffer outputBuffer = new StringBuffer();
+        StringBuilder outputBuffer = new StringBuilder();
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(tmpfile));

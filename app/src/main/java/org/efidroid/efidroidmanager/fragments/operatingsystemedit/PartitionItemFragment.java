@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,6 @@ import org.efidroid.efidroidmanager.types.FSTabEntry;
 import org.efidroid.efidroidmanager.types.OSEditFragmentInteractionListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PartitionItemFragment extends Fragment implements OperatingSystem.OperatingSystemChangeListener {
     // data,status
@@ -38,7 +38,7 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
     private static final int SCHEMEID_ANDROID_LOOPALL = 2;
 
     // schemes
-    private final HashMap<Integer, PartitionScheme> SCHEMES = new HashMap<>();
+    private final SparseArray<PartitionScheme> SCHEMES = new SparseArray<>();
 
     // UI
     private AppCompatSpinner mSpinnerPartitionScheme = null;
@@ -71,7 +71,6 @@ public class PartitionItemFragment extends Fragment implements OperatingSystem.O
     public PartitionItemFragment() {
     }
 
-    @SuppressWarnings("unused")
     public static PartitionItemFragment newInstance() {
         return new PartitionItemFragment();
     }

@@ -22,8 +22,6 @@ import java.util.Date;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
 
 public class DataHelper {
-    private static DeviceInfo mDeviceInfoCache = null;
-
     public interface DeviceInfoLoadCallback {
         void onDeviceInfoLoadError(Exception e);
         void onDeviceInfoLoaded(DeviceInfo deviceInfo);

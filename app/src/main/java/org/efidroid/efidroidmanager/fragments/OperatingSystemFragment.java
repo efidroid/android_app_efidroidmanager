@@ -2,22 +2,18 @@ package org.efidroid.efidroidmanager.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -25,18 +21,13 @@ import com.melnykov.fab.FloatingActionButton;
 
 import org.efidroid.efidroidmanager.R;
 
-import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.activities.GenericProgressActivity;
-import org.efidroid.efidroidmanager.activities.MainActivity;
 import org.efidroid.efidroidmanager.activities.OperatingSystemEditActivity;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
-import org.efidroid.efidroidmanager.models.MountInfo;
 import org.efidroid.efidroidmanager.models.OperatingSystem;
 import org.efidroid.efidroidmanager.tasks.OSRemovalProgressServiceTask;
-import org.efidroid.efidroidmanager.types.MountEntry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -121,7 +121,7 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         InstallationEntry entry = mListener.getInstallStatus().getWorkingEntry();
         if (entry != null) {
-            Date date = new Date(entry.getTimeStamp() * 1000l);
+            Date date = new Date(entry.getTimeStamp() * 1000L);
             DateFormat format = DateFormat.getDateTimeInstance();
 
             mListData.add(new InstallStatusRecyclerViewAdapter.Item(getString(R.string.efidroid_version), entry.getEFIDroidReleaseVersionString()));

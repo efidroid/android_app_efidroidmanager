@@ -20,11 +20,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.SweepGradient;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
@@ -70,7 +68,7 @@ public class ProgressCircle extends ViewGroup {
      * Class constructor taking only a context. Use this constructor to create
      * {@link ProgressCircle} objects from your own code.
      *
-     * @param context
+     * @param context Context
      */
     public ProgressCircle(Context context) {
         super(context);
@@ -82,7 +80,7 @@ public class ProgressCircle extends ViewGroup {
      * is used by the layout engine to construct a {@link ProgressCircle} from a set of
      * XML attributes.
      *
-     * @param context
+     * @param context Context
      * @param attrs   An attribute set which can contain attributes from
      *                {@link org.efidroid.efidroidmanager.R.styleable} as well as attributes inherited
      *                from {@link android.view.View}.
@@ -282,7 +280,6 @@ public class ProgressCircle extends ViewGroup {
         }
     }
 
-    @SuppressWarnings("unused")
     public void setValue(float value, boolean animate, long duration) {
         if (value > mMaxValue) {
             value = mMaxValue;
@@ -296,8 +293,7 @@ public class ProgressCircle extends ViewGroup {
             anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    float val = (Float) valueAnimator.getAnimatedValue();
-                    mCurrentValue = val;
+                    mCurrentValue = (float) (Float) valueAnimator.getAnimatedValue();
                     onDataChanged();
                 }
             });
@@ -315,8 +311,7 @@ public class ProgressCircle extends ViewGroup {
             anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    mProgressStrokeColor = val;
+                    mProgressStrokeColor = (int) (Integer) valueAnimator.getAnimatedValue();
                     mProgressStrokePaint.setColor(mProgressStrokeColor);
                     invalidate();
                 }
@@ -336,8 +331,7 @@ public class ProgressCircle extends ViewGroup {
             anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    mFillColor = val;
+                    mFillColor = (int) (Integer) valueAnimator.getAnimatedValue();
                     mBackgroundPaint.setColor(mFillColor);
                     invalidate();
                 }
@@ -366,8 +360,7 @@ public class ProgressCircle extends ViewGroup {
             anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    mContentTextColor = val;
+                    mContentTextColor = (int) (Integer) valueAnimator.getAnimatedValue();
                     mTextPaint.setColor(mContentTextColor);
                     invalidate();
                 }
@@ -380,7 +373,6 @@ public class ProgressCircle extends ViewGroup {
             invalidate();
         }
     }
-
 
     public void setProgressHidden(final boolean hidden, boolean animate, long duration) {
         if (mHideProgress == hidden)
@@ -442,7 +434,7 @@ public class ProgressCircle extends ViewGroup {
         /**
          * Construct a PieView
          *
-         * @param context
+         * @param context Context
          */
         public PieView(Context context) {
             super(context);

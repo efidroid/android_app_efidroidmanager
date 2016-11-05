@@ -43,9 +43,7 @@ public class Util {
     }
 
     public static String byteToHexStr(byte b) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%02X", b));
-        return sb.toString();
+        return String.format("%02X", b);
     }
 
     public static void savePng(File file, Bitmap bitmap) throws IOException {
@@ -116,8 +114,7 @@ public class Util {
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                layoutParams.height = val;
+                layoutParams.height = (int) (Integer) valueAnimator.getAnimatedValue();
                 appBarLayout.setLayoutParams(layoutParams);
             }
         });

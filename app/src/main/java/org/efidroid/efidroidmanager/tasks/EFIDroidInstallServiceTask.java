@@ -1,9 +1,6 @@
 package org.efidroid.efidroidmanager.tasks;
 
 import android.os.Bundle;
-
-import com.stericson.rootshell.RootShell;
-import com.stericson.roottools.RootTools;
 import android.support.annotation.Keep;
 
 import org.efidroid.efidroidmanager.AppConstants;
@@ -21,7 +18,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -53,7 +49,6 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         URL url = new URL(AppConstants.getUrlUpdates(getService().getBaseContext(), mDeviceInfo));
         URLConnection connection = url.openConnection();
         connection.connect();
-        int fileLength = connection.getContentLength();
 
         // open stream
         InputStream input = new BufferedInputStream(connection.getInputStream());
@@ -81,7 +76,6 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         URL url = new URL(urlString);
         URLConnection connection = url.openConnection();
         connection.connect();
-        int fileLength = connection.getContentLength();
 
         // open streams
         InputStream input = new BufferedInputStream(connection.getInputStream());
