@@ -1,6 +1,7 @@
 package org.efidroid.efidroidmanager.tasks;
 
 import android.os.Bundle;
+import android.support.annotation.Keep;
 
 import com.stericson.roottools.RootTools;
 
@@ -37,6 +38,7 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
     private int mProgress = 0;
 
 
+    @Keep
     @SuppressWarnings("unused")
     public EFIDroidUninstallServiceTask(GenericProgressIntentService service) {
         super(service);

@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.stericson.rootshell.RootShell;
 import com.stericson.roottools.RootTools;
+import android.support.annotation.Keep;
 
 import org.efidroid.efidroidmanager.AppConstants;
 import org.efidroid.efidroidmanager.R;
@@ -39,7 +40,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
     private boolean mSuccess = false;
     private int mProgress = 0;
 
-
+    @Keep
     @SuppressWarnings("unused")
     public EFIDroidInstallServiceTask(GenericProgressIntentService service) {
         super(service);

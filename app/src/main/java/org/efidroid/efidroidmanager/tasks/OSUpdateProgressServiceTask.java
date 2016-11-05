@@ -2,6 +2,7 @@ package org.efidroid.efidroidmanager.tasks;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.Keep;
 
 import com.stericson.roottools.RootTools;
 
@@ -24,6 +25,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
     private OperatingSystem mOperatingSystem = null;
     private boolean mSuccess = false;
 
+    @Keep
     @SuppressWarnings("unused")
     public OSUpdateProgressServiceTask(GenericProgressIntentService service) {
         super(service);
