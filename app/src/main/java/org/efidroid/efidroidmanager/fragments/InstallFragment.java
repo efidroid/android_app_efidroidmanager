@@ -383,7 +383,9 @@ public class InstallFragment extends Fragment implements AppBarLayout.OnOffsetCh
         FloatingActionButton fab = mListener.getFAB();
         CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         layoutParams.gravity = Gravity.END | Gravity.TOP;
-        layoutParams.setMargins(layoutParams.leftMargin, Util.getStatusBarHeight(getContext()) + Util.getToolBarHeight(getContext()) + 300 + 32 + fab.getHeight() / 2 + verticalOffset, layoutParams.rightMargin, layoutParams.bottomMargin);
+
+        float margin_top = Util.getToolBarHeight(getContext()) + Util.dp2px(appBarLayout.getContext(), 300) - (fab.getHeight() / 2) + verticalOffset;
+        layoutParams.setMargins(layoutParams.leftMargin, (int) margin_top, layoutParams.rightMargin, layoutParams.bottomMargin);
         fab.setLayoutParams(layoutParams);
     }
 
