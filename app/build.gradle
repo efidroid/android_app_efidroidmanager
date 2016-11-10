@@ -20,7 +20,7 @@ android {
         applicationId "org.efidroid.efidroidmanager"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 3
+        versionCode 4
         versionName "1.0-g${gitRevision()}${gitDirty()}"
 
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
