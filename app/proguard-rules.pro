@@ -15,3 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Ignore warnings caused by ini4j referencing non Android-runtime classes
+-dontwarn java.beans.*
