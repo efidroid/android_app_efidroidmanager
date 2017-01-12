@@ -22,6 +22,7 @@ import org.efidroid.efidroidmanager.types.ReturnCodeException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -675,7 +676,27 @@ public final class RootToolsEx {
         int lastVersionCode = sp.getInt(AppConstants.SHAREDPREFS_GLOBAL_LAST_APP_VERSION, 0);
 
         try {
-            InputStream is = context.getAssets().open(Build.CPU_ABI + "/busybox");
+            ArrayList<String> abis = new ArrayList<>();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                abis.addAll(Arrays.asList(Build.SUPPORTED_ABIS));
+            }
+            else {
+                abis.add(Build.CPU_ABI);
+                abis.add(Build.CPU_ABI2);
+            }
+
+            InputStream is = null;
+            for(String abi : abis) {
+                try {
+                    is = context.getAssets().open(abi + "/busybox");
+                }
+                catch (FileNotFoundException ignored) {
+                }
+            }
+            if(is==null) {
+                throw new IOException("can't find compatible busybox");
+            }
+
             File out = new File(context.getFilesDir(), "/busybox");
             if (!out.exists() || lastVersionCode != BuildConfig.VERSION_CODE)
                 FileUtils.copyInputStreamToFile(is, out);
