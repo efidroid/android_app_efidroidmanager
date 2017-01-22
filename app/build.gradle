@@ -25,6 +25,10 @@ android {
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
         buildConfigField "String", "USERNAME", "\""+System.getProperty("user.name")+"\""
         buildConfigField "String", "HOSTNAME", "\""+InetAddress.getLocalHost().getHostName()+"\""
+
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
     }
     buildTypes {
         release {
@@ -34,6 +38,11 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
         }
     }
 }

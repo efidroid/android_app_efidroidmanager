@@ -16,6 +16,7 @@ public class DeviceInfo implements Parcelable {
 
     // data
     private String mDeviceName = null;
+    private boolean mUseLoki;
     private FSTab mFSTab = null;
 
     // state
@@ -31,6 +32,7 @@ public class DeviceInfo implements Parcelable {
 
     protected DeviceInfo(Parcel in) {
         mDeviceName = in.readString();
+        mUseLoki = in.readByte() != 0;
         mFSTab = in.readParcelable(FSTab.class.getClassLoader());
     }
 
@@ -54,12 +56,14 @@ public class DeviceInfo implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mDeviceName);
+        dest.writeByte(mUseLoki ? (byte)1 : (byte)0);
         dest.writeParcelable(mFSTab, flags);
     }
 
     public void parseDeviceList(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
         mDeviceName = jsonObject.getString(AppConstants.DEVICE_NAME);
+        mUseLoki = jsonObject.getBoolean(AppConstants.USE_LOKI);
     }
 
     public void parseFSTab(String data) throws IOException {
@@ -73,6 +77,8 @@ public class DeviceInfo implements Parcelable {
     public FSTab getFSTab() {
         return mFSTab;
     }
+
+    public boolean useLoki() { return mUseLoki; }
 
     public String getESPDir(boolean requireUEFIESPDir) {
         for (FSTabEntry entry : mFSTab.getFSTabEntries()) {
