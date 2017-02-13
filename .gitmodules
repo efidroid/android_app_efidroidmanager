@@ -1,0 +1,3 @@
+[submodule "sub_projects/Loki"]
+	path = sub_projects/Loki
+	url = https://github.com/efidroid/modules_loki.git

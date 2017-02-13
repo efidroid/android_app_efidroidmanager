@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import org.efidroid.efidroidmanager.RootToolsEx;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class FSTabEntry implements Parcelable {
     final String mBlkDevice;
     final String mMountPoint;
@@ -91,33 +94,20 @@ public class FSTabEntry implements Parcelable {
         return mMountFlags;
     }
 
-    public String getFfMgrFlags() {
-        return mFfMgrFlags;
+    public List<String> getFfMgrFlags() {
+        return Arrays.asList(mFfMgrFlags.split(","));
     }
 
     public boolean isMultiboot() {
-        String[] parts = mFfMgrFlags.split(",");
-        for (String part : parts) {
-            if (part.equals("multiboot"))
-                return true;
-        }
-
-        return false;
+        return getFfMgrFlags().contains("multiboot");
     }
 
     public boolean isUEFI() {
-        String[] parts = mFfMgrFlags.split(",");
-        for (String part : parts) {
-            if (part.equals("uefi"))
-                return true;
-        }
-
-        return false;
+        return getFfMgrFlags().contains("uefi");
     }
 
     public String getESP() {
-        String[] parts = mFfMgrFlags.split(",");
-        for (String part : parts) {
+        for (String part : getFfMgrFlags()) {
             if (!part.startsWith("esp"))
                 continue;
 

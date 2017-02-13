@@ -8,6 +8,8 @@ import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
 import org.efidroid.efidroidmanager.models.DeviceInfo;
+import org.efidroid.efidroidmanager.patching.Patcher;
+import org.efidroid.efidroidmanager.patching.PatcherStorage;
 import org.efidroid.efidroidmanager.services.GenericProgressIntentService;
 import org.efidroid.efidroidmanager.types.FSTabEntry;
 import org.efidroid.efidroidmanager.types.InstallationEntry;
@@ -115,6 +117,9 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
     }
 
     private void doInstall(String updateDir) throws Exception {
+        // determine appropriate patcher
+        Patcher patcher = PatcherStorage.selectPatcher(mDeviceInfo, getService().getApplicationContext());
+
         // get esp parent directory
         String espParent = mDeviceInfo.getESPDir(false);
         if (espParent == null)
@@ -161,14 +166,21 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
             }
         }
 
+        patcher.prepareEnvironment(updateDir);
+
         // install
         for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
             if (!entry.isUEFI())
                 continue;
 
             String file = updateDir + "/" + entry.getName() + ".img";
+            if (patcher.isPatchRequired(entry)) {
+                patcher.patchImage(entry, file);
+            }
             RootToolsEx.dd(file, entry.getBlkDevice());
         }
+
+        patcher.cleanupEnvironment();
     }
 
     public void onProcess(Bundle extras) {

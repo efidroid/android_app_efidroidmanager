@@ -36,6 +36,11 @@ android {
             versionNameSuffix "-debug"
         }
     }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
+        }
+    }
 }
 
 dependencies {
