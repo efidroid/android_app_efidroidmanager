@@ -125,4 +125,9 @@
     <string name="error_creating_system">Error creating system %1$s</string>
     <string name="error_updating_system">Error updating system %1$s</string>
     <string name="device_is_encrypted">Encrypted devices are not supported</string>
+    <string name="use_custom_ota_server">Use custom OTA server</string>
+    <string name="ota_server_url">Address of OTA server</string>
+    <string name="ota_settings">OTA Settings</string>
+    <string name="invalid_input">Invalid Input</string>
+    <string name="invalid_url_message">Server URL must have \"http\" or \"https\" scheme and contain non-empty hostname</string>
 </resources>

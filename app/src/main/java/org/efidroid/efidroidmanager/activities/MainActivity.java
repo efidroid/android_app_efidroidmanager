@@ -485,6 +485,14 @@ public class MainActivity extends AppCompatActivity
             } else {
                 fragment = new InstallFragment();
             }
+        } else if (id == R.id.nav_settings) {
+            Intent i = new Intent(this, PrefActivity.class);
+            startActivity(i);
+
+            // close drawer
+            mDrawer.closeDrawer(GravityCompat.START);
+
+            return true;
         }
 
         mActiveMenuItemId = item.getItemId();

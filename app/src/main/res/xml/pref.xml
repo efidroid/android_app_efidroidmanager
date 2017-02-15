@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/app_name">
+    <PreferenceCategory
+        android:title="@string/ota_settings"
+        android:key="ota_settings">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="@string/use_custom_ota_server"
+            android:key="use_custom_ota_server" />
+        <EditTextPreference
+            android:dependency="use_custom_ota_server"
+            android:defaultValue="http://hostname/"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:title="@string/ota_server_url"
+            android:key="ota_server_url"
+            android:inputType="textFilter" />
+    </PreferenceCategory>
+</PreferenceScreen>
