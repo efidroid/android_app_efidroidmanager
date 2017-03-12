@@ -2,7 +2,6 @@ package org.efidroid.efidroidmanager.types;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
@@ -74,7 +73,7 @@ public class InstallationEntry implements Parcelable {
         long off_ramdisk = off_kernel + Util.ROUNDUP(kernel_size, page_size);
         long off_second = off_ramdisk + Util.ROUNDUP(ramdisk_size, page_size);
         long off_tags = off_second + Util.ROUNDUP(second_size, page_size);
-        long off_meta = off_tags + dt_size;
+        long off_meta = off_tags + Util.ROUNDUP(dt_size, page_size);
 
         // read meta
         byte[] meta = RootToolsEx.readBinaryFileEx(mFSTabEntry.getBlkDevice(), off_meta, 36);
