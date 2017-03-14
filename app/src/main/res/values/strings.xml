@@ -75,6 +75,7 @@
     <string name="cant_load_install_info">"Can\'t load installation info. "</string>
     <string name="cant_load_device_info_check_connection">Can\'t load device info. Please check your connection.\n\n</string>
     <string name="try_again">Try again</string>
+    <string name="override_ota_server">Override OTA server</string>
     <string name="you_need_root">You need Root access to use this app.</string>
     <string name="share_text">I\'m running EFIDroid on my %1$s!\nMore info: http://efidroid.org</string>
     <string name="os_delete_confirmation">Do you want to delete \'%1$s\'?</string>

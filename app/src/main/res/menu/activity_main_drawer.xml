@@ -33,6 +33,10 @@
             android:id="@+id/nav_install"
             android:icon="@drawable/ic_menu_settings"
             android:title="@string/install_update" />
+        <item
+            android:id="@+id/nav_override_ota"
+            android:icon="@drawable/ic_menu_settings"
+            android:title="@string/override_ota_server" />
     </group>
 
     <group android:id="@+id/nav_group_communicate">
