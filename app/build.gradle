@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
-def gitRevision() {
+static def gitRevision() {
     def cmd = "git rev-parse --short HEAD"
     return cmd.execute().text.trim()
 }
 
-def gitDirty() {
+static def gitDirty() {
     def cmd = "git diff-index --name-only HEAD"
     if(cmd.execute().text.trim().length()>0)
         return "-dirty";
