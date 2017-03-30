@@ -45,6 +45,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.efidroid.efidroidmanager.activities.MainActivity" />
         </activity>
+        <activity
+            android:name=".activities.PrefActivity"
+            android:label="@string/action_settings"
+            android:theme="@style/AppTheme.ActionMode" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.efidroid.efidroidmanager.activities.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

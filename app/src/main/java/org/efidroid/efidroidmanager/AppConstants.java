@@ -1,11 +1,11 @@
 package org.efidroid.efidroidmanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
-import android.text.TextUtils;
+import android.preference.PreferenceManager;
 
 import org.efidroid.efidroidmanager.models.DeviceInfo;
-import org.efidroid.efidroidmanager.types.SystemPropertiesProxy;
 
 public final class AppConstants {
     private static final String URL_EFIDROID_SERVER = "https://raw.githubusercontent.com/efidroid";
@@ -19,11 +19,8 @@ public final class AppConstants {
     public static final String PATH_INTERNAL_FSTAB = "fstab.multiboot";
 
     private static String getUrlServer(Context context) {
-        String url = SystemPropertiesProxy.get(context, "efidroid.server_url", "");
-        if (TextUtils.isEmpty(url))
-            url = URL_EFIDROID_SERVER;
-
-        return url;
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        return sp.getBoolean("use_custom_ota_server", false) ? sp.getString("ota_server_url", "") : URL_EFIDROID_SERVER;
     }
 
     public static String getUrlOta(Context context) {
