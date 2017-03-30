@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.util.TypedValue;
 import android.view.View;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Util {
     public static OperatingSystemEditActivity.MultibootPartitionInfo getPartitionInfoByName(ArrayList<OperatingSystemEditActivity.MultibootPartitionInfo> list, String name) {
@@ -33,6 +36,18 @@ public class Util {
 
     public static String name2path(String name) {
         return name.replaceAll("\\W+", "_");
+    }
+
+    public static List<String> getABIs() {
+        ArrayList<String> abis = new ArrayList<>();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            abis.addAll(Arrays.asList(Build.SUPPORTED_ABIS));
+        }
+        else {
+            abis.add(Build.CPU_ABI);
+            abis.add(Build.CPU_ABI2);
+        }
+        return abis;
     }
 
     public static byte[] longToBytes(long x) {

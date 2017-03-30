@@ -676,14 +676,7 @@ public final class RootToolsEx {
         int lastVersionCode = sp.getInt(AppConstants.SHAREDPREFS_GLOBAL_LAST_APP_VERSION, 0);
 
         try {
-            ArrayList<String> abis = new ArrayList<>();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                abis.addAll(Arrays.asList(Build.SUPPORTED_ABIS));
-            }
-            else {
-                abis.add(Build.CPU_ABI);
-                abis.add(Build.CPU_ABI2);
-            }
+            List<String> abis = Util.getABIs();
 
             InputStream is = null;
             for(String abi : abis) {
