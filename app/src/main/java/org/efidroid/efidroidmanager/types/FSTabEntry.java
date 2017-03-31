@@ -105,6 +105,16 @@ public class FSTabEntry implements Parcelable {
         return false;
     }
 
+    public boolean isBootloader() {
+        String[] parts = mFfMgrFlags.split(",");
+        for (String part : parts) {
+            if (part.equals("bootloader")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isUEFI() {
         String[] parts = mFfMgrFlags.split(",");
         for (String part : parts) {

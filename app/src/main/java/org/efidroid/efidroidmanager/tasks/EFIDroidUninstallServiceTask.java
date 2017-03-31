@@ -54,7 +54,7 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
         String espDir = espParent + "/UEFIESP";
         RootToolsEx.mkdir(espDir, true);
 
-        // restore backups
+        // restore backups, do not restore bootloader
         for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
             if (!entry.isUEFI())
                 continue;
@@ -64,7 +64,7 @@ public class EFIDroidUninstallServiceTask extends ProgressServiceTask {
 
         // remove backups
         for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
-            if (!entry.isUEFI())
+            if (!(entry.isUEFI() || entry.isBootloader()))
                 continue;
 
             RootTools.deleteFileOrDirectory(espDir + "/partition_" + entry.getName() + ".img", false);

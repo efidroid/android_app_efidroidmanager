@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Keep;
 
 import org.efidroid.efidroidmanager.AppConstants;
+import org.efidroid.efidroidmanager.LokiTool;
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
 import org.efidroid.efidroidmanager.Util;
@@ -17,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -114,6 +116,17 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         return downloadDir;
     }
 
+    private void lokiPatchAndFlash(LokiTool.PartitionLabel partition,
+                                   String bootloaderImage, String file) throws Exception {
+        if (bootloaderImage == null)
+            throw new FileNotFoundException("Cannot find backed up bootloader");
+        String patchedFile = file + ".lok";
+        if (!LokiTool.patchImage(partition,bootloaderImage,file,patchedFile))
+            throw new Exception("Loki patching error");
+        if (!LokiTool.flashImage(partition,patchedFile))
+            throw new Exception("Loki flashing patched image error");
+    }
+
     private void doInstall(String updateDir) throws Exception {
         // get esp parent directory
         String espParent = mDeviceInfo.getESPDir(false);
@@ -128,7 +141,7 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
         if (!mInstallationStatus.isInstalled() || mInstallationStatus.isBroken()) {
             // create backups
             for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
-                if (!entry.isUEFI())
+                if (!(entry.isUEFI() || entry.isBootloader())) //also backup bootloader partition
                     continue;
 
                 if (!RootToolsEx.isFile(updateDir + "/" + entry.getName() + ".img"))
@@ -156,8 +169,15 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
                     }
 
                 }
-
                 RootToolsEx.createPartitionBackup(getService(), entry.getBlkDevice(), espDir + "/partition_" + entry.getName() + ".img", -1);
+            }
+        }
+
+        //fetch backed up bootloader image name
+        String bootloaderImage = null;
+        for (FSTabEntry entry : mDeviceInfo.getFSTab().getFSTabEntries()) {
+            if (entry.isBootloader()) {
+                bootloaderImage = espDir + "/partition_" + entry.getName() + ".img";
             }
         }
 
@@ -167,7 +187,17 @@ public class EFIDroidInstallServiceTask extends ProgressServiceTask {
                 continue;
 
             String file = updateDir + "/" + entry.getName() + ".img";
-            RootToolsEx.dd(file, entry.getBlkDevice());
+
+            //if needed, apply LOKI patch to boot and recovery partitions
+            if (entry.getName().equals(LokiTool.PartitionLabel.BOOT.getLabel())) {
+                if (mDeviceInfo.useLoki())
+                    lokiPatchAndFlash(LokiTool.PartitionLabel.BOOT,bootloaderImage,file);
+            } else if (entry.getName().equals(LokiTool.PartitionLabel.RECOVERY.getLabel())) {
+                if (mDeviceInfo.useLoki())
+                    lokiPatchAndFlash(LokiTool.PartitionLabel.RECOVERY,bootloaderImage,file);
+            } else {
+                RootToolsEx.dd(file, entry.getBlkDevice());
+            }
         }
     }
 

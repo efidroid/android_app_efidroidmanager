@@ -11,6 +11,7 @@ public final class AppConstants {
     private static final String URL_EFIDROID_SERVER = "https://raw.githubusercontent.com/efidroid";
 
     public static final String DEVICE_NAME = Build.MANUFACTURER.toLowerCase() + "/" + Build.DEVICE.toLowerCase();
+    public static final String USE_LOKI = "useLoki";
     public static final String SHAREDPREFS_GLOBAL = "org.efidroid.efidroidmanager";
     public static final String SHAREDPREFS_GLOBAL_LAST_DEVICEINFO_UPDATE = "last_deviceinfo_update";
     public static final String SHAREDPREFS_GLOBAL_LAST_APP_VERSION = "last_app_version";
