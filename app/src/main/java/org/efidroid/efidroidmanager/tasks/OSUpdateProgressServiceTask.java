@@ -129,7 +129,7 @@ public class OSUpdateProgressServiceTask extends ProgressServiceTask {
                             try {
                                 long size = partition.getSize();
 
-                                if (partition.getPartitionName().equals("firmware")) {
+                                if ((partition.getPartitionName().equals("firmware")) || (partition.getPartitionName().equals("firmware-modem"))) {
                                     FSTabEntry fsTabEntry = deviceInfo.getFSTab().getEntryByName(partition.getPartitionName());
                                     if (fsTabEntry == null)
                                         throw new Exception("Can't find " + partition.getPartitionName() + "in fstab.multiboot");
