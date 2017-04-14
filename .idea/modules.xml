@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/sub_projects/RootShell/RootShell.iml" filepath="$PROJECT_DIR$/sub_projects/RootShell/RootShell.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sub_projects/RootTools/RootTools.iml" filepath="$PROJECT_DIR$/sub_projects/RootTools/RootTools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android_app_efidroidmanager.iml" filepath="$PROJECT_DIR$/android_app_efidroidmanager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sub_projects/sub_projects.iml" filepath="$PROJECT_DIR$/sub_projects/sub_projects.iml" />
+    </modules>
+  </component>
+</project>
