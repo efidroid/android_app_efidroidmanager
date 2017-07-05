@@ -28,6 +28,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.melnykov.fab.FloatingActionButton;
 
+import org.efidroid.efidroidmanager.AppConstants;
 import org.efidroid.efidroidmanager.DataHelper;
 import org.efidroid.efidroidmanager.R;
 import org.efidroid.efidroidmanager.RootToolsEx;
@@ -49,21 +50,20 @@ public class MainActivity extends AppCompatActivity
         OperatingSystemFragment.OnOperatingSystemFragmentInteractionListener,
         DataHelper.DeviceInfoLoadCallback, InstallFragment.OnInstallFragmentInteractionListener {
 
+    // args
+    private static final String ARG_DEVICE_INFO = "deviceinfo";
+    private static final String ARG_ACTIVEMENU_ID = "activemenu_id";
+    private static final String ARG_HAS_ROOT = "has_root";
+    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
+    private static final String ARG_INSTALL_STATUS = "install_status";
     // status
     private boolean hasRoot = false;
     private boolean mTouchDisabled = false;
     private int mActiveMenuItemId = 0;
     private MenuItem mPreviousMenuItem;
     private AsyncTask<?, ?, ?> mFragmentLoadingTask = null;
-
     // data
     private DeviceInfo mDeviceInfo = null;
-
-    // args
-    private static final String ARG_DEVICE_INFO = "deviceinfo";
-    private static final String ARG_ACTIVEMENU_ID = "activemenu_id";
-    private static final String ARG_HAS_ROOT = "has_root";
-
     // UI
     private NavigationView mNavigationView;
     private FloatingActionButton mFab;
@@ -75,10 +75,10 @@ public class MainActivity extends AppCompatActivity
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private AppBarLayout mAppBarLayout;
     private FrameLayout mToolbarFrameLayout;
-
     // operating systems
     private ArrayList<OperatingSystem> mOperatingSystems;
-    private static final String ARG_OPERATING_SYSTEMS = "operating_systems";
+    // installation
+    private InstallationStatus mInstallStatus = null;
 
     private AsyncTask<Void, Void, Exception> makeOperatingSystemsTask() {
         final ArrayList<OperatingSystem> list = new ArrayList<>();
@@ -157,10 +157,6 @@ public class MainActivity extends AppCompatActivity
             }
         };
     }
-
-    // installation
-    private InstallationStatus mInstallStatus = null;
-    private static final String ARG_INSTALL_STATUS = "install_status";
 
     private AsyncTask<Void, Void, Exception> makeInstallationStatusTask(final InstallFragment.InstallStatusLoadCallback callback) {
         final InstallationStatus installStatus = new InstallationStatus();
@@ -286,13 +282,29 @@ public class MainActivity extends AppCompatActivity
         new MaterialDialog.Builder(this)
                 .title(R.string.error)
                 .content(getString(R.string.cant_load_device_info_check_connection) + e.getLocalizedMessage())
-                .positiveText(R.string.try_again)
+                .positiveText(R.string.try_again).neutralText(R.string.override_ota_server)
                 .cancelable(false).onPositive(new MaterialDialog.SingleButtonCallback() {
             @Override
             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 DataHelper.loadDeviceInfo(MainActivity.this, MainActivity.this);
             }
+        }).onNeutral(new MaterialDialog.SingleButtonCallback() {
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                showOverrideOTAServerDialog();
+            }
         }).show();
+    }
+
+    public void showOverrideOTAServerDialog() {
+        new MaterialDialog.Builder(MainActivity.this).title(R.string.override_ota_server)
+                .input(null, AppConstants.getUrlServerConfig(MainActivity.this), new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        AppConstants.setUrlServerConfig(MainActivity.this, input.toString());
+                        DataHelper.loadDeviceInfo(MainActivity.this, MainActivity.this);
+                    }
+                }).show();
     }
 
     private void onLoadUiData() {
@@ -485,6 +497,10 @@ public class MainActivity extends AppCompatActivity
             } else {
                 fragment = new InstallFragment();
             }
+        } else if (id == R.id.nav_override_ota) {
+            mDrawer.closeDrawer(GravityCompat.START);
+            showOverrideOTAServerDialog();
+            return true;
         }
 
         mActiveMenuItemId = item.getItemId();

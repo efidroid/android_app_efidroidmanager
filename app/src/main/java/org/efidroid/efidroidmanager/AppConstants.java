@@ -8,7 +8,7 @@ import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.types.SystemPropertiesProxy;
 
 public final class AppConstants {
-    private static final String URL_EFIDROID_SERVER = "https://raw.githubusercontent.com/efidroid";
+    private static final String URL_EFIDROID_SERVER = "https://raw.githubusercontent.com/abraha2d";
 
     public static final String DEVICE_NAME = Build.MANUFACTURER.toLowerCase() + "/" + Build.DEVICE.toLowerCase();
     public static final String SHAREDPREFS_GLOBAL = "org.efidroid.efidroidmanager";
@@ -19,11 +19,23 @@ public final class AppConstants {
     public static final String PATH_INTERNAL_FSTAB = "fstab.multiboot";
 
     private static String getUrlServer(Context context) {
-        String url = SystemPropertiesProxy.get(context, "efidroid.server_url", "");
+        String url = getUrlServerConfig(context);
         if (TextUtils.isEmpty(url))
             url = URL_EFIDROID_SERVER;
 
         return url;
+    }
+
+    public static String getUrlServerConfig(Context context) {
+        String url = SystemPropertiesProxy.get(context, "efidroid.server_url", "");
+        if (TextUtils.isEmpty(url))
+            url = SystemPropertiesProxy.get(context, "persist.efidroid.server_url", "");
+
+        return url;
+    }
+
+    public static void setUrlServerConfig(Context context, String serverUrl) {
+        SystemPropertiesProxy.set(context, "persist.efidroid.server_url", serverUrl);
     }
 
     public static String getUrlOta(Context context) {

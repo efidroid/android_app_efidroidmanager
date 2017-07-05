@@ -251,8 +251,12 @@ public class SystemPropertiesProxy {
 
         try {
 
-            @SuppressWarnings("unused")
-            DexFile df = new DexFile(new File("/system/app/Settings.apk"));
+            try {
+                @SuppressWarnings("unused")
+                DexFile df = new DexFile(new File("/system/app/Settings.apk"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             @SuppressWarnings("unused")
             ClassLoader cl = context.getClassLoader();
             @SuppressWarnings("rawtypes")
