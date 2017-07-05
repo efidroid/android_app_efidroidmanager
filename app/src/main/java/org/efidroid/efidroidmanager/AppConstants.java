@@ -8,7 +8,7 @@ import org.efidroid.efidroidmanager.models.DeviceInfo;
 import org.efidroid.efidroidmanager.types.SystemPropertiesProxy;
 
 public final class AppConstants {
-    private static final String URL_EFIDROID_SERVER = "https://raw.githubusercontent.com/efidroid";
+    private static final String URL_EFIDROID_SERVER = "https://raw.githubusercontent.com/abraha2d";
 
     public static final String DEVICE_NAME = Build.MANUFACTURER.toLowerCase() + "/" + Build.DEVICE.toLowerCase();
     public static final String SHAREDPREFS_GLOBAL = "org.efidroid.efidroidmanager";
